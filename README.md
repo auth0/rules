@@ -1,4 +1,4 @@
-rules
+Auth0 Rules Repository
 =====
 
-sample rules
+Here are some common rules for Auth0
