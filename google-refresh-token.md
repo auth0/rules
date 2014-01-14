@@ -8,20 +8,22 @@ The only caveat is that Google will send you the `refresh_token` only once, and 
 
 Here's the rule:
 
-    function (user, context, callback) {
-      
-      // if the user that just logged in has a refresh_token, persist it
-      if (user.refresh_token) {
-        user.persistent.refresh_token = user.refresh_token;
-      }
-      
-      // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.
-      // function encryptAesSha256 (password, textToEncrypt) {
-      //   var cipher = crypto.createCipher('aes-256-cbc', password);
-      //   var crypted = cipher.update(textToEncrypt, 'utf8', 'hex');
-      //   crypted += cipher.final('hex');
-      //   return crypted;
-      // }
-      
-      callback(null, user, context);
-    }
+```js
+function (user, context, callback) {
+  
+  // if the user that just logged in has a refresh_token, persist it
+  if (user.refresh_token) {
+    user.persistent.refresh_token = user.refresh_token;
+  }
+  
+  // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.
+  // function encryptAesSha256 (password, textToEncrypt) {
+  //   var cipher = crypto.createCipher('aes-256-cbc', password);
+  //   var crypted = cipher.update(textToEncrypt, 'utf8', 'hex');
+  //   crypted += cipher.final('hex');
+  //   return crypted;
+  // }
+  
+  callback(null, user, context);
+}
+```
