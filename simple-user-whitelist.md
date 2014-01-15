@@ -1,3 +1,8 @@
+## Simple User Whitelist
+
+This rule will only allow access to users with specific email addresses.
+
+```js
 function (user, context, callback) {
     var whitelist = [ 'user1@mail.com', 'user2@mail.com' ]; //authorized users
     var userHasAccess = whitelist.some(
@@ -11,3 +16,4 @@ function (user, context, callback) {
 
     callback(null, user, context);
 }
+```
