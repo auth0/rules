@@ -23,5 +23,8 @@ A rule will run on Step 4 and this is the information each rule will get:
     * `ip`: the originating IP address of the user trying to log in.
   * `samlConfiguration`: an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for `samlp` and `wsfed` protocol).
 
+This is the rules editor inside Auth0:
+
+![](https://cloudup.com/cCZrpGptHIx+)
 
 [More information about them here](https://docs.auth0.com/rules).
