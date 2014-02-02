@@ -59,6 +59,9 @@ function (user, context, callback) {
 
       });
     }
+    
+    // any other error
+    return callback(new Error('The login returned an unkonwn error. Body: ' + body));
   });
 
 }
