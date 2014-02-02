@@ -59,6 +59,8 @@ function (user, context, callback) {
           return callback(null, user, context);
         }
 
+        return callback(new Error('The login returned an unknown error. Body: ' + body));
+
       });
     }
   });
