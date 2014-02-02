@@ -4,7 +4,6 @@ This rule is used to generate a session token for accessing [Parse API](http://p
 adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls. 
 
 The only way of generating a session token is using the [`login`](https://parse.com/docs/rest#users-login) endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain `session tokens`.
-More information is available in the Appery API: http://docs.appery.io/documentation/backendservices/database/#Signing_in_login
 
 If the user doesn't exist, this rule will auto-provision one, with `email`, `name` or `user_id` as the handle.
 
