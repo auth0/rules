@@ -34,6 +34,7 @@ function (user, context, callback) {
     // user was found, add sessionToken to user profile
     if (response.statusCode === 200) {
       user.appery_session_token = JSON.parse(body).sessionToken;
+      user.appery_userId = JSON.parse(body)._id;
       return callback(null, user, context);
     }
     
@@ -56,6 +57,7 @@ function (user, context, callback) {
         // user created, add sessionToken to user profile
         if (response.statusCode === 200) {
           user.appery_session_token = body.sessionToken;
+          user.appery_userId = body._id;
           return callback(null, user, context);
         }
 
