@@ -5,24 +5,26 @@ This rule gets user information from __rapleaf__ using the e-mail (if available)
 ```
 function (user, context, callback) {
   
+  //Filter by app
+  //if(context.clientName !== 'AN APP') return callback(null, user, context);
+  
   var rapLeafAPIKey = 'YOUR RAPLEAF API KEY';
   
   if(user.email){
     request('https://personalize.rapleaf.com/v4/dr?email=' + 
             encodeURIComponent(user.email) + 
             '&api_key=' + rapLeafAPIKey, 
-            function(e,r,b){  
-              console.log(r.statusCode);
-              if(e) return callback(e);
+            function(err, response, body){  
+              if(err) return callback(err);
               
-              if(r.statusCode===200){
-               user.rapLeafData = JSON.parse(b);
+              if(response.statusCode===200){
+               user.rapLeafData = JSON.parse(body);
               }
               
-              return callback(null,user,context);
+              return callback(null, user, context);
             });
-  }else{
-    return callback(null,user,context);
+  } else {
+    return callback(null, user, context);
   }
 }
 ```
