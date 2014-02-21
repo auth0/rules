@@ -1,7 +1,7 @@
 ## Generate an Appery.io Session Token
 
 This rule is used to generate a session token for accessing [Appery.io Database Services](http://appery.io/). The rule
-adds a new `user.appery_session_token` property set to the user profile containing the Appery session token. Yuo can use this `session token` to make further Appery API calls. 
+adds a new `user.appery_session_token` property set to the user profile containing the Appery.io session token. Yuo can use this `session token` to make further Appery.io API calls. 
 
 The only way of generating a session token is using the [`login`](http://docs.appery.io/documentation/users-rest-api/) endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain `session tokens`. Nobody can see this password since it's hashed on Appery's database. You could rotate it, but in this case, make sure you update the existing users.
 
