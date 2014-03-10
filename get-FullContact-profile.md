@@ -6,16 +6,16 @@ This rule gets the user profile from FullContact using the e-mail (if available)
 function (user, context, callback) {
   
   var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';
-  
+
   if(user.email){
-    request('https://api.fullcontact.com/v2/person.json?email=' + user.email + '&apiKey=' + fullContactAPIKey,
-            function(e,r,b){
-              if(e) return callback(e);
-              if(r.statusCode===200){
-                user.fullContactInfo = JSON.parse(b);
-              }
-              return callback(null, user, context);
-            });
+    request('https://api.fullcontact.com/v2/person.json?email=' + encodeURIComponent(user.email) + '&apiKey=' + fullContactAPIKey,
+          function(e,r,b){
+            if(e) return callback(e);
+            if(r.statusCode===200){
+              user.fullContactInfo = JSON.parse(b);
+            }
+            return callback(null, user, context);
+          });
   }
   else{
     return callback(null, user, context);
