@@ -1,11 +1,19 @@
 ## Querystring
 
-This rule checks if the login transaction includes a query variable called `some_querystring` with a value `whatever` and if it does, it will add an attribute.
+This rule shows how to check for variables in the `querystring`. As an example, the snippet below checks if the login transaction includes a query variable called `some_querystring` with a value `whatever` and if it does, it will add an attribute to the user profile.
 
-For instance, this login request will match the if `https://YOURS.auth0.com/authorize?response_type=code&redirect_uri=CALLBACK&connection=google-oauth2&client_id=YOUR_CLIENTID&some_querystring=whatever`.
+An example of typicall authorization URL:
+```
+https://YOURS.auth0.com/authorize?response_type=code
+                  &redirect_uri=CALLBACK
+                  &connection=google-oauth2
+                  &client_id=YOUR_CLIENTID
+                  &some_querystring=whatever
+```
+  
 The `context.request.query` object is parsed using the `querystring` module <http://nodejs.org/api/querystring.html>
 
-> Note: it works for other protocols as well. E.g. WS-Fed would be `https://YOURS.auth0.com/wsfed?wtrealm=YOUR_APP_REALM&whr=urn:google-oauth2&some_querystring=whatever`
+> Note: this rule works with any protocols supported by Auth0. For example, WS-Fed would be something like: `https://YOURS.auth0.com/wsfed?wtrealm=YOUR_APP_REALM&whr=urn:google-oauth2&some_querystring=whatever`
 
 ```js
 function (user, context, callback) {
