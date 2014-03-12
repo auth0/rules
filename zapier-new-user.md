@@ -1,6 +1,6 @@
 ## Trigger a Zap on New Users
 
-> **What is Zapier?** Zapier is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.
+**What is Zapier?** [Zapier](http://zapier.com) is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.
 
 ![](https://cloudup.com/cgwZds8MjA7+)
 
