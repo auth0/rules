@@ -4,7 +4,7 @@
 
 ![](https://cloudup.com/cgwZds8MjA7+)
 
-This rule will call Zapier static hook every time a new user logs in.
+This rule will call Zapier static hook every time a new user signs up.
 
 ```js
 function (user, context, callback) {
