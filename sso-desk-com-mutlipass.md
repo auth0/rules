@@ -2,7 +2,9 @@
 
 This rule will generate a Multipass URL that can be used for SSO with <desk.com>. The details behind this are documented on [this article](http://dev.desk.com/guides/sso/#what).
 
-After successful login on your application, Auth0 will add the property `desk_login_url` to the user profile object. You can display this URL on your app. When a user follows the link, they will get access to desk.com automatically.  The __User profile__ will contain URL 
+![](https://puu.sh/7rstz)
+
+After successful login on your application, Auth0 will add the property `desk_login_url` to the __user profile__ object. You can display this URL on your app. When a user follows the link, they will get access to desk.com automatically.  
 
 > Note: adjust the expiration of the Multipass so it is aligned with your app.
 
