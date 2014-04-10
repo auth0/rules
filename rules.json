@@ -1,0 +1,242 @@
+[
+  {
+    "title": "Allow Access during weekdays for a specific App",
+    "categories": [
+      "access control"
+    ],
+    "description": "<p>This rule is used to prevent access during weekends for a specific app.</p>\n",
+    "code": "function (user, context, callback) {\n\n  if(context.clientName === 'TheAppToCheckAccessTo')\n  {\n    var d = new Date().getDay();\n\n    if(d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Active Directory group membership",
+    "categories": [
+      "access control"
+    ],
+    "description": "<p>This rule checks if a user belongs to an AD group and if not, it will return Access Denied.</p>\n<blockquote>\n<p>Note: you can mix this with <code>context.clientID</code> or <code>clientName</code> to do it only for specific application</p>\n</blockquote>\n",
+    "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+  },
+  {
+    "title": "Add attributes to a user for specific connection",
+    "categories": [
+      "enrich profile"
+    ],
+    "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won&#39;t be persistede to the user). This is useful for cases where you want to enrich the user information for a specific application.</p>\n",
+    "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    user.vip = true;\n  }\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Add persistent attributes to the user",
+    "categories": [
+      "enrich profile"
+    ],
+    "description": "<p>This rule count the amount of login for each user and store it as a persistent property (i.e. metadata).</p>\n",
+    "code": "function (user, context, callback) {\n  user.loginCount = ++user.loginCount || 1;\n\n  //this makes the property persistent\n  user.persistent.loginCount = user.loginCount;\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Add user roles from a SQL Server database",
+    "categories": [
+      "enrich profile"
+    ],
+    "description": "<p>This rule will query a SQL server database on each login and add a <code>roles</code> array to the user.</p>\n<blockquote>\n<p>Note: you can store the connection string securely on Auth0 encrypted configuration. Also make sure when you call an external endpoint to open your firewall/ports to our IP address which you can find it in the rules editor. This happens when you query SQL Azure for example.</p>\n</blockquote>\n",
+    "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n\n  // Queries a table by e-mail and returns associated 'Roles'\n  function getRoles(email, done) {\n    var connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    });\n\n    var query = \"SELECT Email, Role \" +\n                \"FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', function (err) {\n      if (err) return done(new Error(err));\n\n      var request = new sqlserver.Request(query, function (err, rowCount, rows) {\n        if (err) return done(new Error(err));\n\n        var roles = rows.map(function (row) {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}"
+  },
+  {
+    "title": "Generate an Appery.io Session Token",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule is used to generate a session token for accessing <a href=\"http://appery.io/\">Appery.io Database Services</a>. The rule\nadds a new <code>user.appery_session_token</code> property set to the user profile containing the Appery.io session token. Yuo can use this <code>session token</code> to make further Appery.io API calls.</p>\n<p>The only way of generating a session token is using the <a href=\"http://docs.appery.io/documentation/users-rest-api/\"><code>login</code></a> endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain <code>session tokens</code>. Nobody can see this password since it&#39;s hashed on Appery&#39;s database. You could rotate it, but in this case, make sure you update the existing users.</p>\n<p>More information is available in the Appery API: <a href=\"http://docs.appery.io/documentation/backendservices/database/#Signing_in_login\">http://docs.appery.io/documentation/backendservices/database/#Signing_in_login</a></p>\n<p>If the user doesn&#39;t exist, this rule will auto-provision one, with <code>email</code>, <code>name</code> or <code>user_id</code> as the handle.</p>\n",
+    "code": "function (user, context, callback) {\n  // run this only for the Appery application\n  // if (context.clientID !== 'APPERY CLIENT ID IN AUTH0') return callback(null, user, context);\n\n  var APPERY_DATABASE_ID = '<APPERY_DATABASE_ID>';\n  var PASSWORD_SECRET = 'A REALLY LONG PASSWORD';         // you can use this to generate one http://www.random.org/strings/\n  var username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db\n\n  request.get({\n    url: 'https://api.appery.io/rest/1/db/login',\n    qs: {\n      username: username,\n      password: PASSWORD_SECRET\n    },\n    headers: {\n      'X-Appery-Database-Id': APPERY_DATABASE_ID\n    }\n  },\n  function (err, response, body) {\n    if (err) return callback(err);\n\n    // user was found, add sessionToken to user profile\n    if (response.statusCode === 200) {\n      user.appery_session_token = JSON.parse(body).sessionToken;\n      user.appery_userId = JSON.parse(body)._id;\n      return callback(null, user, context);\n    }\n\n    // user don't exist, create it\n    if (response.statusCode === 404) {\n      console.log('not found');\n      request.post({\n        url: 'https://api.appery.io/rest/1/db/users',\n        json: {\n          username: username,\n          password: PASSWORD_SECRET\n        },\n        headers: {\n          'X-Appery-Database-Id': APPERY_DATABASE_ID\n        }\n      },\n      function (err, response, body) {\n        if (err) return callback(err);\n\n        // user created, add sessionToken to user profile\n        if (response.statusCode === 200) {\n          user.appery_session_token = body.sessionToken;\n          user.appery_userId = body._id;\n          return callback(null, user, context);\n        }\n\n        return callback(new Error('The login returned an unknown error. Body: ' + body));\n\n      });\n    }\n  });\n\n}"
+  },
+  {
+    "title": "Creates a new Lead in Salesforce on First Login",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the <code>resource owner</code> flow to obtain an <code>access_token</code>. The username you use to authenticate the API will appear as the <strong>creator</strong> of the lead. </p>\n<blockquote>\n<p>Note: this sample implements very basic error handling.</p>\n</blockquote>\n",
+    "code": "function (user, context, callback) {\n\n  if(user.recordedAsLead){\n    return callback(null,user,callback);\n    }\n\n  getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD, \n              function(e,r){\n                      if( e ) return callback(e);\n\n                      createLead( r.instance_url, r.access_token, function(e,result){\n                          if(e) return callback(e);\n              user.persistent.recordedAsLead = true;\n              return callback(null,user,context);\n                      });\n                  });\n\n  //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm\n  function createLead(url,access_token, callback){\n\n    //Can use many more fields\n    var data = {\n          LastName: user.name,\n          Company: 'Web channel signups'\n      };\n\n      request.post({\n          url: url + \"/services/data/v20.0/sobjects/Lead/\",\n          headers: {\n              \"Authorization\": \"OAuth \" + access_token,\n              \"Content-type\": \"application/json\"\n          },\n          body: JSON.stringify(data)\n          }, function(e,r,b){\n              if(e) return callback(e);\n              return callback(null,b);\n          });\n  }\n\n  //Obtains a SFCOM access_token with user credentials\n  function getAccessToken(client_id, client_secret, username, password, callback){\n      request.post({\n          url: 'https://login.salesforce.com/services/oauth2/token',\n          form: {\n              grant_type: 'password',\n              client_id: client_id,\n              client_secret: client_secret,\n              username: username,\n              password: password\n          }}, function(e,r,b){\n              if(e) return callback(e);\n              return callback(null,JSON.parse(b));\n          });\n  }\n}"
+  },
+  {
+    "title": "Access denied based on a Dropbox whitelist",
+    "categories": [
+      "access control"
+    ],
+    "description": "<p>This rule denies access to a user based on a list of emails stored in Dropbox.</p>\n",
+    "code": "function (user, context, callback) {\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/21665105/users.txt'\n  },\n  function (err, response, body) {\n    var whitelist = body.split('\\r\\n');\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}"
+  },
+  {
+    "title": "Generate a custom token for Firebase authentication",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule is used to generate a custom authetication token for accessing Firebase. The rule\nadds a new <code>user.firebase</code> property set to the user profile containing the following:</p>\n<ul>\n<li><code>user.firebase.fb_id</code> : a base64 encoded string based on the <code>user.user_id</code> unique property</li>\n<li><code>user.firebase.access_token</code> : the signed token that can be used to authenticate to Firebase</li>\n<li><code>user.firebase.expiry</code> : the number of seconds from epoch indicating the Date/Time the access token expires</li>\n</ul>\n<p>More information is available in the Firebase API: <a href=\"https://www.firebase.com/docs/security/custom-login.html\">Custom Token Generation</a></p>\n",
+    "code": "function (user, context, callback) {\n\n  function calcEpochTime(seconds) {\n    // calculate expiry for 24 hours as number of seconds from epoch\n    var currentTime = Math.floor(new Date().getTime() / 1000);\n    var addSeconds = seconds || 0;\n    return currentTime + addSeconds;\n  }\n\n  function encode(str, format) {\n    var encoded = new Buffer(str, format).toString('base64');\n    return encoded.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n  }\n\n  function createToken(secret, data, issue, expiry) {\n    var TOKEN_SEP = \".\";\n    var TOKEN_VERSION = 0;\n\n    var header = {\"typ\":\"JWT\",\"alg\":\"HS256\"};\n    var iat = issue || calcEpochTime();\n    var exp = expiry || iat + (24 * 3600);\n    var claims = {\"v\":TOKEN_VERSION,\"iat\":iat,\"exp\":exp,\"d\":data};\n\n    // encode headers and claims\n    var encodedHeader = encode(JSON.stringify(header));\n    var encodedClaims = encode(JSON.stringify(claims));\n    var token = encodedHeader + TOKEN_SEP + encodedClaims;\n\n    // sign the token\n    var hmac = crypto.createHmac('sha256', secret).update(token);\n    var hashBytes = hmac.digest('binary');\n    var sig = encode(hashBytes, 'binary');\n    var signedToken = encodedHeader + TOKEN_SEP + encodedClaims + TOKEN_SEP + sig;\n\n    return signedToken;\n  }\n\n  // read the stored Firebase secret required to sign\n  // the access token\n  var secret = configuration.FIREBASE_SECRET;\n\n  // generate a unique Firebase id by base64 encoding\n  // the user profile 'user.user_id\" claim\n  var fb_id = new Buffer(user.user_id).toString('base64');\n\n  // create the data that we want to be added to the token\n  // this data is available in Firebase rules\n  var data = {\n    \"fb_id\": fb_id,\n    \"user_id\": user.user_id,\n    \"name\" : user.name, \n    \"email\": user.email\n  };\n\n  // generate issue and expiry date/times (seconds from epoch)\n  var issue = calcEpochTime();\n  var expiry = issue + (24 * 3600);\n\n  // generate the signed token\n  var accessToken = createToken(secret, data, issue, expiry);\n\n  // add a firebase claim to the user profile\n  user.firebase = {\n    \"fb_id\": fb_id,\n    \"access_token\": accessToken,\n    \"expiry\": expiry\n  };\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Get a FullContact Profile based on User email",
+    "categories": [
+      "enrich profile"
+    ],
+    "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user profile and returns. Any other conditions are ignored. See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>\n",
+    "code": "function (user, context, callback) {\n\n  var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';\n\n  if(user.email){\n    request('https://api.fullcontact.com/v2/person.json?email=' + encodeURIComponent(user.email) + '&apiKey=' + fullContactAPIKey,\n          function(e,r,b){\n            if(e) return callback(e);\n            if(r.statusCode===200){\n              user.fullContactInfo = JSON.parse(b);\n            }\n            return callback(null, user, context);\n          });\n  }\n  else{\n    return callback(null, user, context);\n  }\n}"
+  },
+  {
+    "title": "Get rapleaf user info based on User email and add it to user profile",
+    "categories": [
+      "enrich profile"
+    ],
+    "description": "<p>This rule gets user information from <strong>rapleaf</strong> using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>rapLeafInfo</code> to the user profile and returns. Any other conditions are ignored. See <a href=\"http://www.rapleaf.com/developers/personalization-api/\">RapLeaf docs</a> for full details.</p>\n",
+    "code": "function (user, context, callback) {\n\n  //Filter by app\n  //if(context.clientName !== 'AN APP') return callback(null, user, context);\n\n  var rapLeafAPIKey = 'YOUR RAPLEAF API KEY';\n\n  if(user.email){\n    request('https://personalize.rapleaf.com/v4/dr?email=' +\n            encodeURIComponent(user.email) +\n            '&api_key=' + rapLeafAPIKey,\n            function(err, response, body){\n              if(err) return callback(err);\n\n              if(response.statusCode===200){\n               user.rapLeafData = JSON.parse(body);\n              }\n\n              return callback(null, user, context);\n            });\n  } else {\n    return callback(null, user, context);\n  }\n}"
+  },
+  {
+    "title": "Storing Google Refresh Token",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>In some scenarios, you might want to access Google APIs from your application. You do that by using the <code>access_token</code> stored on the <code>identities</code> array (<code>user.identities[0].access_token</code>). However <code>access_token</code>s have an expiration and in order to get a new one, you have to ask the user to login again. That&#39;s why Google allows asking for a <code>refresh_token</code> that can be used forever (until the user revokes it) to obtain new <code>access_tokens</code> without requiring the user to relogin.</p>\n<p>The way you ask for a <code>refresh_token</code> is by sending the <code>access_type=offline</code> as an extra parameter as <a href=\"https://docs.auth0.com/login-widget2#6\">explained here</a>.</p>\n<p>The only caveat is that Google will send you the <code>refresh_token</code> only once, and if you haven&#39;t stored it, you will have to ask for it again and add <code>approval_prompt=force</code> so the user explicitly consent again. Since this would be annoying from a user experience perspective, you should store the refresh token on Auth0 as a persistent property of the user, only if it there is a new one available.</p>\n<p>Here&#39;s the rule:</p>\n",
+    "code": "function (user, context, callback) {\n\n  // if the user that just logged in has a refresh_token, persist it\n  if (user.refresh_token) {\n    user.persistent.refresh_token = user.refresh_token;\n  }\n\n  // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.\n  // function encryptAesSha256 (password, textToEncrypt) {\n  //   var cipher = crypto.createCipher('aes-256-cbc', password);\n  //   var crypted = cipher.update(textToEncrypt, 'utf8', 'hex');\n  //   crypted += cipher.final('hex');\n  //   return crypted;\n  // }\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Generate a JSON Web Token",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule generates a signed JSON Web Token based on the <code>user</code> object. Useful when using other protocols like SAML or WS-Federation and you need to call a downstream API that accepts JSON Web Tokens. The <code>id_token</code> will be part of the user profile, which will be translated to a SAML Attribute.</p>\n",
+    "code": "function (user, context, callback) {\n  var CLIENT_SECRET = 'YOUR_CLIENT_SECRET';\n  user.id_token = jwt.sign(user, new Buffer(CLIENT_SECRET, 'base64'));\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Tracks Logins in MixPanel",
+    "categories": [
+      "webhooks"
+    ],
+    "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property. See <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>\n",
+    "code": "function (user, context, callback) {\n\n  var mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": YOUR_MIXPANEL_TOKEN,\n        \"application\": context.clientName\n    }\n  };\n\n  var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get('http://api.mixpanel.com/track/?data=' + base64Event,\n              function(e,r,b){\n                  callback(null,user,context);\n              });\n}"
+  },
+  {
+    "title": "Generate an Parse Session Token",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule is used to generate a session token for accessing <a href=\"http://parse.com/\">Parse API</a>. The rule\nadds a new <code>user.parse_session_token</code> property set to the user profile containing the Parse session token. You can use this <code>session token</code> to make further Parse API calls. </p>\n<p>The only way of generating a session token is using the <a href=\"https://parse.com/docs/rest#users-login\"><code>login</code></a> endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain <code>session tokens</code>.</p>\n<p>If the user doesn&#39;t exist, this rule will auto-provision one, with <code>email</code>, <code>name</code> or <code>user_id</code> as the handle.</p>\n<p>&lt;img src=&quot;https://docs.google.com/drawings/d/1vCyhpNkW2rOktXI5bp4sogmR6p8qBqJeJY-A5vfHA8c/pub?w=1219&amp;h=558&quot;&gt;</p>\n",
+    "code": "function rule(user, context, callback) {\n  // run this only for the Parse application\n  // if (context.clientID !== 'PARSE CLIENT ID IN AUTH0') return callback(null, user, context);\n\n  var PARSE_APP_ID = 'PLACE HERE YOUR PARSE APP ID';\n  var PARSE_API_KEY = 'PLACE HERE YOUR PARSE REST API KEY';\n  var PARSE_USER_PASSWORD = 'PARSE_USER_MASTER_KEY'; // you can use this to generate one http://www.random.org/strings/\n\n  var username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db\n\n  request.get({\n    url: 'https://api.parse.com/1/login',\n    qs: {\n      username: username,\n      password: PARSE_USER_PASSWORD\n    },\n    headers: {\n      'X-Parse-Application-Id': PARSE_APP_ID,\n      'X-Parse-REST-API-Key': PARSE_API_KEY\n    }\n  }, \n  function (err, response, body) {\n    if (err) return callback(err);\n\n    // user was found, add sessionToken to user profile\n    if (response.statusCode === 200) {\n      user.parse_session_token = JSON.parse(body).sessionToken;\n      return callback(null, user, context);\n    }\n\n    // Not found. Likely the user doesn't exist, we provision one\n    if(response.statusCode === 404) {\n      request.post({\n        url: 'https://api.parse.com/1/users',\n        json: {\n          username: username,\n          password: PARSE_USER_PASSWORD\n        },\n        headers: {\n          'X-Parse-Application-Id': PARSE_APP_ID,\n          'X-Parse-REST-API-Key': PARSE_API_KEY,\n          'Content-Type': 'application/json'\n        }\n      }, \n      function (err, response, body) {\n        if (err) return callback(err);\n\n        // user created, add sessionToken to user profile\n        if (response.statusCode === 201) {\n          user.parse_session_token = body.sessionToken;\n          return callback(null, user, context);\n        }\n        return callback(new Error('The user provisioning returned an unkonwn error. Body: ' + JSON.stringify(body)));\n      });\n    }\n    else\n    {\n      return callback(new Error('The login returned an unkonwn error. Status: ' + response.statusCode + 'Body: ' + body));\n    }\n  });\n}"
+  },
+  {
+    "title": "Querystring",
+    "categories": [
+      "enrich profile"
+    ],
+    "description": "<p>This rule shows how to check for variables in the <code>querystring</code>. As an example, the snippet below checks if the login transaction includes a query variable called <code>some_querystring</code> with a value <code>whatever</code> and if it does, it will add an attribute to the user profile.</p>\n<p>An example of typicall authorization URL:</p>\n<p>The <code>context.request.query</code> object is parsed using the <code>querystring</code> module <a href=\"http://nodejs.org/api/querystring.html\">http://nodejs.org/api/querystring.html</a></p>\n<blockquote>\n<p>Note: this rule works with any protocols supported by Auth0. For example, WS-Fed would be something like: <code>https://YOURS.auth0.com/wsfed?wtrealm=YOUR_APP_REALM&amp;whr=urn:google-oauth2&amp;some_querystring=whatever</code></p>\n</blockquote>\n",
+    "code": "https://YOURS.auth0.com/authorize?response_type=code\n                  &redirect_uri=CALLBACK\n                  &connection=google-oauth2\n                  &client_id=YOUR_CLIENTID\n                  &some_querystring=whatever"
+  },
+  {
+    "title": "Remove attributes from a user",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>Sometimes you don&#39;t need every attribute from the user. You can use a rule to delete attributes.</p>\n",
+    "code": "function (user, context, callback) {\n  delete user.some_attribute;\n\n  // another option would be to define a whitelist of attributes you want, \n  // instead of delete the ones you don't want\n  /* \n  var whitelist = ['email', 'name', 'identities'];\n  Object.keys(user).forEach(function(key) {\n    console.log(whitelist.indexOf(key));\n    if (whitelist.indexOf(key) === -1) delete user[key];\n  });\n  */\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "SAML Attributes mapping",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attrbiutes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, look at <a href=\"https://docs.auth0.com/saml-configuration\">https://docs.auth0.com/saml-configuration</a>.</p>\n",
+    "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\"\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\"\n  };\n\n  callback(null, user, context)\n}"
+  },
+  {
+    "title": "Send events to Keen.io",
+    "categories": [
+      "webhooks"
+    ],
+    "description": "<p>This rule is used to send a <code>signup</code> event to <a href=\"http://keen.io\">Keen IO</a></p>\n<p>The rule checks whether the user has already signed up before or not. This is tracked by the persistent <code>user.signedUp</code> property. If the property is present, everything else is skipped.\nIf not, then we POST a new event with some information to a <code>signups Collection</code> on Keen IO.</p>\n<p>Once enabled, events will be displayed on Keen IO dashboard:\n<img src=\"http://puu.sh/7k4qN.png\" alt=\"\"></p>\n",
+    "code": "function(user, context, callback) {\n\n  if(user.signedUp){\n    return callback(null, user, context);\n  }\n\n  var writeKey = 'YOUR KEEN IO WRITE KEY';\n  var projectId = 'YOUR KEEN IO PROJECT ID';\n  var eventCollection = 'signups';\n\n  var keenEvent = {\n    userId: user.user_id,\n    name: user.name,\n    ip: context.request.ip //Potentially any other properties in the user profile/context\n  };\n\n  request.post({\n      method: 'POST',\n      url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,\n      headers: {\n        'Content-type': 'application/json',\n      },\n      body: JSON.stringify(keenEvent),\n      },\n      function (e, r, body) {\n        if( e ) return callback(e,user,context);\n        //We assume everything went well\n        user.persistent.signedUp = true;\n        return callback(null, user, context);\n       });\n\n}"
+  },
+  {
+    "title": "Send events to segment.io",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule is used to send two differen events to <a href=\"http://segment.io\">segment.io</a> </p>\n<p>The rule checks whether the user has already signed up before or not. This is tracked by the persistent <code>user.signedUp</code> property. If the property is present then we assume this is a <strong>login</strong> event, otherwise we assume a new <strong>signup</strong>.</p>\n<p>The <code>sendEvent</code> function is a simple wrapper around the <a href=\"https://segment.io/libraries/rest-api#track\">segment.io Track REST API</a> which is trivial to call using the provided <code>request</code> module. Notice we are also sending some additional contextual information: the IP address and User Agent of the user.</p>\n",
+    "code": "function(user, context, callback) {\n\n  if(user.signedUp){\n    sendEvent('login');\n  } else {\n    sendEvent('signup');  \n  }\n\n  function sendEvent(e)\n  {\n    var sioTrack =  \n    {\n      secret: \"YOUR SEGMENTIO SECRET\",\n      userId: user.user_id,\n      event: e,\n      properties: {\n        application: context.clientName,\n        ip: context.ip,\n        agent: context.userAgent\n      },\n      context: {\n        \"providers\" : { \"all\": false }\n      }\n    };\n\n    request({\n      method: 'POST',\n      url: '  https://api.segment.io/v1/track',\n      headers: {\n        'Content-type': 'application/json',\n      },\n      body: JSON.stringify(sioTrack),\n    }, \n    function (err, response, body) {\n      if(err) return callback(err, user, context);\n      if(e === 'signup'){ user.persistent.signedUp = true; }\n      callback(null, user, context);\n    });\n  }\n}"
+  },
+  {
+    "title": "Detect whether it's a first time login/signup",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule will create a persistent property <code>signed_up</code> when the user logs in for the first time (i.e. a new user). The next time the user logs in, this rule will be skipped.</p>\n",
+    "code": "function (user, context, callback) {\n  // short-circuit if the user signed up already\n  if (user.signed_up) return callback(null, user, context);\n\n  // first time login/signup\n\n  user.persistent.signed_up = true;\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Simple User Whitelist for a Specific App",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule will only allow access to users with specific email addresses on a specific app.</p>\n",
+    "code": "function (user, context, callback) {\n\n    if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n      return callback(null, user, context); \n    }\n\n    var whitelist = [ 'user1@mail.com', 'user2@mail.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) { \n        return email === user.email; \n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+  },
+  {
+    "title": "Simple User Whitelist",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule will only allow access to users with specific email addresses.</p>\n",
+    "code": "function (user, context, callback) {\n    var whitelist = [ 'user1@mail.com', 'user2@mail.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) { \n        return email === user.email; \n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+  },
+  {
+    "title": "Simple User Whitelist for Users of a Specific Connection",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).</p>\n",
+    "code": "function (user, context, callback) {\n\n    // We check users only authenticated with 'fitbit'\n    if(context.connection === 'fitbit'){\n\n      var whitelist = [ 'user1', 'user2' ]; //authorized users\n      var userHasAccess = whitelist.some(\n        function (name) { \n          return name === user.name; \n        });\n\n      if (!userHasAccess) {\n        return callback(new UnauthorizedError('Access denied.'));\n      }\n    }\n\n    callback(null, user, context);\n}"
+  },
+  {
+    "title": "Query a SOAP Web Service",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule shows how to query a basic profile http binding SOAP web service for roles and add those to the user.</p>\n",
+    "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n\n  function getRoles(callback) {\n    request.post({\n      url:  'https://somedomain.com/RoleService.svc',\n      body: '<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><GetRolesForCurrentUser xmlns=\"http://tempuri.org\"/></s:Body></s:Envelope>',\n      headers: { 'Content-Type': 'text/xml; charset=utf-8',\n              'SOAPAction': http://tempuri.org/RoleService/GetRolesForCurrentUser' }\n    }, function (err, response, body) {\n      if (err) return callback(err);\n\n      var parser = new xmldom.DOMParser();\n      var doc = parser.parseFromString(body);\n      var roles = xpath.select(\"//*[local-name(.)='string']\", doc).map(function(node) { return node.textContent; });\n      return callback(null, roles);\n    });\n  }\n}"
+  },
+  {
+    "title": "Tracks Logins/SignUps with Splunk",
+    "categories": [
+      "default"
+    ],
+    "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>Events will show up on the Splunk console shortly after user access:</p>\n<p><img src=\"http://puu.sh/7R1EW.png\" alt=\"\"></p>\n",
+    "code": "function(user, context, callback) {\n\n  var splunkBaseUrl = 'YOUR SPLUNK SERVER, like: https://your server:8089';\n\n  //Add any interesting info to the event\n  var event = {\n    message: user.signedUp ? 'Login' : 'SignUp',\n    application: context.clientName,\n    clientIP: context.request.ip,\n    protocol: context.protocol,  \n    userName: user.name,\n    userId: user.user_id\n  };\n\n  request.post( {\n                  url: splunkBaseUrl + '/services/receivers/simple?source=auth0&sourcetype=auth0_activity',\n                  auth: {\n                      'user': 'YOUR SPLUNK USER',\n                      'pass': 'YOUR SPLUNK PASSWORD',\n                    },\n                  body: JSON.stringify(event)\n                },\n                function(e,r,b) {\n                    if( e ) return callback(e);\n                    if( r.statusCode !== 200 ) return callback('Invalid operation');\n                    user.persistent.signedUp = true;\n                    return callback(e,user,context);\n                 });\n}"
+  },
+  {
+    "title": "SSO with desk.com via Multipass",
+    "categories": [
+      "third party"
+    ],
+    "description": "<p>This rule will generate a Multipass URL that can be used for SSO with &lt;desk.com&gt;. The details behind this are documented on <a href=\"http://dev.desk.com/guides/sso/#what\">this article</a>.</p>\n<p><img src=\"https://puu.sh/7rstz\" alt=\"\"></p>\n<p>After successful login on your application, Auth0 will add the property <code>desk_login_url</code> to the <strong>user profile</strong> object. You can display this URL on your app. When a user follows the link, they will get access to desk.com automatically.</p>\n<blockquote>\n<p>Note: adjust the expiration of the Multipass so it is aligned with your app.</p>\n</blockquote>\n",
+    "code": "function (user, context, callback) {\n\n  var deskSubDomain = 'YOUR DESK SUBDOMAIN'; //https://{subdomain}.desk.com\n  var deskAPIKey = 'YOUR DESK MULTIPASS API KEY';\n\n  //Mutipass with a 5 min expiration\n  var deskToken = {\n    \"uid\": user.user_id,\n    \"expires\": (new Date(new Date().getTime() + (5 * 60 * 1000))).toISOString(),\n    \"customer_email\": user.email,\n    \"customer_name\": user.name\n  };\n\n  var mp = multipass(deskToken, deskAPIKey, deskSubDomain);\n  var signature = sign(deskAPIKey, mp);\n\n  user.desk_login_url = 'https://' + deskSubDomain + '.desk.com/customer/authentication/multipass/callback?multipass=' + encodeURIComponent(mp) + '&signature=' + encodeURIComponent(signature);\n\n  function sign(key, multipass)\n  {\n    var sha1 = crypto.createHmac('sha1',key);\n    return sha1.update(multipass).digest('base64');\n  }\n\n  function multipass(jsonData, apiKey, site) {\n    var data = new Buffer(JSON.stringify(jsonData), 'utf8');\n    var key = crypto.createHash('sha1').update(apiKey + site).digest('binary').substring(0, 16);\n    var iv = new Buffer('OpenSSL for Ruby', 'utf8');\n\n    var pad = 16 - (data.length % 16),\n        paddedData = new Buffer(data.length + pad);\n    data.copy(paddedData);\n    for (var i = data.length, len = paddedData.length; i < len; ++i) {\n      paddedData[i] = pad;\n    }\n    // Encrypt with AES\n    var cipher = crypto.createCipheriv('aes-128-cbc', key, iv);\n    cipher.setAutoPadding(false);\n    var token = cipher.update(paddedData);\n\n    var mp = Buffer.concat([iv, token]);\n\n    return mp.toString('base64');\n  }\n\n  callback(null, user, context);\n}"
+  },
+  {
+    "title": "Update user profile identity in Firebase",
+    "categories": [
+      "webhooks"
+    ],
+    "description": "<p>This rule is used to create or update identity information for a user profile\nstored in Firebase using the Firebase REST API. The unique <code>user.user_id</code> is\nbase64 encoded to provide a unique generated key for the user.</p>\n<p>Each time the user logs into the system, properties of their user\nprofile can updated in Firebase to keep identity properties (like\nname, email, etc) in sync with authentication credentials.</p>\n<p>You can find more information in the Firebase API: <a href=\"https://www.firebase.com/docs/rest-api.html\">REST API</a></p>\n",
+    "code": "function (user, context, callback) {\n\n  var baseURL = configuration.FIREBASE_URL;\n  var secret = configuration.FIREBASE_SECRET;\n  var fb_id = new Buffer(user.user_id).toString('base64');\n\n  var fbIdentity = {\n    \"identity\": {\n      \"user_id\": user.user_id,\n      \"email\": user.email,\n      \"name\": user.name,\n      \"nickname\": user.nickname,\n      \"picture\": user.picture\n    }\n  };\n\n  var putURL = baseURL + \"/users/\" + fb_id + \".json?auth=\" + secret;\n  request.put({\n    \"url\": putURL,\n    \"json\": fbIdentity\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    return callback(null, user, context);\n  });\n}"
+  },
+  {
+    "title": "Trigger a Zap on Every User Login",
+    "categories": [
+      "webhooks"
+    ],
+    "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/iGyywQuJqIb+\" alt=\"\"></p>\n<p>This rule will call Zapier static hook every time a user logs in.</p>\n",
+    "code": "function (user, context, callback) {\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n  var payload_to_zap = extend({}, user, small_context);\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    // swallow error\n    callback(null, user, context);\n  });\n\n  function extend(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i],\n          keys = Object.keys(source);\n\n      for (var j = 0; j < keys.length; j++) {\n          var name = keys[j];\n          target[name] = source[name];\n      }\n    }\n    return target;\n  }\n}"
+  },
+  {
+    "title": "Trigger a Zap on New Users",
+    "categories": [
+      "webhooks"
+    ],
+    "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/cgwZds8MjA7+\" alt=\"\"></p>\n<p>This rule will call Zapier static hook every time a new user signs up.</p>\n",
+    "code": "function (user, context, callback) {\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  // short-circuit if the user signed up already\n  if (user.signed_up) return callback(null, user, context);\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n  var payload_to_zap = extend({}, user, small_context);\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    // swallow error\n    // mark the user as `signed_up` so next time the rule does not execute\n    user.persistent.signed_up = true;\n    callback(null, user, context);\n  });\n\n  function extend(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i],\n          keys = Object.keys(source);\n\n      for (var j = 0; j < keys.length; j++) {\n          var name = keys[j];\n          target[name] = source[name];\n      }\n    }\n    return target;\n  }\n}"
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "name": "rules",
+  "version": "0.0.0",
+  "description": "Auth0 Rules Repository =====",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/auth0/rules.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/auth0/rules/issues"
+  },
+  "homepage": "https://github.com/auth0/rules",
+  "dependencies": {
+    "marked": "^0.3.2",
+    "js-yaml": "^3.0.2",
+    "async": "^0.7.0"
+  }
+}

@@ -1,4 +1,8 @@
-## Access denied based on Active Directory group membership
+---
+categories:
+- access control
+---
+## Active Directory group membership
 
 This rule checks if a user belongs to an AD group and if not, it will return Access Denied.
 
@@ -8,8 +12,8 @@ This rule checks if a user belongs to an AD group and if not, it will return Acc
 function (user, context, callback) {
     var groupAllowed = 'group1';
     var userHasAccess = user.groups.some(
-      function (group) { 
-        return groupAllowed === group; 
+      function (group) {
+        return groupAllowed === group;
       });
 
     if (!userHasAccess) {

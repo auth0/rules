@@ -1,3 +1,7 @@
+---
+categories:
+- webhooks
+---
 ## Tracks Logins in MixPanel
 
 This rule will send a `Sign In` event to MixPanel, and will include the application the user is signing in to as a property. See [MixPanel HTTP API](https://mixpanel.com/help/reference/http) for more information.
@@ -16,7 +20,7 @@ function (user, context, callback) {
   };
 
   var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');
-  
+
   request.get('http://api.mixpanel.com/track/?data=' + base64Event,
               function(e,r,b){
                   callback(null,user,context);

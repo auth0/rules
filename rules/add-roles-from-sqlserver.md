@@ -1,3 +1,7 @@
+---
+categories:
+- enrich profile
+---
 ## Add user roles from a SQL Server database
 
 This rule will query a SQL server database on each login and add a `roles` array to the user.

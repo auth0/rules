@@ -1,18 +1,19 @@
-## Trigger a Zap on New Users
+---
+categories:
+- webhooks
+---
+## Trigger a Zap on Every User Login
 
 **What is Zapier?** [Zapier](http://zapier.com) is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.
 
-![](https://cloudup.com/cgwZds8MjA7+)
+![](https://cloudup.com/iGyywQuJqIb+)
 
-This rule will call Zapier static hook every time a new user signs up.
+This rule will call Zapier static hook every time a user logs in.
 
 ```js
 function (user, context, callback) {
   var ZAP_HOOK_URL = 'REPLACE_ME';
 
-  // short-circuit if the user signed up already
-  if (user.signed_up) return callback(null, user, context);
-  
   var small_context = {
     appName: context.clientName,
     userAgent: context.userAgent,
@@ -24,14 +25,12 @@ function (user, context, callback) {
   request.post({
     url: ZAP_HOOK_URL,
     json: payload_to_zap
-  }, 
+  },
   function (err, response, body) {
     // swallow error
-    // mark the user as `signed_up` so next time the rule does not execute
-    user.persistent.signed_up = true;
     callback(null, user, context);
   });
-  
+
   function extend(target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i],
