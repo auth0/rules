@@ -1,8 +1,3 @@
----
-gallery: true
-categories:
-- third party
----
 ## SSO with desk.com via Multipass
 
 This rule will generate a Multipass URL that can be used for SSO with <desk.com>. The details behind this are documented on [this article](http://dev.desk.com/guides/sso/#what).

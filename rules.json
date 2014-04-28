@@ -197,18 +197,5 @@
         "code": "function (user, context, callback) {\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  // short-circuit if the user signed up already\n  if (user.signed_up) return callback(null, user, context);\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n  var payload_to_zap = extend({}, user, small_context);\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    // swallow error\n    // mark the user as `signed_up` so next time the rule does not execute\n    user.persistent.signed_up = true;\n    callback(null, user, context);\n  });\n\n  function extend(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i],\n          keys = Object.keys(source);\n\n      for (var j = 0; j < keys.length; j++) {\n          var name = keys[j];\n          target[name] = source[name];\n      }\n    }\n    return target;\n  }\n}"
       }
     ]
-  },
-  {
-    "name": "third party",
-    "templates": [
-      {
-        "title": "SSO with desk.com via Multipass",
-        "categories": [
-          "third party"
-        ],
-        "description": "<p>This rule will generate a Multipass URL that can be used for SSO with &lt;desk.com&gt;. The details behind this are documented on <a href=\"http://dev.desk.com/guides/sso/#what\">this article</a>.</p>\n<p><img src=\"https://puu.sh/7rstz\" alt=\"\"></p>\n<p>After successful login on your application, Auth0 will add the property <code>desk_login_url</code> to the <strong>user profile</strong> object. You can display this URL on your app. When a user follows the link, they will get access to desk.com automatically.</p>\n<blockquote>\n<p>Note: adjust the expiration of the Multipass so it is aligned with your app.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n\n  var deskSubDomain = 'YOUR DESK SUBDOMAIN'; //https://{subdomain}.desk.com\n  var deskAPIKey = 'YOUR DESK MULTIPASS API KEY';\n\n  //Mutipass with a 5 min expiration\n  var deskToken = {\n    \"uid\": user.user_id,\n    \"expires\": (new Date(new Date().getTime() + (5 * 60 * 1000))).toISOString(),\n    \"customer_email\": user.email,\n    \"customer_name\": user.name\n  };\n\n  var mp = multipass(deskToken, deskAPIKey, deskSubDomain);\n  var signature = sign(deskAPIKey, mp);\n\n  user.desk_login_url = 'https://' + deskSubDomain + '.desk.com/customer/authentication/multipass/callback?multipass=' + encodeURIComponent(mp) + '&signature=' + encodeURIComponent(signature);\n\n  function sign(key, multipass)\n  {\n    var sha1 = crypto.createHmac('sha1',key);\n    return sha1.update(multipass).digest('base64');\n  }\n\n  function multipass(jsonData, apiKey, site) {\n    var data = new Buffer(JSON.stringify(jsonData), 'utf8');\n    var key = crypto.createHash('sha1').update(apiKey + site).digest('binary').substring(0, 16);\n    var iv = new Buffer('OpenSSL for Ruby', 'utf8');\n\n    var pad = 16 - (data.length % 16),\n        paddedData = new Buffer(data.length + pad);\n    data.copy(paddedData);\n    for (var i = data.length, len = paddedData.length; i < len; ++i) {\n      paddedData[i] = pad;\n    }\n    // Encrypt with AES\n    var cipher = crypto.createCipheriv('aes-128-cbc', key, iv);\n    cipher.setAutoPadding(false);\n    var token = cipher.update(paddedData);\n\n    var mp = Buffer.concat([iv, token]);\n\n    return mp.toString('base64');\n  }\n\n  callback(null, user, context);\n}"
-      }
-    ]
   }
 ]
