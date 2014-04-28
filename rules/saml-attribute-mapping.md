@@ -1,3 +1,8 @@
+---
+gallery: true
+categories:
+- enrich profile
+---
 ## SAML Attributes mapping
 
 If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attrbiutes.

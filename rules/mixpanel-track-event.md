@@ -1,6 +1,7 @@
 ---
+gallery: true
 categories:
-- webhooks
+- webhook
 ---
 ## Tracks Logins in MixPanel
 
@@ -21,9 +22,13 @@ function (user, context, callback) {
 
   var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');
 
-  request.get('http://api.mixpanel.com/track/?data=' + base64Event,
-              function(e,r,b){
-                  callback(null,user,context);
-              });
+  request.get({
+    url: 'http://api.mixpanel.com/track/}'
+    qs: {
+      data: base64Event
+    }
+  }, function(e,r,b){
+    callback(null,user,context);
+  });
 }
 ```

@@ -1,6 +1,7 @@
 ---
+gallery: true
 categories:
-- webhooks
+- webhook
 ---
 ## Update user profile identity in Firebase
 

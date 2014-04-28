@@ -1,22 +1,22 @@
 ---
+gallery: true
 categories:
 - access control
 ---
-## Access denied based on a Dropbox whitelist
+## Whitelist on the cloud
 
-This rule denies access to a user based on a list of emails stored in Dropbox.
+This rule denies/grant access to users based on a list of emails stored in Dropbox.
 
 ```js
 function (user, context, callback) {
   request.get({
     url: 'https://dl.dropboxusercontent.com/u/21665105/users.txt'
-  },
-  function (err, response, body) {
+  }, function (err, response, body) {
     var whitelist = body.split('\r\n');
-    var userHasAccess = whitelist.some(
-      function (email) {
-        return email === user.email;
-      });
+
+    var userHasAccess = whitelist.some(function (email) {
+      return email === user.email;
+    });
 
     if (!userHasAccess) {
       return callback(new UnauthorizedError('Access denied.'));

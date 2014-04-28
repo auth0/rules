@@ -1,4 +1,5 @@
 ---
+gallery: true
 categories:
 - access control
 ---

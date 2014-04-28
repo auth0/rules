@@ -1,6 +1,7 @@
 ---
+gallery: true
 categories:
-- webhooks
+- webhook
 ---
 ## Send events to Keen.io
 

@@ -1,7 +1,7 @@
 ## Generate an Parse Session Token
 
 This rule is used to generate a session token for accessing [Parse API](http://parse.com/). The rule
-adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls. 
+adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls.
 
 The only way of generating a session token is using the [`login`](https://parse.com/docs/rest#users-login) endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain `session tokens`.
 
@@ -17,7 +17,7 @@ function rule(user, context, callback) {
   var PARSE_APP_ID = 'PLACE HERE YOUR PARSE APP ID';
   var PARSE_API_KEY = 'PLACE HERE YOUR PARSE REST API KEY';
   var PARSE_USER_PASSWORD = 'PARSE_USER_MASTER_KEY'; // you can use this to generate one http://www.random.org/strings/
-  
+
   var username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db
 
   request.get({
@@ -30,7 +30,7 @@ function rule(user, context, callback) {
       'X-Parse-Application-Id': PARSE_APP_ID,
       'X-Parse-REST-API-Key': PARSE_API_KEY
     }
-  }, 
+  },
   function (err, response, body) {
     if (err) return callback(err);
 
@@ -53,7 +53,7 @@ function rule(user, context, callback) {
           'X-Parse-REST-API-Key': PARSE_API_KEY,
           'Content-Type': 'application/json'
         }
-      }, 
+      },
       function (err, response, body) {
         if (err) return callback(err);
 

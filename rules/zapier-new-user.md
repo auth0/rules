@@ -1,6 +1,7 @@
 ---
+gallery: true
 categories:
-- webhooks
+- webhook
 ---
 ## Trigger a Zap on New Users
 

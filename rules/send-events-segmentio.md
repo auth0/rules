@@ -1,6 +1,11 @@
+---
+icon: segmentio.png
+categories:
+- webhook
+---
 ## Send events to segment.io
 
-This rule is used to send two differen events to [segment.io](http://segment.io) 
+This rule is used to send two differen events to [segment.io](http://segment.io)
 
 The rule checks whether the user has already signed up before or not. This is tracked by the persistent `user.signedUp` property. If the property is present then we assume this is a __login__ event, otherwise we assume a new __signup__.
 
@@ -13,12 +18,12 @@ function(user, context, callback) {
   if(user.signedUp){
     sendEvent('login');
   } else {
-    sendEvent('signup');  
+    sendEvent('signup');
   }
 
   function sendEvent(e)
   {
-    var sioTrack =  
+    var sioTrack =
     {
       secret: "YOUR SEGMENTIO SECRET",
       userId: user.user_id,
@@ -40,7 +45,7 @@ function(user, context, callback) {
         'Content-type': 'application/json',
       },
       body: JSON.stringify(sioTrack),
-    }, 
+    },
     function (err, response, body) {
       if(err) return callback(err, user, context);
       if(e === 'signup'){ user.persistent.signedUp = true; }

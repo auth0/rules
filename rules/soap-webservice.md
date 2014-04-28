@@ -1,17 +1,14 @@
-## Query a SOAP Web Service
+---
+gallery: true
+categories:
+- enrich profile
+---
+## Roles from a SOAP Service
 
 This rule shows how to query a basic profile http binding SOAP web service for roles and add those to the user.
 
 ```js
 function (user, context, callback) {
-  getRoles(user.email, function(err, roles) {
-    if (err) return callback(err);
-
-    user.roles = roles;
-
-    callback(null, user, context);
-  });
-
   function getRoles(callback) {
     request.post({
       url:  'https://somedomain.com/RoleService.svc',
@@ -27,5 +24,13 @@ function (user, context, callback) {
       return callback(null, roles);
     });
   }
+
+  getRoles(user.email, function(err, roles) {
+    if (err) return callback(err);
+
+    user.roles = roles;
+
+    callback(null, user, context);
+  });
 }
 ```

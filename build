@@ -4,7 +4,6 @@ var marked = require('marked');
 var yaml = require('js-yaml');
 var async = require('async');
 
-
 marked.setOptions({
   renderer: new marked.Renderer(),
   gfm: true,
@@ -35,6 +34,10 @@ async.map(files, function (file, callback) {
       content = split.slice(2).join('---');
     }
 
+    if (!meta.gallery) {
+      return callback();
+    }
+
     var lex = marked.lexer(content);
 
     var title = lex.filter(function (t) {
@@ -55,7 +58,7 @@ async.map(files, function (file, callback) {
       title:       title || meta.title,
       categories:  meta.categories || ['default'],
       description: description,
-      code:        code
+      code:        code,
     };
 
     callback(null, result);
@@ -65,7 +68,29 @@ async.map(files, function (file, callback) {
     console.log(err.stack);
     process.exit(1);
   }
+
+  //group by category
+  var rules = results;
+
+  var categories = rules.filter(function (rt) {
+    return !!rt;
+  }).map(function (rule) {
+    return rule.categories;
+  }).reduce(function (prev, curr) {
+    var new_cats = curr.filter(function (cat) {
+      return !~prev.indexOf(cat);
+    });
+    return prev.concat(new_cats);
+  }, []).map(function (cat) {
+    return {
+      name:      cat,
+      templates: rules.filter(function (t) {
+        return t && ~t.categories.indexOf(cat);
+      })
+    };
+  });
+
   console.log('all good!');
-  fs.writeFileSync(__dirname + '/rules.json', JSON.stringify(results, null, 2));
+  fs.writeFileSync(__dirname + '/rules.json', JSON.stringify(categories, null, 2));
   process.exit(0);
 });

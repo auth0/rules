@@ -1,6 +1,3 @@
----
-category: "third party"
----
 ## Generate an Appery.io Session Token
 
 This rule is used to generate a session token for accessing [Appery.io Database Services](http://appery.io/). The rule
