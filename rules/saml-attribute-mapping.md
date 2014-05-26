@@ -13,11 +13,11 @@ For more information about SAML options, look at <https://docs.auth0.com/saml-co
 ```js
 function (user, context, callback) {
   context.samlConfiguration.mappings = {
-     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "user_id"
+     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "user_id",
      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress":   "email",
      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name":           "name"
   };
 
-  callback(null, user, context)
+  callback(null, user, context);
 }
 ```
