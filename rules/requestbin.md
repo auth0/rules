@@ -23,7 +23,8 @@ function (user, context, callback) {
     },
     timeout: 15000
   }, function(err, response, body){
-    callback(null, user, context);
+    if (err) return callback(new Error(err));
+    return callback(null, user, context);
   });
 }
 ```

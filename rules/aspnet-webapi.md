@@ -3,7 +3,7 @@ gallery: true
 categories:
 - webhook
 ---
-## Custom webhook with ASP.NET WebApi
+## Custom webhook with ASP.NET WebApi2
 
 This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User's profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.
 
@@ -19,22 +19,24 @@ Contributed by Robert McLaws, AdvancedREI.com
 
 ```js
 function (user, context, callback) {    
-  if (user.customId !== undefined) {
+  if (!user.customId) {
     console.log("Found ID!");
-    callback(null, user, context);
-  } else {
-    request.post({
-      url: 'http://yourwebsite.com/auth0',
-      json: {
-        user: user,
-        context: context,
-        secretToken: ";ojhsajk;h;Kh:Jh",
-      },
-      timeout: 15000
-    }, function(err, response, body){
-      user.persistent.customId = body.customId;
-      callback(null, user, context);
-    });
-  }
+    return callback(null, user, context);
+  } 
+
+  // You should make your requests over SSL to protect your app secrets.
+  request.post({
+    url: 'https://yourwebsite.com/auth0',
+    json: {
+      user: user,
+      context: context,
+      secretToken: ";ojhsajk;h;Kh:Jh",
+    },
+    timeout: 15000
+  }, function(err, response, body){
+    if (err) return callback(new Error(err));
+    user.persistent.customId = body.customId;
+    return callback(null, user, context);
+  });
 }
 ```
