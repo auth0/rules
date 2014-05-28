@@ -19,7 +19,7 @@ Contributed by Robert McLaws, AdvancedREI.com
 
 ```js
 function (user, context, callback) {    
-  if (!user.customId) {
+  if (user.customId) {
     console.log("Found ID!");
     return callback(null, user, context);
   } 
