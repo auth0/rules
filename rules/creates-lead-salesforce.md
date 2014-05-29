@@ -12,20 +12,20 @@ This rule will check if this is the first user login, and in that case will call
 ```
 function (user, context, callback) {
 
-  if(user.recordedAsLead){
+  if (user.recordedAsLead){
     return callback(null,user,callback);
-    }
+  }
 
   getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,
-        function(e,r){
-            if( e ) return callback(e);
-
-            createLead( r.instance_url, r.access_token, function(e,result){
-              if(e) return callback(e);
-              user.persistent.recordedAsLead = true;
-              return callback(null,user,context);
-            });
-          });
+    function(e,r) {
+      if (e) return callback(e);
+      
+      createLead( r.instance_url, r.access_token, function (e, result) {
+        if (e) return callback(e);
+        user.persistent.recordedAsLead = true;
+        return callback(null,user,context);
+      });
+    });
 
   //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm
   function createLead(url,access_token, callback){
@@ -43,14 +43,14 @@ function (user, context, callback) {
         "Content-type": "application/json"
       },
       body: JSON.stringify(data)
-      }, function(e,r,b){
-        if(e) return callback(e);
+      }, function(e,r,b) {
+        if (e) return callback(e);
         return callback(null,b);
       });
   }
 
   //Obtains a SFCOM access_token with user credentials
-  function getAccessToken(client_id, client_secret, username, password, callback){
+  function getAccessToken(client_id, client_secret, username, password, callback) {
     request.post({
       url: 'https://login.salesforce.com/services/oauth2/token',
       form: {
@@ -59,8 +59,8 @@ function (user, context, callback) {
         client_secret: client_secret,
         username: username,
         password: password
-      }}, function(e,r,b){
-        if(e) return callback(e);
+      }}, function(e,r,b) {
+        if (e) return callback(e);
         return callback(null,JSON.parse(b));
       });
   }
