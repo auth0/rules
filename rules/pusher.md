@@ -3,7 +3,7 @@ gallery: true
 categories:
 - webhook
 ---
-## Obtains a Pusher token for subscribing/publishing to priovate channels
+## Obtains a Pusher token for subscribing/publishing to private channels
 
 This rule will generate a [pusher.com] token that can be used to send and receive messages from private channels. See [a complete example here](https://github.com/auth0/auth0-pusher).
 
