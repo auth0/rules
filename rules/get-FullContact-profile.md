@@ -18,7 +18,7 @@ function (user, context, callback) {
   }
 
   request({
-    url: 'https://api.fullcontact.com/v2/person.json'
+    url: 'https://api.fullcontact.com/v2/person.json',
     qs: {
       email:  user.email,
       apiKey: fullContactAPIKey
