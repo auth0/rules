@@ -1,12 +1,14 @@
 # Notify users if login happens from a different IP and machine
 
-This rule checks if the user has changed device or location since last login and sends him an SMS if that happened. Location & device are computed as a hash of the `userAgent` and the `IP address`. SMS are sent through [Twilio](http://www.twilio.com).
+This rule checks if the user has changed device or location since last login and sends him an SMS if that happened. Location & device are computed as a hash of the `userAgent` and the `IP address`. SMS are sent through [Twilio](http://www.twilio.com) and uses the `user.phone` property. If it is not available, then everything is ignored; but signature is computed.
 
 ```
 function (user, context, callback) {
   var currentFingerprint = clientFingerprint();
   
   user.persistent.lastDeviceFingerPrint = currentFingerprint;
+  
+  if( !user.phone ) return callback(null, user, context);
   
   if( !user.lastDeviceFingerPrint || user.lastDeviceFingerPrint === currentFingerprint ) {
           return callback(null, user, context);
