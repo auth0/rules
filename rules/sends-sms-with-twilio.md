@@ -1,6 +1,9 @@
-# Notify users if login happens from a different IP and machine
+# Notify users if login happens from a different IP or machine
 
-This rule checks if the user has changed device or location since last login and sends him an SMS if that happened. Location & device are computed as a hash of the `userAgent` and the `IP address`. SMS are sent through [Twilio](http://www.twilio.com) and uses the `user.phone` property. If it is not available, then everything is ignored; but signature is computed.
+This rule checks if the user has changed device or location since last login and sends him an SMS if that happened. Location & device are computed as a hash of the `userAgent` and the `IP address`. SMS are sent through [Twilio](http://www.twilio.com) and uses the `user.phone` property.
+
+If `user.phone` is not available, then everything is ignored; but signature is computed.
+
 
 ```
 function (user, context, callback) {
@@ -42,7 +45,7 @@ function (user, context, callback) {
       form: {
         'Body': 'You\'ve logged in from a different device or location.',
         'To': user.phone,
-        'From': '+18668132884'
+        'From': '+18668888888'
       }
     }, function(e,r,b) {
       if (e) return done(e);
