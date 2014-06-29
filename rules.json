@@ -8,7 +8,7 @@
           "access control"
         ],
         "description": "<p>This rule is used to prevent access during weekends for a specific app.</p>\n",
-        "code": "function (user, context, callback) {\n\n  if(context.clientName === 'TheAppToCheckAccessTo')\n  {\n    var d = new Date().getDay();\n\n    if(d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  if (context.clientName === 'TheAppToCheckAccessTo') {\n    var d = new Date().getDay();\n\n    if (d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Active Directory group membership",
@@ -85,7 +85,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user profile and returns. Any other conditions are ignored. See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';\n\n  if(!user.email) {\n    //the profile doesn't have email so we can't query fullcontact api.\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://api.fullcontact.com/v2/person.json'\n    qs: {\n      email:  user.email,\n      apiKey: fullContactAPIKey\n    }\n  }, function (e,r,b) {\n    if(e) return callback(e);\n\n    if(r.statusCode===200){\n      user.fullContactInfo = JSON.parse(b);\n    }\n\n    return callback(null, user, context);\n  });\n}"
+        "code": "function (user, context, callback) {\n\n  var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';\n\n  if(!user.email) {\n    //the profile doesn't have email so we can't query fullcontact api.\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://api.fullcontact.com/v2/person.json',\n    qs: {\n      email:  user.email,\n      apiKey: fullContactAPIKey\n    }\n  }, function (e,r,b) {\n    if(e) return callback(e);\n\n    if(r.statusCode===200){\n      user.fullContactInfo = JSON.parse(b);\n    }\n\n    return callback(null, user, context);\n  });\n}"
       },
       {
         "title": "Enrich profile with Rapleaf",
@@ -108,7 +108,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule shows how to check for variables in the <code>querystring</code>. As an example, the snippet below checks if the login transaction includes a query variable called <code>some_querystring</code> with a value <code>whatever</code> and if it does, it will add an attribute to the user profile.</p>\n<p>An example of typicall authorization URL:</p>\n<p>The <code>context.request.query</code> object is parsed using the <code>querystring</code> module <a href=\"http://nodejs.org/api/querystring.html\">http://nodejs.org/api/querystring.html</a></p>\n<blockquote>\n<p>Note: this rule works with any protocols supported by Auth0. For example, WS-Fed would be something like: <code>https://YOURS.auth0.com/wsfed?wtrealm=YOUR_APP_REALM&amp;whr=urn:google-oauth2&amp;some_querystring=whatever</code></p>\n</blockquote>\n",
+        "description": "<p>This rule shows how to check for variables in the <code>querystring</code>. As an example, the snippet below checks if the login transaction includes a query variable called <code>some_querystring</code> with a value <code>whatever</code> and if it does, it will add an attribute to the user profile.</p>\n<p>An example of typical authorization URL:</p>\n<p>The <code>context.request.query</code> object is parsed using the <code>querystring</code> module <a href=\"http://nodejs.org/api/querystring.html\">http://nodejs.org/api/querystring.html</a></p>\n<blockquote>\n<p>Note: this rule works with any protocols supported by Auth0. For example, WS-Fed would be something like: <code>https://YOURS.auth0.com/wsfed?wtrealm=YOUR_APP_REALM&amp;whr=urn:google-oauth2&amp;some_querystring=whatever</code></p>\n</blockquote>\n",
         "code": "https://YOURS.auth0.com/authorize?response_type=code\n                  &redirect_uri=CALLBACK\n                  &connection=google-oauth2\n                  &client_id=YOUR_CLIENTID\n                  &some_querystring=whatever"
       },
       {
@@ -125,7 +125,7 @@
           "enrich profile"
         ],
         "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attrbiutes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, look at <a href=\"https://docs.auth0.com/saml-configuration\">https://docs.auth0.com/saml-configuration</a>.</p>\n",
-        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\"\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\"\n  };\n\n  callback(null, user, context)\n}"
+        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\"\n  };\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Roles from a SOAP Service",
@@ -141,12 +141,20 @@
     "name": "webhook",
     "templates": [
       {
+        "title": "Custom webhook with ASP.NET WebApi2",
+        "categories": [
+          "webhook"
+        ],
+        "description": "<p>This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User&#39;s profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.</p>\n<p>In this example, we&#39;re going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.</p>\n<p>Within the snippet, the &quot;secretToken&quot; is a simple way to ensure that the communication is coming from Auth0. Just type in a random string into the Rule, and then check for that string in your WebApi request.</p>\n<p>In your WebApi code, complete whatever operations are necessary, then call <code>return Json(new { customId = USERSCUSTOMID });</code> to return the required JSON to the Rule.</p>\n<blockquote>\n<p>Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the <code>[HttpPost]</code> attribute.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>\n",
+        "code": "function (user, context, callback) {    \n  if (user.customId) {\n    console.log(\"Found ID!\");\n    return callback(null, user, context);\n  } \n\n  // You should make your requests over SSL to protect your app secrets.\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: \";ojhsajk;h;Kh:Jh\",\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    user.persistent.customId = body.customId;\n    return callback(null, user, context);\n  });\n}"
+      },
+      {
         "title": "Creates a new Lead in Salesforce on First Login",
         "categories": [
           "webhook"
         ],
         "description": "<p>This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the <code>resource owner</code> flow to obtain an <code>access_token</code>. The username you use to authenticate the API will appear as the <strong>creator</strong> of the lead.</p>\n<blockquote>\n<p>Note: this sample implements very basic error handling.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n\n  if(user.recordedAsLead){\n    return callback(null,user,callback);\n    }\n\n  getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,\n        function(e,r){\n            if( e ) return callback(e);\n\n            createLead( r.instance_url, r.access_token, function(e,result){\n              if(e) return callback(e);\n              user.persistent.recordedAsLead = true;\n              return callback(null,user,context);\n            });\n          });\n\n  //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm\n  function createLead(url,access_token, callback){\n\n    //Can use many more fields\n    var data = {\n      LastName: user.name,\n      Company: 'Web channel signups'\n    };\n\n    request.post({\n      url: url + \"/services/data/v20.0/sobjects/Lead/\",\n      headers: {\n        \"Authorization\": \"OAuth \" + access_token,\n        \"Content-type\": \"application/json\"\n      },\n      body: JSON.stringify(data)\n      }, function(e,r,b){\n        if(e) return callback(e);\n        return callback(null,b);\n      });\n  }\n\n  //Obtains a SFCOM access_token with user credentials\n  function getAccessToken(client_id, client_secret, username, password, callback){\n    request.post({\n      url: 'https://login.salesforce.com/services/oauth2/token',\n      form: {\n        grant_type: 'password',\n        client_id: client_id,\n        client_secret: client_secret,\n        username: username,\n        password: password\n      }}, function(e,r,b){\n        if(e) return callback(e);\n        return callback(null,JSON.parse(b));\n      });\n  }\n}"
+        "code": "function (user, context, callback) {\n\n  if (user.recordedAsLead){\n    return callback(null,user,callback);\n  }\n\n  getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,\n    function(e,r) {\n      if (e) return callback(e);\n\n      createLead( r.instance_url, r.access_token, function (e, result) {\n        if (e) return callback(e);\n        user.persistent.recordedAsLead = true;\n        return callback(null,user,context);\n      });\n    });\n\n  //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm\n  function createLead(url,access_token, callback){\n\n    //Can use many more fields\n    var data = {\n      LastName: user.name,\n      Company: 'Web channel signups'\n    };\n\n    request.post({\n      url: url + \"/services/data/v20.0/sobjects/Lead/\",\n      headers: {\n        \"Authorization\": \"OAuth \" + access_token,\n        \"Content-type\": \"application/json\"\n      },\n      body: JSON.stringify(data)\n      }, function(e,r,b) {\n        if (e) return callback(e);\n        return callback(null,b);\n      });\n  }\n\n  //Obtains a SFCOM access_token with user credentials\n  function getAccessToken(client_id, client_secret, username, password, callback) {\n    request.post({\n      url: 'https://login.salesforce.com/services/oauth2/token',\n      form: {\n        grant_type: 'password',\n        client_id: client_id,\n        client_secret: client_secret,\n        username: username,\n        password: password\n      }}, function(e,r,b) {\n        if (e) return callback(e);\n        return callback(null,JSON.parse(b));\n      });\n  }\n}"
       },
       {
         "title": "Tracks Logins in MixPanel",
@@ -155,6 +163,14 @@
         ],
         "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property. See <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>\n",
         "code": "function (user, context, callback) {\n\n  var mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": YOUR_MIXPANEL_TOKEN,\n        \"application\": context.clientName\n    }\n  };\n\n  var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/}'\n    qs: {\n      data: base64Event\n    }\n  }, function(e,r,b){\n    callback(null,user,context);\n  });\n}"
+      },
+      {
+        "title": "Obtains a Pusher token for subscribing/publishing to private channels",
+        "categories": [
+          "webhook"
+        ],
+        "description": "<p>This rule will generate a [pusher.com] token that can be used to send and receive messages from private channels. See <a href=\"https://github.com/auth0/auth0-pusher\">a complete example here</a>.</p>\n",
+        "code": "function (user, context, callback) {\n\n  var pusherKey='YOUR PUSHER KEY';\n  var pusherSecret = '{YOUR PUSHER SECRET}';\n\n  if( context.request.query.channel && context.request.query.socket_id)\n  {\n    user.pusherAuth = pusherKey + \":\" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);\n  }\n\n  callback(null, user, context);\n\n  function sign(secret, channel, socket_id)\n  {\n    var string_to_sign = socket_id+\":\"+channel;\n    var sha = crypto.createHmac('sha256',secret);\n    return sha.update(string_to_sign).digest('hex');\n  }\n}"
       },
       {
         "title": "Send events to Keen.io",
@@ -195,6 +211,40 @@
         ],
         "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/cgwZds8MjA7+\" alt=\"\"></p>\n<p>This rule will call Zapier static hook every time a new user signs up.</p>\n",
         "code": "function (user, context, callback) {\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  // short-circuit if the user signed up already\n  if (user.signed_up) return callback(null, user, context);\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n  var payload_to_zap = extend({}, user, small_context);\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    // swallow error\n    // mark the user as `signed_up` so next time the rule does not execute\n    user.persistent.signed_up = true;\n    callback(null, user, context);\n  });\n\n  function extend(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i],\n          keys = Object.keys(source);\n\n      for (var j = 0; j < keys.length; j++) {\n          var name = keys[j];\n          target[name] = source[name];\n      }\n    }\n    return target;\n  }\n}"
+      }
+    ]
+  },
+  {
+    "name": "multifactor",
+    "templates": [
+      {
+        "title": "Multifactor with Duo Security",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code or an sms message. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>You need to create two <strong>integrations</strong> in Duo Security one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>\n",
+        "code": "function (user, context, callback) {\n\n  //if (condition == ..) { }\n  context.multifactor = {\n    provider: 'duo',\n    skey: 'Your WebSDK Integration Key',\n    ikey: '....',\n    admin: {\n      skey: 'Your AdminSDK Integration Key',\n      ikey: 'YYY.....'\n    }\n  };\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "title": "Multifactor with Google Authenticator",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -&gt; Multifactor.</p>\n",
+        "code": "function (user, context, callback) {\n\n  //if (condition == ..) { }\n  context.multifactor = {\n    provider: 'google-authenticator'\n  };\n\n  callback(null, user, context);\n}"
+      }
+    ]
+  },
+  {
+    "name": "debugging",
+    "templates": [
+      {
+        "title": "Dump rule variables to RequestB.in",
+        "categories": [
+          "debugging"
+        ],
+        "description": "<p>This rule shows how to post the variables sent to your Rule to <a href=\"http://RequestB.in\">http://RequestB.in</a> to help troubleshoot issues with your Rules.</p>\n<p>You can run this rule by itself, or paste it into an existing rule. Once the rule has posted data to RequestB.in, you can use a site like <a href=\"http://bodurov.com/JsonFormatter/\">http://bodurov.com/JsonFormatter/</a> to more easily visualize the data.</p>\n<blockquote>\n<p>Note: You should deactivate this rule or comment out the code once you are finished troubleshooting.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>\n",
+        "code": "function (user, context, callback) {\n  request.post({\n    url: 'http://requestb.in/YourBinUrl',\n    json: {\n      user: user,\n      context: context,\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    return callback(null, user, context);\n  });\n}"
       }
     ]
   }
