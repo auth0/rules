@@ -181,6 +181,14 @@
         "code": "function(user, context, callback) {\n\n  if(user.signedUp){\n    return callback(null, user, context);\n  }\n\n  var writeKey = 'YOUR KEEN IO WRITE KEY';\n  var projectId = 'YOUR KEEN IO PROJECT ID';\n  var eventCollection = 'signups';\n\n  var keenEvent = {\n    userId: user.user_id,\n    name: user.name,\n    ip: context.request.ip //Potentially any other properties in the user profile/context\n  };\n\n  request.post({\n      method: 'POST',\n      url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,\n      headers: {\n        'Content-type': 'application/json',\n      },\n      body: JSON.stringify(keenEvent),\n      },\n      function (e, r, body) {\n        if( e ) return callback(e,user,context);\n        //We assume everything went well\n        user.persistent.signedUp = true;\n        return callback(null, user, context);\n       });\n\n}"
       },
       {
+        "title": "Send emails through SendGrid",
+        "categories": [
+          "webhook"
+        ],
+        "description": "<p>This rule will send an email to an administrator on the first login of a user.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>In the same way you can use other services like <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a>, <a href=\"https://mandrillapp.com/api/docs/\">Mandrill</a> and few others.</p>\n",
+        "code": "function(user, context, callback) {\n  if (!user.persistent.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    form: {\n      'api_user': 'YOUR SENDGRID API USER',\n      'api_key': 'YOUR SENDGRID API PASS',\n      'to': 'admin@myapp.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@myapp.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.persistent.signedUp = true;\n    callback(null, user, context);\n  });\n}"
+      },
+      {
         "title": "Tracks Logins/SignUps with Splunk",
         "categories": [
           "webhook"
