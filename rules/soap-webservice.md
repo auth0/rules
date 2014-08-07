@@ -14,7 +14,7 @@ function (user, context, callback) {
       url:  'https://somedomain.com/RoleService.svc',
       body: '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><GetRolesForCurrentUser xmlns="http://tempuri.org"/></s:Body></s:Envelope>',
       headers: { 'Content-Type': 'text/xml; charset=utf-8',
-              'SOAPAction': http://tempuri.org/RoleService/GetRolesForCurrentUser' }
+              'SOAPAction': 'http://tempuri.org/RoleService/GetRolesForCurrentUser' }
     }, function (err, response, body) {
       if (err) return callback(err);
 
