@@ -17,13 +17,28 @@ function (user, context, callback) {
 
   //if (condition == ..) { }
   context.multifactor = {
+
+    //required
     provider: 'duo',
-    skey: 'Your WebSDK Integration Key',
-    ikey: '....',
+    ikey: 'DIXBMNY4AVF6LZO8IOS8',
+    skey: 'nZLxq8GK720lwV0oTKkLbBRSnQHJzRVsaKCOLPnh',
+    host: 'api-3617a049.duosecurity.com',
+
+    //optional, force DuoSecurity everytime this rule runs. Defaults false.
+    ignoreCookie: true,
+
+    //optional
+    //Use some attribute of the profile as the username in DuoSecurity.
+    //This is also useful if you already have your users enrolled in Duo.
+    username: user.nickname
+
+    //optional
+    //Admin credentials. If you provide an Admin SDK type of credentials
+    //auth0 will update the realname and email in DuoSecurity.
     admin: {
-      skey: 'Your AdminSDK Integration Key',
-      ikey: 'YYY.....'
-    }
+      ikey: 'DIAN7MDMAS68ZSKNV6UM',
+      skey: 'YL8OVzvoeehNXAXu9ME4KL9I1uiYrKoHvuzHnSRj'
+    },
   };
 
   callback(null, user, context);
