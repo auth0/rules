@@ -9,7 +9,7 @@ In some scenarios, you might want to access Google Admin APIs from your applicat
 
 To create a service account go to Google API Console, create a new Client ID and choose Service Account
 
-![](https://cloudup.com/cpvhC6n9xW9+)
+<img src="https://cloudup.com/cpvhC6n9xW9+" width="420">
 
 You will get the key that you would have to convert to PEM and remove the passphrase using this command
 
