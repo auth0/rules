@@ -22,7 +22,7 @@ You will get the key that you would have to convert to PEM and remove the passph
 Login to Google Apps Admin and go to <https://admin.google.com/AdminHome?chromeless=1#OGX:ManageOauthClients> (Security -> Advanced Settings -> Manage OAuth Client Access)
 Enter
 
-<img src="https://cloudup.com/c0Nq5NWRFaQ+" width="420">
+<img src="https://cloudup.com/c0Nq5NWRFaQ+" width="620">
 
 Enter the Client ID created on the previous step and the scope you want to allow access to.
 
