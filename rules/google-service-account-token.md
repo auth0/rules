@@ -7,6 +7,8 @@ categories:
 
 In some scenarios, you might want to access Google Admin APIs from your applications. Accesing those APIs require either a consent of the Google Apps administrator or creating a Service Account and obtain a token programatically without interactive consent. This rule create such token based on a service account and put it under `user.admin_access_token`. 
 
+#### Service Account
+
 To create a service account go to Google API Console, create a new Client ID and choose Service Account
 
 <img src="https://cloudup.com/cpvhC6n9xW9+" width="420">
@@ -15,7 +17,16 @@ You will get the key that you would have to convert to PEM and remove the passph
 
   openssl pkcs12 -in yourkey.p12 -out yourkey.pem -nocerts -nodes
 
-Replace the values of the rule below:
+### Give Access to the Client on Google Apps Admin
+
+Login to Google Apps Admin and go to <https://admin.google.com/AdminHome?chromeless=1#OGX:ManageOauthClients> (Security -> Advanced Settings -> Manage OAuth Client Access)
+Enter
+
+<img src="https://cloudup.com/c0Nq5NWRFaQ+" width="420">
+
+Enter the Client ID created on the previous step and the scope you want to allow access to.
+
+#### Replace the values of the rule below:
 
 * `KEY`: the string representation of the key (open the PEM and replace enters with \n to make it one line).
 * `GOOGLE_CLIENT_ID_EMAIL`: this is the email address of the service account created (NOT the Client ID).
