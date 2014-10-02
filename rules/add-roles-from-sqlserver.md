@@ -30,6 +30,8 @@ function (user, context, callback) {
         encrypt:  true,
         rowCollectionOnRequestCompletion: true
       }
+    }).on('errorMessage', function (error) {
+      console.log(error.message);
     });
 
     var query = "SELECT Email, Role " +
