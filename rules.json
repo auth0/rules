@@ -19,12 +19,28 @@
         "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
+        "title": "Check last password reset",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule will check the last time that a user changed his or her account password.</p>\n",
+        "code": "function (user, context, callback) {\n\n  function daydiff (first, second) {\n    return (second-first)/(1000*60*60*24);\n  }\n\n  var last_password_change = user.last_password_reset || user.created_at;\n\n  if (daydiff(new Date(last_password_change), new Date()) > 30) {\n    return callback(new UnauthorizedError('please change your password'));\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
         "title": "Whitelist on the cloud",
         "categories": [
           "access control"
         ],
         "description": "<p>This rule denies/grant access to users based on a list of emails stored in Dropbox.</p>\n",
         "code": "function (user, context, callback) {\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/21665105/users.txt'\n  }, function (err, response, body) {\n    var whitelist = body.split('\\r\\n');\n\n    var userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}"
+      },
+      {
+        "title": "Set roles to a user",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule adds a Roles field to the user based on some pattern</p>\n",
+        "code": "function (user, context, callback) {\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(error);\n    } else {\n      user.persistent.roles = roles;\n      callback(null, user, context);\n  });\n\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@gonto.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n  }\n}"
       },
       {
         "title": "Whitelist for a Specific App",
@@ -64,6 +80,14 @@
         "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    user.vip = true;\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "title": "Add country to the user profile",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>This rule will add the <code>country</code> attribute to the user based on his ip address.</p>\n",
+        "code": "function (user, context, callback) {\n  user.country = context.request.geoip.country;\n\n   // Example geoip object:\n   // \"geoip\": {\n   //    \"country_code\": \"AR\",\n   //    \"country_code3\": \"ARG\",\n   //    \"country_name\": \"Argentina\",\n   //    \"region\": \"05\",\n   //    \"city\": \"Cordoba\",\n   //    \"latitude\": -31.41349983215332,\n   //    \"longitude\": -64.18109893798828,\n   //    \"continent_code\": \"SA\",\n   //    \"time_zone\": \"America/Argentina/Cordoba\"\n   //  }\n\n  callback(null, user, context);\n}"
+      },
+      {
         "title": "Add persistent attributes to the user",
         "categories": [
           "enrich profile"
@@ -77,7 +101,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule will query a SQL server database on each login and add a <code>roles</code> array to the user.</p>\n<blockquote>\n<p>Note: you can store the connection string securely on Auth0 encrypted configuration. Also make sure when you call an external endpoint to open your firewall/ports to our IP address which you can find it in the rules editor. This happens when you query SQL Azure for example.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n\n  // Queries a table by e-mail and returns associated 'Roles'\n  function getRoles(email, done) {\n    var connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    });\n\n    var query = \"SELECT Email, Role \" +\n                \"FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', function (err) {\n      if (err) return done(new Error(err));\n\n      var request = new sqlserver.Request(query, function (err, rowCount, rows) {\n        if (err) return done(new Error(err));\n\n        var roles = rows.map(function (row) {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}"
+        "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n\n  // Queries a table by e-mail and returns associated 'Roles'\n  function getRoles(email, done) {\n    var connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', function (error) {\n      console.log(error.message);\n    });\n\n    var query = \"SELECT Email, Role \" +\n                \"FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', function (err) {\n      if (err) return done(new Error(err));\n\n      var request = new sqlserver.Request(query, function (err, rowCount, rows) {\n        if (err) return done(new Error(err));\n\n        var roles = rows.map(function (row) {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}"
       },
       {
         "title": "Enrich profile with FullContact",
@@ -102,6 +126,14 @@
         ],
         "description": "<p>In some scenarios, you might want to access Google APIs from your application. You do that by using the <code>access_token</code> stored on the <code>identities</code> array (<code>user.identities[0].access_token</code>). However <code>access_token</code>s have an expiration and in order to get a new one, you have to ask the user to login again. That&#39;s why Google allows asking for a <code>refresh_token</code> that can be used forever (until the user revokes it) to obtain new <code>access_tokens</code> without requiring the user to relogin.</p>\n<p>The way you ask for a <code>refresh_token</code> is by sending the <code>access_type=offline</code> as an extra parameter as <a href=\"https://docs.auth0.com/login-widget2#6\">explained here</a>.</p>\n<p>The only caveat is that Google will send you the <code>refresh_token</code> only once, and if you haven&#39;t stored it, you will have to ask for it again and add <code>approval_prompt=force</code> so the user explicitly consent again. Since this would be annoying from a user experience perspective, you should store the refresh token on Auth0 as a persistent property of the user, only if it there is a new one available.</p>\n<p>Here&#39;s the rule:</p>\n",
         "code": "function (user, context, callback) {\n\n  // if the user that just logged in has a refresh_token, persist it\n  if (user.refresh_token) {\n    user.persistent.refresh_token = user.refresh_token;\n  }\n\n  // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.\n  // function encryptAesSha256 (password, textToEncrypt) {\n  //   var cipher = crypto.createCipher('aes-256-cbc', password);\n  //   var crypted = cipher.update(textToEncrypt, 'utf8', 'hex');\n  //   crypted += cipher.final('hex');\n  //   return crypted;\n  // }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "title": "Create a Google access_token using a Service Account",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>In some scenarios, you might want to access Google Admin APIs from your applications. Accesing those APIs require either a consent of the Google Apps administrator or creating a Service Account and obtain a token programatically without interactive consent. This rule create such token based on a service account and put it under <code>user.admin_access_token</code>. </p>\n<p>To create a service account go to Google API Console, create a new Client ID and choose Service Account</p>\n<p>&lt;img src=&quot;https://cloudup.com/cpvhC6n9xW9+&quot; width=&quot;420&quot;&gt;</p>\n<p>You will get the key that you would have to convert to PEM and remove the passphrase using this command</p>\n<p>  openssl pkcs12 -in yourkey.p12 -out yourkey.pem -nocerts -nodes</p>\n<p>Login to Google Apps Admin and go to <a href=\"https://admin.google.com/AdminHome?chromeless=1#OGX:ManageOauthClients\">https://admin.google.com/AdminHome?chromeless=1#OGX:ManageOauthClients</a> (Security -&gt; Advanced Settings -&gt; Manage OAuth Client Access)\nEnter</p>\n<p>&lt;img src=&quot;https://cloudup.com/c0Nq5NWRFaQ+&quot; width=&quot;620&quot;&gt;</p>\n<p>Enter the Client ID created on the previous step and the scope you want to allow access to.</p>\n<ul>\n<li><code>KEY</code>: the string representation of the key (open the PEM and replace enters with \\n to make it one line).</li>\n<li><code>GOOGLE_CLIENT_ID_EMAIL</code>: this is the email address of the service account created (NOT the Client ID).</li>\n<li><code>SCOPE</code>: the scope you want access to. Full list of scopes <a href=\"https://developers.google.com/admin-sdk/directory/v1/guides/authorizing\">https://developers.google.com/admin-sdk/directory/v1/guides/authorizing</a>.</li>\n<li><code>ADMIN_EMAIL</code>: a user of your Google Apps domain that this rule would impersonate.</li>\n</ul>\n<blockquote>\n<p>NOTE: the Google access_token will last 1 hour, so you will have to either force a re-login or use a refresh token to trigger a token refresh on Auth0 and hence the rule running again.</p>\n<p>NOTE 2: you might want to be careful what scopes you ask for and where the access_token will be used. For instance, if used from a JavaScript application, a low-privilieged user might grab the token and do API calls that you wouldn&#39;t allow.</p>\n</blockquote>\n<p>Here&#39;s the rule:</p>\n",
+        "code": "function (user, context, callback) {\n\n  // this is the private key you downloaded from your service account.\n  // make sure you remove the password from the key and convert it to PEM using the following\n  // openssl pkcs12 -in yourkey.p12 -out yourkey.pem -nocerts -nodes\n  // finally, you should put this as a configuration encrypted in Auth0\n  var KEY = '....RSA private key downloaded from service account...'; \n\n  // this is the email address of the service account created (NOT the Client ID)\n  var GOOGLE_CLIENT_ID_EMAIL = '.....@developer.gserviceaccount.com';\n\n  // the scope you want access to. Full list of scopes https://developers.google.com/admin-sdk/directory/v1/guides/authorizing\n  var SCOPE = 'https://www.googleapis.com/auth/admin.directory.user.readonly';\n\n  // a user of your Google Apps domain that this rule would impersonate\n  var ADMIN_EMAIL = 'foo@corp.com';\n\n  var token = jwt.sign({ scope: SCOPE, sub: ADMIN_EMAIL }, KEY, { audience: \"https://accounts.google.com/o/oauth2/token\", issuer: GOOGLE_CLIENT_ID_EMAIL, expiresInMinutes: 60, algorithm: 'RS256'});\n\n  request.post({ url: 'https://accounts.google.com/o/oauth2/token', form: { grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: token } }, function(err, resp, body) {\n    if (err) return callback(null, user, context);\n    var result = JSON.parse(body);\n    if (result.error) {\n      console.log(body);\n      // log and swallow\n      return callback(null, user, context);\n    }\n\n    user.admin_access_token = result.access_token;\n    callback(null, user, context);\n  });\n\n}"
       },
       {
         "title": "Querystring",
@@ -230,8 +262,8 @@
         "categories": [
           "multifactor"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code or an sms message. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>You need to create two <strong>integrations</strong> in Duo Security one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //if (condition == ..) { }\n  context.multifactor = {\n    provider: 'duo',\n    skey: 'Your WebSDK Integration Key',\n    ikey: '....',\n    admin: {\n      skey: 'Your AdminSDK Integration Key',\n      ikey: 'YYY.....'\n    }\n  };\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>\n",
+        "code": "function (user, context, callback) {\n\n  //if (condition == ..) { }\n  context.multifactor = {\n\n    //required\n    provider: 'duo',\n    ikey: 'DIXBMN...LZO8IOS8',\n    skey: 'nZLxq8GK7....saKCOLPnh',\n    host: 'api-3....049.duosecurity.com',\n\n    //optional, force DuoSecurity everytime this rule runs. Defaults false.\n    ignoreCookie: true,\n\n    //optional\n    //Use some attribute of the profile as the username in DuoSecurity.\n    //This is also useful if you already have your users enrolled in Duo.\n    username: user.nickname\n\n    //optional\n    //Admin credentials. If you provide an Admin SDK type of credentials\n    //auth0 will update the realname and email in DuoSecurity.\n    admin: {\n      ikey: 'DIAN...NV6UM',\n      skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n    },\n  };\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Multifactor with Google Authenticator",
