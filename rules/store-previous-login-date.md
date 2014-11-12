@@ -12,8 +12,9 @@ If the user is logging in for the first time, then `previousLogin` and `latestLo
 
 ```js
 function (user, context, callback) {
-  user.persistent.previousLogin = user.latestLogin || new Date();
-  user.persistent.latestLogin = new Date();
+  var now = new Date();
+  user.persistent.previousLogin = user.latestLogin || now;
+  user.persistent.latestLogin = now;
   callback(null, user, context);
 }
 ```
