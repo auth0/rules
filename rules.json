@@ -40,7 +40,7 @@
           "access control"
         ],
         "description": "<p>This rule adds a Roles field to the user based on some pattern</p>\n",
-        "code": "function (user, context, callback) {\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(error);\n    } else {\n      user.persistent.roles = roles;\n      callback(null, user, context);\n  });\n\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@gonto.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n  }\n}"
+        "code": "function (user, context, callback) {\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@gonto.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.persistent.roles = roles;\n      callback(null, user, context);\n    }\n  });\n}"
       },
       {
         "title": "Whitelist for a Specific App",
