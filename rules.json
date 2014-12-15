@@ -194,7 +194,7 @@
           "webhook"
         ],
         "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property. See <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": YOUR_MIXPANEL_TOKEN,\n        \"application\": context.clientName\n    }\n  };\n\n  var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/}'\n    qs: {\n      data: base64Event\n    }\n  }, function(e,r,b){\n    callback(null,user,context);\n  });\n}"
+        "code": "function (user, context, callback) {\n\n  var mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": \"{REPLACE_WITH_YOUR_MIXPANEL_TOKEN}\",\n        \"application\": context.clientName\n    }\n  };\n\n  var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/}',\n    qs: {\n      data: base64Event\n    }\n  }, function(e,r,b){\n    callback(null,user,context);\n  });\n}"
       },
       {
         "title": "Obtains a Pusher token for subscribing/publishing to private channels",
