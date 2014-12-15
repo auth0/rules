@@ -15,7 +15,7 @@ function (user, context, callback) {
     "event": "Sign In",
     "properties": {
         "distinct_id": user.user_id,
-        "token": YOUR_MIXPANEL_TOKEN,
+        "token": "{REPLACE_WITH_YOUR_MIXPANEL_TOKEN}",
         "application": context.clientName
     }
   };
@@ -23,7 +23,7 @@ function (user, context, callback) {
   var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');
 
   request.get({
-    url: 'http://api.mixpanel.com/track/}'
+    url: 'http://api.mixpanel.com/track/}',
     qs: {
       data: base64Event
     }
