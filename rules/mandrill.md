@@ -14,7 +14,7 @@ Make sure to change the sender and destination emails.
 ```js
 function (user, context, callback) {
   // Only send an email when user signs up
-  if (user.persistent.signedUp) {
+  if (!user.persistent.signedUp) {
     // See https://mandrillapp.com/api/docs/messages.JSON.html#method=send
     var body = {
       key: configuration.MANDRILL_API_KEY,
