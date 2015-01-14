@@ -30,7 +30,7 @@ function (user, context, callback) {
     //optional
     //Use some attribute of the profile as the username in DuoSecurity.
     //This is also useful if you already have your users enrolled in Duo.
-    username: user.nickname
+    username: user.nickname,
 
     //optional
     //Admin credentials. If you provide an Admin SDK type of credentials
