@@ -1,20 +1,20 @@
 ## Generate an Appery.io Session Token
 
 This rule is used to generate a session token for accessing [Appery.io Database Services](http://appery.io/). The rule
-adds a new `user.appery_session_token` property set to the user profile containing the Appery.io session token. Yuo can use this `session token` to make further Appery.io API calls.
+adds a new `user.apperyio_session_token` property set to the user profile containing the Appery.io session token. Yuo can use this `session token` to make further Appery.io API calls.
 
-The only way of generating a session token is using the [`login`](http://docs.appery.io/documentation/users-rest-api/) endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain `session tokens`. Nobody can see this password since it's hashed on Appery's database. You could rotate it, but in this case, make sure you update the existing users.
+The only way of generating a session token is using the [`login`](http://docs.appery.io/documentation/users-rest-api/) endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain `session tokens`. Nobody can see this password since it's hashed on Appery.io database. You could rotate it, but in this case, make sure you update the existing users.
 
-More information is available in the Appery API: http://docs.appery.io/documentation/backendservices/database/#Signing_in_login
+More information is available in the Appery.io API: http://docs.appery.io/documentation/backendservices/database/#Signing_in_login
 
 If the user doesn't exist, this rule will auto-provision one, with `email`, `name` or `user_id` as the handle.
 
 ```js
 function (user, context, callback) {
-  // run this only for the Appery application
-  // if (context.clientID !== 'APPERY CLIENT ID IN AUTH0') return callback(null, user, context);
+  // run this only for the Appery.io application
+  // if (context.clientID !== 'APPERYIO CLIENT ID IN AUTH0') return callback(null, user, context);
 
-  var APPERY_DATABASE_ID = '<APPERY_DATABASE_ID>';
+  var APPERYIO_DATABASE_ID = '<APPERYIO_DATABASE_ID>';
   var PASSWORD_SECRET = 'A REALLY LONG PASSWORD';         // you can use this to generate one http://www.random.org/strings/
   var username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db
 
@@ -25,7 +25,7 @@ function (user, context, callback) {
       password: PASSWORD_SECRET
     },
     headers: {
-      'X-Appery-Database-Id': APPERY_DATABASE_ID
+      'X-Appery-Database-Id': APPERYIO_DATABASE_ID
     }
   },
   function (err, response, body) {
@@ -33,8 +33,8 @@ function (user, context, callback) {
 
     // user was found, add sessionToken to user profile
     if (response.statusCode === 200) {
-      user.appery_session_token = JSON.parse(body).sessionToken;
-      user.appery_userId = JSON.parse(body)._id;
+      user.apperyio_session_token = JSON.parse(body).sessionToken;
+      user.apperyio_userId = JSON.parse(body)._id;
       return callback(null, user, context);
     }
 
@@ -48,7 +48,7 @@ function (user, context, callback) {
           password: PASSWORD_SECRET
         },
         headers: {
-          'X-Appery-Database-Id': APPERY_DATABASE_ID
+          'X-Appery-Database-Id': APPERYIO_DATABASE_ID
         }
       },
       function (err, response, body) {
@@ -56,8 +56,8 @@ function (user, context, callback) {
 
         // user created, add sessionToken to user profile
         if (response.statusCode === 200) {
-          user.appery_session_token = body.sessionToken;
-          user.appery_userId = body._id;
+          user.apperyio_session_token = body.sessionToken;
+          user.apperyio_userId = body._id;
           return callback(null, user, context);
         }
 
