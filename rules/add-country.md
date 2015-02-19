@@ -9,7 +9,7 @@ This rule will add the `country` attribute to the user based on his ip address.
 
 ```js
 function (user, context, callback) {
-  user.country = context.request.geoip.country;
+  user.country = context.request.geoip.country_name;
 
    // Example geoip object:
    // "geoip": {
