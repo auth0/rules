@@ -17,7 +17,7 @@ function (user, context, callback) {
 
   var options = {
   	subject: user.id,
-  	expirationInMinutes: 600, //Should be greater than the SAML token expiration
+  	expiresInMinutes: 600, //Should be greater than the SAML token expiration
   	audience: CLIENT_ID,
   	issuer: 'https://{your auth0 account}.auth0.com'
   };
