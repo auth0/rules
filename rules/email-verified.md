@@ -11,7 +11,7 @@ Note that it might be a better UX to make this verification from your applicatio
 ```js
 function (user, context, callback) {
   if (!user.email_verified) {
-    return callback(new Error('Please verify your email before logging in.'));
+    return callback(new UnauthorizedError('Please verify your email before logging in.'));
   } else {
     return callback(null, user, context);
   }
