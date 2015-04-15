@@ -20,7 +20,7 @@ function(user, context, callback) {
 
   //Add any interesting info to the event
   var event = {
-    message: user.signedUp ? 'Login' : 'SignUp',
+    message: user.app_metadata.signedUp ? 'Login' : 'SignUp',
     application: context.clientName,
     clientIP: context.request.ip,
     protocol: context.protocol,
@@ -42,8 +42,14 @@ function(user, context, callback) {
   }, function(e,r,b) {
     if (e) return callback(e);
     if (r.statusCode !== 200) return callback(new Error('Invalid operation'));
-    user.persistent.signedUp = true;
-    return callback(e, user, context);
+    user.app_metadata.signedUp = true;
+    auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+    .then(function(){
+      callback(null, user, context);
+    });
+    .catch(function(err){
+      callback(err);
+    });
   });
 
 }

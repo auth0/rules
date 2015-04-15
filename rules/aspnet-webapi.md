@@ -19,7 +19,7 @@ Contributed by Robert McLaws, AdvancedREI.com
 
 ```js
 function (user, context, callback) {    
-  if (user.customId) {
+  if (user.app_metadata.customId) {
     console.log("Found ID!");
     return callback(null, user, context);
   } 
@@ -35,8 +35,14 @@ function (user, context, callback) {
     timeout: 15000
   }, function(err, response, body){
     if (err) return callback(new Error(err));
-    user.persistent.customId = body.customId;
-    return callback(null, user, context);
+    user.app_metadata.customId = body.customId;
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+      .then(function(){
+        callback(null, user, context);
+      })
+      .catch(function(err){
+        callback(err);
+      });
   });
 }
 ```

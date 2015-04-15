@@ -5,11 +5,16 @@ This rule will create a persistent property `signed_up` when the user logs in fo
 ```js
 function (user, context, callback) {
   // short-circuit if the user signed up already
-  if (user.signed_up) return callback(null, user, context);
+  if (user.app_metadata.signed_up) return callback(null, user, context);
   
   // first time login/signup
-  
-  user.persistent.signed_up = true;
-  callback(null, user, context);
+  user.app_metadata.signed_up = true;
+    auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+    .then(function(){
+      callback(null, user, context);
+    });
+    .catch(function(err){
+      callback(err);
+    });
 }
 ```

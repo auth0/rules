@@ -15,12 +15,6 @@ Here's the rule:
 
 ```js
 function (user, context, callback) {
-
-  // if the user that just logged in has a refresh_token, persist it
-  if (user.refresh_token) {
-    user.persistent.refresh_token = user.refresh_token;
-  }
-
   // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.
   // function encryptAesSha256 (password, textToEncrypt) {
   //   var cipher = crypto.createCipher('aes-256-cbc', password);
@@ -29,6 +23,16 @@ function (user, context, callback) {
   //   return crypted;
   // }
 
-  callback(null, user, context);
+  // if the user that just logged in has a refresh_token, persist it
+  if (user.refresh_token) {
+    user.app_metadata.refresh_token = user.refresh_token;
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+      .then(function(){
+        callback(null, user, context);
+      })
+      .catch(function(err){
+        callback(err);
+      });
+  }
 }
 ```

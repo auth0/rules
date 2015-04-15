@@ -14,7 +14,7 @@ Make sure to change the sender and destination emails.
 ```js
 function (user, context, callback) {
   // Only send an email when user signs up
-  if (!user.signedUp) {
+  if (!user.app_metadata.signedUp) {
     // See https://mandrillapp.com/api/docs/messages.JSON.html#method=send
     var body = {
       key: configuration.MANDRILL_API_KEY,
@@ -34,12 +34,15 @@ function (user, context, callback) {
     var mandrill_send_endpoint = 'https://mandrillapp.com/api/1.0/messages/send.json';
 
     request.post({url: mandrill_send_endpoint, form: body}, function (err, resp, body) {
-      if (!err) {
-        user.persistent.signedUp = true;
-        callback(null, user, context);
-      } else {
-        throw new Error(body);
-      }
+      if (err) { return callback(err); }
+      user.app_metadata.signedUp = true;
+      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function(){
+          callback(null, user, context);
+        })
+        .catch(function(err){
+          callback(err);
+        });
     });
   } else {
     // User had already logged in before, do nothing

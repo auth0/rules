@@ -23,8 +23,14 @@ function (user, context, callback) {
     if (err) {
       callback(err);
     } else {
-      user.persistent.roles = roles;
-      callback(null, user, context);
+      user.app_metadata.roles = roles;
+      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function(){
+          callback(null, user, context);
+        })
+        .catch(function(err){
+          callback(err);
+        });
     }
   });
 }

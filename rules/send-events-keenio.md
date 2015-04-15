@@ -41,9 +41,15 @@ function(user, context, callback) {
       function (e, r, body) {
         if( e ) return callback(e,user,context);
         //We assume everything went well
-        user.persistent.signedUp = true;
-        return callback(null, user, context);
-       });
+        user.app_metadata.signedUp = true;
+        auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+          .then(function(){
+            callback(null, user, context);
+          })
+          .catch(function(err){
+            callback(err);
+          });
+      });
 
 }
 ```
