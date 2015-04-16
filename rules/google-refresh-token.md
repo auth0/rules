@@ -15,6 +15,7 @@ Here's the rule:
 
 ```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.
   // function encryptAesSha256 (password, textToEncrypt) {
   //   var cipher = crypto.createCipher('aes-256-cbc', password);

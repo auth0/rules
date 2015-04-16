@@ -13,9 +13,9 @@ Events will show up on the Splunk console shortly after user access:
 
 ![](http://puu.sh/7R1EW.png)
 
-```
+```js
 function(user, context, callback) {
-
+  user.app_metadata = user.app_metadata || {};
   var splunkBaseUrl = 'YOUR SPLUNK SERVER, like: https://your server:8089';
 
   //Add any interesting info to the event
@@ -43,7 +43,7 @@ function(user, context, callback) {
     if (e) return callback(e);
     if (r.statusCode !== 200) return callback(new Error('Invalid operation'));
     user.app_metadata.signedUp = true;
-    auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
     .then(function(){
       callback(null, user, context);
     });

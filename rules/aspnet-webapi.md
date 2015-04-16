@@ -18,7 +18,8 @@ In your WebApi code, complete whatever operations are necessary, then call `retu
 Contributed by Robert McLaws, AdvancedREI.com
 
 ```js
-function (user, context, callback) {    
+function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.customId) {
     console.log("Found ID!");
     return callback(null, user, context);

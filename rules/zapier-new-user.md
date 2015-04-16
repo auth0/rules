@@ -13,6 +13,7 @@ This rule will call Zapier static hook every time a new user signs up.
 
 ```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   var ZAP_HOOK_URL = 'REPLACE_ME';
 
   // short-circuit if the user signed up already

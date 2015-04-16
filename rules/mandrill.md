@@ -13,6 +13,7 @@ Make sure to change the sender and destination emails.
 
 ```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   // Only send an email when user signs up
   if (!user.app_metadata.signedUp) {
     // See https://mandrillapp.com/api/docs/messages.JSON.html#method=send

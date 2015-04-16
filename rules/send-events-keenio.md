@@ -15,7 +15,7 @@ Once enabled, events will be displayed on Keen IO dashboard:
 
 ```js
 function(user, context, callback) {
-
+  user.app_metadata = user.app_metadata || {};
   if(user.signedUp){
     return callback(null, user, context);
   }

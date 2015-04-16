@@ -14,7 +14,7 @@ The `sendEvent` function is a simple wrapper around the [segment.io Track REST A
 
 ```js
 function(user, context, callback) {
-
+  user.app_metadata = user.app_metadata || {};
   if(user.app_metadata.signedUp){
     sendEvent('login');
   } else {

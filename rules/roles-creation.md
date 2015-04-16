@@ -9,6 +9,7 @@ This rule adds a Roles field to the user based on some pattern
 
 ```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   // You can add a Role based on what you want
   // In this case I check domain
   var addRolesToUser = function(user, cb) {

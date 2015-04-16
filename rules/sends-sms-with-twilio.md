@@ -5,8 +5,9 @@ This rule checks if the user has changed device or location since last login and
 If `user.phone` is not available, then everything is ignored; but signature is computed.
 
 
-```
+```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   var currentFingerprint = clientFingerprint();
 
   var previousFingerprint = user.app_metadata.lastDeviceFingerPrint;

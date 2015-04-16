@@ -11,7 +11,7 @@ This rule will check if this is the first user login, and in that case will call
 
 ```
 function (user, context, callback) {
-
+  user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.recordedAsLead){
     return callback(null,user,callback);
   }
