@@ -5,15 +5,19 @@ categories:
 ---
 ## Add persistent attributes to the user
 
-This rule count the amount of login for each user and store it as a persistent property (i.e. metadata).
+This rule count set the default color (an example preference) to a user (using user_metadata`).
 
 ```js
 function (user, context, callback) {
-  user.loginCount = ++user.loginCount || 1;
+  user.user_metadata = user.user_metadata || {};
+  user.user_metadata.color = user.user_metadata.color || 'blue';
 
-  //this makes the property persistent
-  user.persistent.loginCount = user.loginCount;
-
-  callback(null, user, context);
+  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+    .then(function(){
+        callback(null, user, context);
+    });
+    .catch(function(err){
+        callback(err);
+    });
 }
 ```

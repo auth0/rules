@@ -5,21 +5,30 @@ This rule checks if the user has changed device or location since last login and
 If `user.phone` is not available, then everything is ignored; but signature is computed.
 
 
-```
+```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   var currentFingerprint = clientFingerprint();
+
+  var previousFingerprint = user.app_metadata.lastDeviceFingerPrint;
+  user.app_metadata.lastDeviceFingerPrint = currentFingerprint;
+
+  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+    .then(function(){
+      if( !user.phone ) return callback(null, user, context);
+      if( !previousFingerprint ||
+        previousFingerprint === currentFingerprint ) {
+        return callback(null, user, context);
+      }
+
+      notifyUser(function(e){
+        return callback(e,user,context);
+      });
+    });
+    .catch(function(err){
+      callback(err);
+    });
   
-  user.persistent.lastDeviceFingerPrint = currentFingerprint;
-  
-  if( !user.phone ) return callback(null, user, context);
-  
-  if( !user.lastDeviceFingerPrint || user.lastDeviceFingerPrint === currentFingerprint ) {
-          return callback(null, user, context);
-        }
-  
-  notifyUser(function(e){
-                        return callback(e,user,context);                    
-                       });
 
   //Computes user device fingerprint with userAgent + IP address
   function clientFingerprint()
@@ -27,12 +36,11 @@ function (user, context, callback) {
     var shasum = crypto.createHash('sha1');
     shasum.update(context.request.userAgent);
     shasum.update(context.request.ip);
-    return shasum.digest('hex');      
+    return shasum.digest('hex');
   }
-  
+
   //Sends user SMS via Twilio
   function notifyUser(done){
-    
     var twilioAccount = 'YOUR TWILIO ACCOUNT';
     var twilioAuthToken = 'YOUR TWILIO AUTH TOKEN';
 

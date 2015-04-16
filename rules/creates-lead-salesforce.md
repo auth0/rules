@@ -11,8 +11,8 @@ This rule will check if this is the first user login, and in that case will call
 
 ```
 function (user, context, callback) {
-
-  if (user.recordedAsLead){
+  user.app_metadata = user.app_metadata || {};
+  if (user.app_metadata.recordedAsLead){
     return callback(null,user,callback);
   }
 
@@ -22,8 +22,15 @@ function (user, context, callback) {
       
       createLead( r.instance_url, r.access_token, function (e, result) {
         if (e) return callback(e);
-        user.persistent.recordedAsLead = true;
-        return callback(null,user,context);
+
+        user.app_metadata.recordedAsLead = true;
+        auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+          .then(function(){
+            callback(null, user, context);
+          })
+          .catch(function(err){
+            callback(err);
+          });
       });
     });
 

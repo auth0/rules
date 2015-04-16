@@ -13,10 +13,11 @@ This rule will call Zapier static hook every time a new user signs up.
 
 ```js
 function (user, context, callback) {
+  user.app_metadata = user.app_metadata || {};
   var ZAP_HOOK_URL = 'REPLACE_ME';
 
   // short-circuit if the user signed up already
-  if (user.signed_up) return callback(null, user, context);
+  if (user.app_metadata.signed_up) return callback(null, user, context);
 
   var small_context = {
     appName: context.clientName,
@@ -33,7 +34,14 @@ function (user, context, callback) {
   function (err, response, body) {
     // swallow error
     // mark the user as `signed_up` so next time the rule does not execute
-    user.persistent.signed_up = true;
+    user.app_metadata.signed_up = true;
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+      .then(function(){
+        callback(null, user, context);
+      })
+      .catch(function(err){
+        callback(err);
+      });
     callback(null, user, context);
   });
 

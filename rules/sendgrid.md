@@ -11,9 +11,10 @@ We use a persistent property `SignedUp` to track whether this is the first login
 
 In the same way you can use other services like [Amazon SES](http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html), [Mandrill](mandrill.md) and few others.
 
-```
+```js
 function(user, context, callback) {
-  if (!user.persistent.signedUp) {
+  user.app_metadata = user.app_metadata || {};
+  if (!user.app_metadata.signedUp) {
     return callback(null, user, context);
   }
 
@@ -30,8 +31,15 @@ function(user, context, callback) {
   }, function(e,r,b) {
     if (e) return callback(e);
     if (r.statusCode !== 200) return callback(new Error('Invalid operation'));
-    user.persistent.signedUp = true;
-    callback(null, user, context);
+
+    user.app_metadata.signedUp = true;
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+    .then(function(){
+      callback(null, user, context);
+    });
+    .catch(function(err){
+      callback(err);
+    });
   });
 }
 ```
