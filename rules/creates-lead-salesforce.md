@@ -16,6 +16,12 @@ function (user, context, callback) {
     return callback(null,user,callback);
   }
 
+  //Populate the variables below with appropriate values
+  var SFCOM_CLIENT_ID = "...";
+  var SFCOM_CLIENT_SECRET = "...";
+  var USERNAME = "...";
+  var PASSWORD = "...";
+
   getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,
     function(e,r) {
       if (e) return callback(e);
