@@ -20,7 +20,7 @@ function (user, context, callback) {
   }
 
   request({
-    url: 'https://personalize.rapleaf.com/v4/dr'
+    url: 'https://personalize.rapleaf.com/v4/dr',
     qs: {
       email: user.email,
       api_key: rapLeafAPIKey
