@@ -24,7 +24,7 @@ function (user, context, callback) {
       notifyUser(function(e){
         return callback(e,user,context);
       });
-    });
+    })
     .catch(function(err){
       callback(err);
     });
