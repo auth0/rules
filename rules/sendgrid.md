@@ -36,7 +36,7 @@ function(user, context, callback) {
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
     .then(function(){
       callback(null, user, context);
-    });
+    })
     .catch(function(err){
       callback(err);
     });
