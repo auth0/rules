@@ -11,7 +11,6 @@ This rule will check that the email the user has used to login matches any of th
 
 ```js
 function (user, context, callback) {
-
   request('https://login.auth0.com/api/v2/connections', {
     headers:
     {
@@ -19,7 +18,6 @@ function (user, context, callback) {
     }  
   },
   function(e,r,b){
-
     if(e) return callback(e);
     
     var connections = JSON.parse(b);
