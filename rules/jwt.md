@@ -23,7 +23,7 @@ function (user, context, callback) {
   };
 
   user.id_token = jwt.sign(api_user, 
-  						   new Buffer(TARGET_CLIENT_SECRET, 'base64'),
+  						   new Buffer(CLIENT_SECRET, 'base64'),
   						   options);
   callback(null, user, context);
 }
