@@ -12,8 +12,7 @@ This rule will check that the email the user has used to login matches any of th
 ```js
 function (user, context, callback) {
   request('https://login.auth0.com/api/v2/connections', {
-    headers:
-    {
+    headers: {
       Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN  //TODO: replace with your own Auth0 APIv2 token
     }  
   },
@@ -24,15 +23,16 @@ function (user, context, callback) {
     var connection = connections[_.findIndex(connections,function(c){
       return (c.name === context.connection);
     })];
-
+    
     //No domains -> access allowed
     if( !connection.options.tenant_domain ) return callback(null, user, context);
-
+    
     //Access allowed if domains is found.
     if( _.findIndex(connection.options.domain_aliases,function(d){
      return user.email.indexOf(d) >= 0; 
     }) >= 0 ) return callback(null, user, context);
-
+    
     return callback('Access denied');
   });
 }
+```
