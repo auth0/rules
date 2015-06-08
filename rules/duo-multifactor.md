@@ -15,7 +15,11 @@ You need to create two __integrations__ in __Duo Security__: one of type __WebSD
 ```js
 function (user, context, callback) {
 
-  //if (condition == ..) { }
+  // optional: run only for a specific client
+  // if (context.clientID !== '{CLIENT_ID}') {
+  //   /* set context.multifactor here instead */
+  // }
+
   context.multifactor = {
 
     //required
@@ -24,21 +28,21 @@ function (user, context, callback) {
     skey: 'nZLxq8GK7....saKCOLPnh',
     host: 'api-3....049.duosecurity.com',
 
-    //optional, force DuoSecurity everytime this rule runs. Defaults false.
-    ignoreCookie: true,
+    //optional, force DuoSecurity everytime this rule runs. Defaults to false.
+    // ignoreCookie: true,
 
     //optional
     //Use some attribute of the profile as the username in DuoSecurity.
     //This is also useful if you already have your users enrolled in Duo.
-    username: user.nickname,
+    // username: user.nickname,
 
     //optional
     //Admin credentials. If you provide an Admin SDK type of credentials
     //auth0 will update the realname and email in DuoSecurity.
-    admin: {
-      ikey: 'DIAN...NV6UM',
-      skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'
-    },
+    // admin: {
+    //  ikey: 'DIAN...NV6UM',
+    //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'
+    // },
   };
 
   callback(null, user, context);
