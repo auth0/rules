@@ -15,7 +15,11 @@ To reset Google Authenticator for a user, you can go to Users, search for the sp
 ```js
 function (user, context, callback) {
 
-  //if (condition == ..) { }
+  // optional: run only for a specific client
+  // if (context.clientID !== '{CLIENT_ID}') {
+  //   /* set context.multifactor here instead */
+  // }
+
   context.multifactor = {
     provider: 'google-authenticator'
   };
