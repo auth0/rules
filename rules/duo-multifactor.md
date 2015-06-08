@@ -20,7 +20,6 @@ function (user, context, callback) {
   //   /* set context.multifactor here instead */
   // }
 
-  //if (condition == ..) { }
   context.multifactor = {
 
     //required
@@ -29,7 +28,7 @@ function (user, context, callback) {
     skey: 'nZLxq8GK7....saKCOLPnh',
     host: 'api-3....049.duosecurity.com',
 
-    //optional, force DuoSecurity everytime this rule runs. Defaults false.
+    //optional, force DuoSecurity everytime this rule runs. Defaults to false.
     // ignoreCookie: true,
 
     //optional

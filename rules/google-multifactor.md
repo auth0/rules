@@ -21,7 +21,12 @@ function (user, context, callback) {
   // }
 
   context.multifactor = {
-    provider: 'google-authenticator'
+    provider: 'google-authenticator',
+
+    // optional, the key to use for TOTP. by default one is generated for you
+    // key: '{YOUR_KEY_HERE}'
+    // optional, force Google Authenticator everytime this rule runs. Defaults to false.
+    // ignoreCookie: true,
   };
 
   callback(null, user, context);
