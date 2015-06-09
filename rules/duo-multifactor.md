@@ -28,7 +28,8 @@ function (user, context, callback) {
     skey: 'nZLxq8GK7....saKCOLPnh',
     host: 'api-3....049.duosecurity.com',
 
-    //optional, force DuoSecurity everytime this rule runs. Defaults to false.
+    // optional, force DuoSecurity everytime this rule runs. Defaults to false.
+    // if accepted by users the cookie lasts for 30 days (this cannot be changed)
     // ignoreCookie: true,
 
     //optional
