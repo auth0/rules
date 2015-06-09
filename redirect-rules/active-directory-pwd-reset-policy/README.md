@@ -279,11 +279,11 @@ The sample application is available in the `/src` folder.
 
 As always the users will start with the Auth0 login screen:
 
-![Login Page](https://cdn.auth0.com/docs/img/redirect-rule-ad-login.png)
+![Login Page](https://cdn.auth0.com/docs/img/redirect-rule-ad-pwd-login.png)
 
 Users with an expired password will be redirect to the self-service password reset page to change their password.
 
-![Change Password](https://cdn.auth0.com/docs/img/redirect-rule-ad-change.png)
+![Change Password](https://cdn.auth0.com/docs/img/redirect-rule-ad-pwd-change.png)
 
 After changing their password they will be redirected back to Auth0 and the login flow continues.
 
