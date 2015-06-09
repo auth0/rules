@@ -1,5 +1,9 @@
 function (user, context, callback) {
 
+  if (context.connection !== 'FabrikamAD') {
+    return callback(null, user, context);
+  }
+  
   var ISSUER = 'https://DOMAIN.auth0.com/';
   var CLIENT_ID = 'CLIENT_ID';
   var CLIENT_SECRET = 'CLIENT_SECRET';

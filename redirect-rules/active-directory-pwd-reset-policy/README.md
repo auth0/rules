@@ -41,6 +41,9 @@ And the following rule contains all of the logic to redirect the user when their
 
 ```js
 function (user, context, callback) {
+  if (context.connection !== 'FabrikamAD') {
+    return callback(null, user, context);
+  }
 
   var ISSUER = 'https://DOMAIN.auth0.com/';
   var CLIENT_ID = 'CLIENT_ID';
