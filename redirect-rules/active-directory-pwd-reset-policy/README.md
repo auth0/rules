@@ -22,7 +22,7 @@ The profile mapper in the Auth0 AD/LDAP Connector allows you to choose which inf
 
 Every time users signs in the `last_pwd_change` attribute will be available in Auth0 (in the rules, in the profile, ...).
 
-### Creating a Redirect Rule
+## Creating a Redirect Rule
 
 The following step is to enforce this logic. For every login Auth0 needs to check the last password change date. If it's more than 30 days ago the login flow needs to be interrupted and the users should be redirect to an external application which allows them to change their password.
 
@@ -275,7 +275,7 @@ public ActionResult ChangeSubmit(PasswordChangeModel model)
 
 The sample application is available in the `/src` folder.
 
-### Result
+## Result
 
 As always the users will start with the Auth0 login screen:
 
