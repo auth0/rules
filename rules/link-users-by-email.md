@@ -6,7 +6,9 @@ categories:
 
 ## Link Accounts with Same Email Address
 
-This rule will link any accounts that have the same email address.
+This rule will link any accounts that have the same email address. You will need to create an API token to use this rule and set a configuration value for `AUTH0_API_TOKEN`. The token you create will need the 'read:users', 'update:users', 'read:users_app_metadata', 'update:users_app_metadata', and 'create:users_app_metadata' scopes.
+
+> Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manaully. See the document on [Linking Accounts](https://auth0.com/docs/link-accounts) for more details.
 
 ```js
 function (user, context, callback) {
