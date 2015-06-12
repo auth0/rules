@@ -5,7 +5,7 @@ categories:
 ---
 ## Add country to the user profile
 
-This rule will add the `country` attribute to the user based on his ip address.
+This rule will add a `country` attribute to the user based on their ip address.
 
 ```js
 function (user, context, callback) {
