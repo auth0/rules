@@ -20,9 +20,10 @@ function(user, context, callback) {
 
   request.post( {
     url: 'https://api.sendgrid.com/api/mail.send.json',
+    headers: {
+      'Authorization': ‘Bearer ...'
+    },
     form: {
-      'api_user': 'YOUR SENDGRID API USER',
-      'api_key': 'YOUR SENDGRID API PASS',
       'to': 'admin@myapp.com',
       'subject': 'NEW SIGNUP',
       'from': 'admin@myapp.com',
