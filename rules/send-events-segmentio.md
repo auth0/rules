@@ -15,40 +15,38 @@ The `sendEvent` function is a simple wrapper around the [segment.io Track REST A
 ```js
 function(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
+  
   if(user.app_metadata.signedUp){
-    sendEvent('login');
+    sendEvent('Logged in');
   } else {
-    sendEvent('signup');
+    sendEvent('Signed up');
   }
 
   function sendEvent(e)
   {
-    var sioTrack =
+    var sioTrack =  
     {
-      secret: "YOUR SEGMENTIO SECRET",
       userId: user.user_id,
       event: e,
       properties: {
-        application: context.clientName,
-        ip: context.ip,
-        agent: context.userAgent
+        application: context.clientName
       },
       context: {
-        "providers" : { "all": false }
+        "ip" : context.request.ip,
+        "userAgent" : context.request.userAgent
       }
     };
-
     request({
       method: 'POST',
-      url: '  https://api.segment.io/v1/track',
+      url: 'https://SEGMENTIO_WRITE_KEY@api.segment.io/v1/track',
       headers: {
         'Content-type': 'application/json',
       },
       body: JSON.stringify(sioTrack),
-    },
+    }, 
     function (err, response, body) {
       if(err) return callback(err, user, context);
-      if(e === 'signup') {
+      if(e === 'Signed up') {
         user.app_metadata.signedUp = true;
         auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
           .then(function(){
