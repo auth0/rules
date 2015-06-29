@@ -5,7 +5,7 @@ categories:
 ---
 ## Enrich profile with FullContact
 
-This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullContactInfo` to the user profile and returns. Any other conditions are ignored. See [FullContact docs](http://www.fullcontact.com/developer/docs/) for full details.
+This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullContactInfo` to the user_metadata and returns. Any other conditions are ignored. See [FullContact docs](http://www.fullcontact.com/developer/docs/) for full details.
 
 ```
 function (user, context, callback) {
@@ -27,10 +27,10 @@ function (user, context, callback) {
     if(e) return callback(e);
 
     if(r.statusCode===200){
-      user.app_metadata = user.app_metadata || {};
-      user.app_metadata.contact_info = JSON.parse(b);
+      user.user_metadata = user.user_metadata || {};
+      user.user_metadata.fullContactInfo = JSON.parse(b);
       
-      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+      auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
         .then(function(){
           callback(null, user, context);
         })
