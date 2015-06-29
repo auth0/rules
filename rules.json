@@ -59,6 +59,14 @@
         "code": "function (user, context, callback) {\n  if (!user.email_verified) {\n    return callback(new UnauthorizedError('Please verify your email before logging in.'));\n  } else {\n    return callback(null, user, context);\n  }\n}"
       },
       {
+        "title": "Link Accounts with Same Email Address",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule will link any accounts that have the same email address. You will need to create an API token to use this rule and set a configuration value for <code>AUTH0_API_TOKEN</code>. The token you create will need the <code>read:users</code> and <code>update:users</code> scopes.</p>\n<blockquote>\n<p>Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on <a href=\"https://auth0.com/docs/link-accounts\">Linking Accounts</a> for more details.</p>\n</blockquote>\n",
+        "code": "function (user, context, callback) {\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  var userApiUrl = 'https://YOUR_TENANT.auth0.com/api/v2/users';\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if(err) return callback(err);\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n          request.post({\n            url: userApiUrl + '/' + user.user_id + '/identities',\n            headers: {\n              Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN\n            },\n            json: { provider: provider, user_id: targetUserId }\n          }, function(err, response, body) {\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
+      },
+      {
         "title": "Set roles to a user",
         "categories": [
           "access control"
@@ -108,7 +116,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will add the <code>country</code> attribute to the user based on his ip address.</p>\n",
+        "description": "<p>This rule will add a <code>country</code> attribute to the user based on their ip address.</p>\n",
         "code": "function (user, context, callback) {\n  user.country = context.request.geoip.country_name;\n\n   // Example geoip object:\n   // \"geoip\": {\n   //    \"country_code\": \"AR\",\n   //    \"country_code3\": \"ARG\",\n   //    \"country_name\": \"Argentina\",\n   //    \"region\": \"05\",\n   //    \"city\": \"Cordoba\",\n   //    \"latitude\": -31.41349983215332,\n   //    \"longitude\": -64.18109893798828,\n   //    \"continent_code\": \"SA\",\n   //    \"time_zone\": \"America/Argentina/Cordoba\"\n   //  }\n\n  callback(null, user, context);\n}"
       },
       {
@@ -250,7 +258,7 @@
           "webhook"
         ],
         "description": "<p>This rule will send an email to an administrator on the first login of a user.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>In the same way you can use other services like <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a>, <a href=\"mandrill.md\">Mandrill</a> and few others.</p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (!user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    form: {\n      'api_user': 'YOUR SENDGRID API USER',\n      'api_key': 'YOUR SENDGRID API PASS',\n      'to': 'admin@myapp.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@myapp.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
+        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (!user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ...'\n    },\n    form: {\n      'to': 'admin@myapp.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@myapp.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
       },
       {
         "title": "Tracks Logins/SignUps with Splunk",
@@ -303,7 +311,7 @@
           "multifactor"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -&gt; Multifactor.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n        // optional, the key to use for TOTP. by default one is generated for you\n        // key: '{YOUR_KEY_HERE}'\n        // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n        // ignoreCookie: true,\n      };\n    // }\n  }\n\n  callback(null, user);\n}"
+        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n        // issuer: 'Label on Google Authenticator App', // optional\n        // key: '{YOUR_KEY_HERE}', //  optional, the key to use for TOTP. by default one is generated for you\n        // ignoreCookie: true // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
       }
     ]
   },
