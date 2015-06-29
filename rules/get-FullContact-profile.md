@@ -27,10 +27,10 @@ function (user, context, callback) {
     if(e) return callback(e);
 
     if(r.statusCode===200){
-      user.user_metadata = user.user_metadata || {};
-      user.user_metadata.contact_info = JSON.parse(b);
+      user.app_metadata = user.app_metadata || {};
+      user.app_metadata.contact_info = JSON.parse(b);
       
-      auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
         .then(function(){
           callback(null, user, context);
         })
