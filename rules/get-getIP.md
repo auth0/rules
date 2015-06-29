@@ -10,11 +10,11 @@ This rule gets the user locations based on the IP and is added to the app_metada
 ```
 function (user, context, callback) {
   
-  user.app_metadata = user.app_metadata || {};
+  user.user_metadata = user.user_metadata || {};
   
-  user.app_metadata.geoip = context.request.geoip;
+  user.user_metadata.geoip = context.request.geoip;
   
-  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
     .then(function(){
       callback(null, user, context);
     })
