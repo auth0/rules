@@ -27,10 +27,17 @@ function (user, context, callback) {
     if(e) return callback(e);
 
     if(r.statusCode===200){
-      user.fullContactInfo = JSON.parse(b);
+      user.user_metadata = user.user_metadata || {};
+      user.user_metadata.contact_info = JSON.parse(b);
+      
+      auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+        .then(function(){
+          callback(null, user, context);
+        })
+        .catch(function(err){
+          callback(err);
+        });
     }
-
-    return callback(null, user, context);
   });
 }
 ```
