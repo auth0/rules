@@ -30,6 +30,6 @@ function (user, context, callback) {
     // }
   }
 
-  callback(null, user);
+  callback(null, user, context);
 }
 ```
