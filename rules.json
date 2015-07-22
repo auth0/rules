@@ -35,6 +35,14 @@
         "code": "function (user, context, callback) {\n\n  function daydiff (first, second) {\n    return (second-first)/(1000*60*60*24);\n  }\n\n  var last_password_change = user.last_password_reset || user.created_at;\n\n  if (daydiff(new Date(last_password_change), new Date()) > 30) {\n    return callback(new UnauthorizedError('please change your password'));\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "title": "Custom authorization scopes",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule maps arbitrary <code>scope</code> values to actual properties in the user profile.</p>\n",
+        "code": "function (user, context, callback) {\n  // The currently requested scopes can be accessed as follows:\n  // context.request.query.scope.match(/\\S+/g)\n  var scopeMapping = {\n    contactInfo: [\"name\", \"email\", \"company\"],\n    publicInfo: [\"public_repos\", \"public_gists\"]\n  };\n  context.jwtConfiguration.scopes = scopeMapping;\n  callback(null, user, context);\n}"
+      },
+      {
         "title": "Disable the Resource Owner endpoint.",
         "categories": [
           "access control"
