@@ -75,6 +75,14 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@gonto.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
       },
       {
+        "title": "Email domain whitelist",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule will only allow access to users with specific email domains.</p>\n",
+        "code": "function (user, context, callback) {\n    var whitelist = ['example.com', 'example.org']; //authorized domains\n    var userHasAccess = whitelist.some(\n      function (domain) {\n        var emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    return callback(null, user, context);\n}"
+      },
+      {
         "title": "Whitelist for a Specific App",
         "categories": [
           "access control"
@@ -140,8 +148,16 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user profile and returns. Any other conditions are ignored. See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';\n\n  if(!user.email) {\n    //the profile doesn't have email so we can't query fullcontact api.\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://api.fullcontact.com/v2/person.json',\n    qs: {\n      email:  user.email,\n      apiKey: fullContactAPIKey\n    }\n  }, function (e,r,b) {\n    if(e) return callback(e);\n\n    if(r.statusCode===200){\n      user.fullContactInfo = JSON.parse(b);\n    }\n\n    return callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user_metadata and returns. Any other conditions are ignored. See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>\n",
+        "code": "function (user, context, callback) {\n\n  var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';\n\n  if(!user.email) {\n    //the profile doesn't have email so we can't query fullcontact api.\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://api.fullcontact.com/v2/person.json',\n    qs: {\n      email:  user.email,\n      apiKey: fullContactAPIKey\n    }\n  }, function (e,r,b) {\n    if(e) return callback(e);\n\n    if(r.statusCode===200){\n      user.user_metadata = user.user_metadata || {};\n      user.user_metadata.fullContactInfo = JSON.parse(b);\n\n      auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
+      },
+      {
+        "title": "Enrich profile with the locations where the user logs in",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>This rule gets the user locations based on the IP and is added to the app_metadata in the <code>geoip</code> attribute.</p>\n",
+        "code": "function (user, context, callback) {\n\n  user.user_metadata = user.user_metadata || {};\n\n  user.user_metadata.geoip = context.request.geoip;\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n}"
       },
       {
         "title": "Enrich profile with Rapleaf",
