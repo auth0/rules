@@ -14,6 +14,12 @@ The `sendEvent` function is a simple wrapper around the [segment.io Track REST A
 
 ```js
 function(user, context, callback) {
+
+  // abort if user is calling the delegation endpoint
+  if(context.protocol === 'delegation'){
+      return callback(null, user, context);
+  }
+
   user.app_metadata = user.app_metadata || {};
   
   if(user.app_metadata.signedUp){
