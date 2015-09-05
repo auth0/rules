@@ -25,7 +25,7 @@ A rule will run on Step 4 and this is the information each rule will get:
 
 This is the rules editor inside Auth0:
 
-![](https://cloudup.com/cCZrpGptHIx+)
+![](http://cdn.auth0.com/docs/img/rules-editor.png)
 
 ---
 
