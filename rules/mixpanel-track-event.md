@@ -23,12 +23,13 @@ function (user, context, callback) {
   var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');
 
   request.get({
-    url: 'http://api.mixpanel.com/track/}',
+    url: 'http://api.mixpanel.com/track/',
     qs: {
       data: base64Event
     }
-  }, function(e,r,b){
-    callback(null,user,context);
   });
 }
+
+// don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`
+callback(null,user,context);
 ```
