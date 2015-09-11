@@ -9,35 +9,43 @@ This rule gets the user profile from FullContact using the e-mail (if available)
 
 ```
 function (user, context, callback) {
+  var FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY';
+  var SLACK_HOOK = 'YOUR SLACK HOOK URL';
 
-  var fullContactAPIKey = 'YOUR FULLCONTACT API KEY';
-
-  if(!user.email) {
-    //the profile doesn't have email so we can't query fullcontact api.
-    return callback(null, user, context);
-  }
-
+  var slack = require('slack-notify')(SLACK_HOOK);
+  
+  // skip if no email
+  if(!user.email) return callback(null, user, context);
+  // skip if fullcontact metadata is already there
+  if(user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
   request({
     url: 'https://api.fullcontact.com/v2/person.json',
     qs: {
       email:  user.email,
-      apiKey: fullContactAPIKey
+      apiKey: FULLCONTACT_KEY
     }
-  }, function (e,r,b) {
-    if(e) return callback(e);
-
-    if(r.statusCode===200){
-      user.user_metadata = user.user_metadata || {};
-      user.user_metadata.fullContactInfo = JSON.parse(b);
+  }, function (error, response, body) {
+    if (error || (response && response.statusCode !== 200)) {
       
-      auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
-        .then(function(){
-          callback(null, user, context);
-        })
-        .catch(function(err){
-          callback(err);
-        });
+      slack.alert({
+        channel: '#slack_channel',
+        text: 'Fullcontact API Error',
+        fields: {
+          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')
+        }
+      });
+
+      // swallow fullcontact api errors and just continue login
+      return callback(null, user, context);
     }
+
+
+    // if we reach here, it means fullcontact returned info and we'll add it to the metadata
+    user.user_metadata = user.user_metadata || {};
+    user.user_metadata.fullcontact = JSON.parse(body);
+
+    auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
+    return callback(null, user, context);
   });
 }
 ```
