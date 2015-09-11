@@ -16,6 +16,9 @@ function (user, context, done) {
     return done(null,user,context);
   }
 
+  var MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
+  var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
+
   //Populate the variables below with appropriate values
   var SFCOM_CLIENT_ID = configuration.SALESFORCE_CLIENT_ID;
   var SFCOM_CLIENT_SECRET = configuration.SALESFORCE_CLIENT_SECRET;
@@ -23,39 +26,35 @@ function (user, context, done) {
   var PASSWORD = configuration.SALESFORCE_PASSWORD;
 
   getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,
-    function(e,r) {
-      if (e) {
-        return console.log('[SALESFORCE-ERROR] There was an error creating salesforce lead for user (getting access token): ' + user.user_id, e);
-      }
-
-      if (!r.instance_url) {
-        return console.log('[SALESFORCE-ERROR] There was an error creating salesforce lead for user (getting access token - instance_url is undefined): ' + user.user_id);
-      }
-
-      if (!r.access_token) {
-        return console.log('[SALESFORCE-ERROR] There was an error creating salesforce lead for user ((getting access token - access_token is undefined)): ' + user.user_id, e);
+    function(r) {
+      if (!r.instance_url || !r.access_token) {
+        slack.alert({
+          channel: '#external_blog',
+          text: 'Error Getting SALESFORCE Access Token',
+          fields: {
+            error: r
+          }
+        });
       }
 
       createLead(r.instance_url, r.access_token, function (e, result) {
-        if (e) {
-          return console.log('[SALESFORCE-ERROR] There was an error creating salesforce lead for user (creating lead): ' + user.user_id, e);
-        }
-
         if (!result.id) {
-          return console.log('[SALESFORCE-ERROR] There was an error creating salesforce lead for user (creating lead): ' + user.user_id, result);
+          slack.alert({
+            channel: '#external_blog',
+            text: 'Error Creating SALESFORCE Lead',
+            fields: {
+              error: result
+            }
+          });
         }
 
         user.app_metadata.recordedAsLead = true;
-        auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-          .then(function() {}, function(err) {
-            console.log('[SALESFORCE-ERROR] There was an error creating salesforce lead for user (updating metadata): ' + user.user_id, e);
-          }).done();
+        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
       });
     });
 
   //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm
   function createLead(url, access_token, callback){
-
     //Can use many more fields
     var data = {
       LastName: user.name,
@@ -69,10 +68,7 @@ function (user, context, done) {
       },
       json: data
       }, function(e,r,b) {
-        if (e) {
-          return callback(e);
-        }
-        return callback(null,b);
+        return callback(b);
       });
   }
 
@@ -87,19 +83,11 @@ function (user, context, done) {
         username: username,
         password: password
       }}, function(e,r,b) {
-        if (e) { return callback(e); }
-        var resJSON;
-        try {
-          resJSON = JSON.parse(b);
-        } catch (error) {
-          return callback(error);
-        }
-
-        return callback(null, resJSON);
+        return callback(JSON.parse(b));
       });
   }
-
+  
+  // don’t wait for the SF API call to finish, return right away (the request will continue on the sandbox)`
   done(null, user, context);
 }
-
 ```
