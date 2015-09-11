@@ -23,5 +23,8 @@ function(user, context, callback) {
    text: message,
    channel: channel
   });
+  
+  // don’t wait for the Slack API call to finish, return right away (the request will continue on the sandbox)`
+  callback(null, user, context);
 }
 ```
