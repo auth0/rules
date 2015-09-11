@@ -15,10 +15,12 @@ Once enabled, events will be displayed on Keen IO dashboard:
 
 ```js
 function(user, context, callback) {
-  user.app_metadata = user.app_metadata || {};
-  if(user.signedUp){
+  if (context.stats.loginsCount > 1) {
     return callback(null, user, context);
   }
+
+  var MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
+  var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
   var writeKey = 'YOUR KEEN IO WRITE KEY';
   var projectId = 'YOUR KEEN IO PROJECT ID';
@@ -31,25 +33,26 @@ function(user, context, callback) {
   };
 
   request.post({
-      method: 'POST',
-      url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(keenEvent),
-      },
-      function (e, r, body) {
-        if( e ) return callback(e,user,context);
-        //We assume everything went well
-        user.app_metadata.signedUp = true;
-        auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-          .then(function(){
-            callback(null, user, context);
-          })
-          .catch(function(err){
-            callback(err);
-          });
+    method: 'POST',
+    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,
+    headers: {
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(keenEvent),
+  },
+  function (error, response, body) {
+    
+    if( error || (response && response.statusCode !== 200) ) {
+      slack.alert({
+        channel: '#some_channel',
+        text: 'KEEN API ERROR',
+        fields: {
+          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')
+        }
       });
+    }
+  });
 
+  callback(null, user, context);
 }
 ```
