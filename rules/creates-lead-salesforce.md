@@ -29,23 +29,27 @@ function (user, context, done) {
     function(r) {
       if (!r.instance_url || !r.access_token) {
         slack.alert({
-          channel: '#external_blog',
+          channel: '#some_channel',
           text: 'Error Getting SALESFORCE Access Token',
           fields: {
             error: r
           }
         });
+
+        return;
       }
 
       createLead(r.instance_url, r.access_token, function (e, result) {
         if (!result.id) {
           slack.alert({
-            channel: '#external_blog',
+            channel: '#some_channel',
             text: 'Error Creating SALESFORCE Lead',
             fields: {
               error: result
             }
           });
+
+          return;
         }
 
         user.app_metadata.recordedAsLead = true;
