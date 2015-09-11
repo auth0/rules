@@ -13,12 +13,15 @@ This rule will call Zapier static hook every time a new user signs up.
 
 ```js
 function (user, context, callback) {
-  user.app_metadata = user.app_metadata || {};
-  var ZAP_HOOK_URL = 'REPLACE_ME';
-
   // short-circuit if the user signed up already
-  if (user.app_metadata.signed_up) return callback(null, user, context);
+  if (context.stats.loginsCount > 1) {
+    return callback(null, user, context);
+  }
 
+  var _ = require('lodash');
+  
+  var ZAP_HOOK_URL = 'REPLACE_ME';
+  
   var small_context = {
     appName: context.clientName,
     userAgent: context.userAgent,
@@ -26,36 +29,15 @@ function (user, context, callback) {
     connection: context.connection,
     strategy: context.connectionStrategy
   };
-  var payload_to_zap = extend({}, user, small_context);
+  
+  var payload_to_zap = _.extend({}, user, small_context);
+  
   request.post({
     url: ZAP_HOOK_URL,
     json: payload_to_zap
-  },
-  function (err, response, body) {
-    // swallow error
-    // mark the user as `signed_up` so next time the rule does not execute
-    user.app_metadata.signed_up = true;
-    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function(){
-        callback(null, user, context);
-      })
-      .catch(function(err){
-        callback(err);
-      });
-    callback(null, user, context);
   });
 
-  function extend(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i],
-          keys = Object.keys(source);
-
-      for (var j = 0; j < keys.length; j++) {
-          var name = keys[j];
-          target[name] = source[name];
-      }
-    }
-    return target;
-  }
+  // don’t wait for the Zapier WebHook call to finish, return right away (the request will continue on the sandbox)`
+  callback(null, user, context);
 }
 ```
