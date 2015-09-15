@@ -34,5 +34,6 @@ function (user, context, callback) {
 
 Note, for this to work you'll need to set 2 configuration settings:
 
-- `ENCRYPT_PASSWORD`, eg: S0me,Password!è§
-- `ENCRYPT_IV`, eg: 0110011001100110
+- `ENCRYPT_PASSWORD`, eg: **S0me,Password!è§**
+- `ENCRYPT_IV`, eg: **abcjfiekdpaifjfd**
+
