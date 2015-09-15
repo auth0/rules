@@ -22,7 +22,7 @@ function (user, context, callback) {
     var decodeKey = crypto.createHash('sha256')
       .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();
     var cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);
-    return cipher.update(JSON.stringify(data || {}), 'utf8', 'hex') + cipher.final('hex');
+    return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');
   }
 }
 ```
