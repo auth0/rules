@@ -45,6 +45,9 @@ function (user, context, callback) {
             },
             json: { provider: provider, user_id: targetUserId }
           }, function(err, response, body) {
+              if (response.statusCode >= 400) {
+               cb(new Error('Error linking account: ' + response.statusMessage));  
+              }
             cb(err);
           });
         } else {
