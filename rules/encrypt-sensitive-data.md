@@ -5,7 +5,7 @@ categories:
 ---
 ## Encrypt sensitive data in the user profile
 
-This rule will set a sensitive value in the app_metadata and encrypt it.
+This rule will set a sensitive value in the app_metadata and encrypt it (see the [Decrypt sensitive data from the user profile](/rules/decrypt-sensitive-data.md) rule for information on how to decrypt the data).
 
 ```js
 function (user, context, callback) {
