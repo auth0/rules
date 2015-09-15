@@ -10,14 +10,14 @@ This rule will set a sensitive value in the app_metadata and encrypt it (see the
 ```js
 function (user, context, callback) {
   user.app_metadata = user.app_metadata || { };
-  user.app_metdata.private_data = encrypt({
+  user.app_metadata.private_data = encrypt({
     license_key: '1234567',
     social_security_number: '56789'
   });
-
-  callback(null, user, context);
   
-  function encrypt = function(data) {
+  callback(null, user, context);
+
+  function encrypt(data) {
     var iv = new Buffer(configuration.ENCRYPT_IV);
     var decodeKey = crypto.createHash('sha256')
       .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();
@@ -36,7 +36,7 @@ The `user` will look like this after the encryption:
   "nickname": "jdoe",
   "picture": "http://foobar.com/pictures/jdoe.png",
   "app_metadata": {
-    "private_data": "5579405b71bbf8390b7ce560522fe9cb20a129ac9fb3b3340d3910daab7dc372643e3c61ac02296f2d476b704cec7ceffc3371724f9ed27e2942c80926c69878"
+    "private_data": "46d2581f53ad45a9423182de2de1ca306659dd94101808cb20338b6a6a2f6e32899747197cfe8ade5a1d8b1ed5b9552357a4264b2cc766ea784e1ca688ce84ed"
   },
   "user_id": "foobar.com|0123456789"
 }
@@ -44,5 +44,5 @@ The `user` will look like this after the encryption:
 
 Note, for this to work you'll need to set 2 configuration settings:
 
-- `ENCRYPT_PASSWORD`, eg: S0me,Password!è§
-- `ENCRYPT_IV`, eg: 0110011001100110
+- `ENCRYPT_PASSWORD`, eg: **S0me,Password!è§**
+- `ENCRYPT_IV`, eg: **abcjfiekdpaifjfd**
