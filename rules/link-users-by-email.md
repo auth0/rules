@@ -29,7 +29,8 @@ function (user, context, callback) {
    }
   },
   function(err, response, body) {
-    if(err) return callback(err);
+    if (err) return callback(err);
+    if (response.statusCode !== 200) return callback(new Error(body));
 
     var data = JSON.parse(body);
     if (data.length > 0) {
