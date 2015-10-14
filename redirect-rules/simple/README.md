@@ -11,11 +11,8 @@ To try this rule out with your own Auth0 account using an existing instance of t
 1. Create a new Auth0 rule using the contents of the [`rule.js`](rule.js) script.
 1. In your account's [Rules](https://manage.auth0.com/#/rules) screen, add a setting that has the key `CONSENT_FORM_URL` and the following value:  
   ```
-  https://sandbox.it.auth0.com/api/run/simple-redirect-protocol/consent?webtask_no_cache=1&auth0_domain=AUTH0_DOMAIN
+  https://sandbox.it.auth0.com/api/run/simple-redirect-protocol/consent?webtask_no_cache=1
   ```
-
-  where:
-  * `AUTH0_DOMAIN` is your Auth0 account's tenant domain (e.g. `your-account.auth0.com`)
 
 1. If you have any other active rules, make sure they account for the fact that they could be executed during a redirect protocol continuation (i.e. when `context.protocol === 'redirect-callback'`). For more information, see the [Redirect protocol in rules](https://auth0.com/docs/protocols#redirect-protocol-in-rules) docs page.
 
@@ -60,15 +57,9 @@ If you'd like to play around with your own implementation of the consent form we
   where:
   * `WEBTASK_PROFILE` is the name of the profile you set up in the previous step
 
-  The output of that command will contain a URL that will be the base URL of the `CONSENT_FORM_URL` setting you configured with the redirect rule. The full URL is that URL appended with `&auth0_domain=AUTH0_DOMAIN`, where `AUTH0_DOMAIN` is your Auth0 account's tenant domain (e.g. `your-account.auth0.com`).
+  The output of this command will contain the URL of your new webtask.
 
-  The full URL will be something like:
-
-  ```
-  https://sandbox.it.auth0.com/api/run/WEBTASK_CONTAINER/consent?webtask_no_cache=1&auth0_domain=AUTH0_DOMAIN
-  ```
-
-1. In your account's [Rules](https://manage.auth0.com/#/rules) screen, delete the existing `CONSENT_FORM_URL` setting since its not pointing to your webtask instance. Recreate that setting using the full URL obtained in the previous step.
+1. In your account's [Rules](https://manage.auth0.com/#/rules) screen, delete the existing `CONSENT_FORM_URL` setting and recreate it with the value that is the URL that was output in the previous step.
 
 1. Try the rule along with your instance of the webtask by the following the steps in the [Run the Rule](#rule-the-rule) section.
 

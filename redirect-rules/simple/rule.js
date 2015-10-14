@@ -3,10 +3,13 @@ function redirectToConsentForm (user, context, callback) {
 
   // redirect to consent form if user has not yet consented
   if (!hasConsented && context.protocol !== 'redirect-callback') {
+    var auth0Domain = auth0.baseUrl.match(/([^:]*:\/\/)?([^\/]+\.[^\/]+)/)[2];
+
     context.redirect = {
       url: configuration.CONSENT_FORM_URL +
+        '&auth0_domain=' + encodeURIComponent(auth0Domain) +
         // generate random state string that Auth0 will validate when we return
-        '&state=' + new Buffer(Math.random().toString()).toString('base64')
+        '&state=' + encodeURIComponent(new Buffer(Math.random().toString()).toString('base64'))
     };
   }
 
