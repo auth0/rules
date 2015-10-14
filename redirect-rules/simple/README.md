@@ -64,3 +64,11 @@ If you'd like to play around with your own implementation of the consent form we
 1. Try the rule along with your instance of the webtask by the following the steps in the [Run the Rule](#rule-the-rule) section.
 
 1. If you want make changes to the webtask, you can upload a new version simply by running the same `wt create` command you did before.
+
+## Data Integrity
+
+As stated, this is a very basic example of using a redirect rule to invoke a consent form. The `confirm` field (which has the value of `yes`) that is being passed back to the Auth0 redirect rule is in plain text.
+
+There are scenarios where you need better assurances of the integrity of the data being returned by the external website (in this case the webtask). For example, if you want to be sure that the data truly came from a trusted source, then it should be signed. If the data is sensitive, then it should be encrypted. A good mechanism for doing this is to use a [JWT](http://jwt.io/). You can build a JWT with claims (that you can optionally encrypt) and then sign it with either a secret shared with your Auth0 rule or with a private key, whose public key is known by the rule. The rule can then verify that the claims are legit and decrypt them, if necessary.
+
+To see an example of this in a webtask, take a look at the [YubiKey-NEO MFA](https://github.com/auth0/rules/blob/master/redirect-rules/yubico-mfa.md) rule, which generates an `id_token` (JWT) that gets send back to the redirect rule.
