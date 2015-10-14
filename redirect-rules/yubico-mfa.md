@@ -1,6 +1,6 @@
 # YubiKey-NEO MFA
 
-```
+```javascript
 var request = require('request');
 var qs = require('qs');
 var jwt = require('jsonwebtoken');
