@@ -11,7 +11,7 @@ To try this rule out with your own Auth0 account using an existing instance of t
 1. Create a new Auth0 rule using the contents of the [`rule.js`](rule.js) script.
 1. In your account's [Rules](https://manage.auth0.com/#/rules) screen, add a setting that has the key `CONSENT_FORM_URL` and the following value:  
   ```
-  https://sandbox.it.auth0.com/api/run/simple-redirect-protocol/consent?webtask_no_cache=1
+  https://sandbox.it.auth0.com/api/run/simple-redirect-protocol/consent
   ```
 
   > The above URL renders a form that we've hosted for you using a webtask, but in the [Consent Form Setup](#consent-form-setup) section below we'll show how to host your own version of this form (with your own URL) that you can enhance for your specific use case.
