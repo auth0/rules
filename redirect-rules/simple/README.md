@@ -67,7 +67,13 @@ If you'd like to play around with your own implementation of the consent form we
 
 1. If you want make changes to the webtask, you can upload a new version simply by running the same `wt create` command you did before.
 
-## Data Integrity
+### Trusted Callback URL's
+
+Our sample rule and webtask make one security compromise for the sake of convenience: the rule passes the Auth0 domain (i.e. `your-tenant.auth0.com`) to the form website and the form uses that to construct a callback URL (i.e. `https://your-tenant.auth0.com/continue`) for returning back to the rule. This is essentially an [open redirect](https://www.owasp.org/index.php/Unvalidated_Redirects_and_Forwards_Cheat_Sheet) and should not be used in production scenarios.
+
+You can lock this down by configuring your form website implementation to only return to a specific URL (i.e. just your Auth0 tenant) instead of one that's generated from a query param. You can then simplify the rule too so it no longer passes the Auth0 domain.
+
+### Data Integrity
 
 As stated, this is a very basic example of using a redirect rule to invoke a consent form. The `confirm` field (which has the value of `yes`) that is being passed back to the Auth0 redirect rule is in plain text.
 
