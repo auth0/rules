@@ -7,7 +7,10 @@ module.exports = function (context, req, res) {
     return res.end('Method not allowed');
   }
 
-  res.writeHead(200, { 'Content-Type': 'text/html '});
+  res.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Cache-Control': 'no-cache'
+  });
   res.end(ejs.render(consentForm.stringify(), {
     title: 'Sample Consent Form',
     action: util.format('https://%s/continue?state=%s',
