@@ -14,6 +14,8 @@ To try this rule out with your own Auth0 account using an existing instance of t
   https://sandbox.it.auth0.com/api/run/simple-redirect-protocol/consent?webtask_no_cache=1
   ```
 
+  > The above URL renders a form that we've hosted for you using a webtask, but in the [Consent Form Setup](#consent-form-setup) section below we'll show how to host your own version of this form (with your own URL) that you can enhance for your specific use case.
+
 1. If you have any other active rules, make sure they account for the fact that they could be executed during a redirect protocol continuation (i.e. when `context.protocol === 'redirect-callback'`). For more information, see the [Redirect protocol in rules](https://auth0.com/docs/protocols#redirect-protocol-in-rules) docs page.
 
 1. Try the rule by following the steps in the next section.
