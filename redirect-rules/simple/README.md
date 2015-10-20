@@ -1,6 +1,8 @@
 # Redirect Rule: Simple Example with a Webtask
 
-This sample demonstrates a minimal implementation of the `redirect` protocol. It contains an Auth0 [rule](http://auth0.com/docs/rules) that will redirect the user to a simple consent form. If the user checks the "I agree" checkbox on this form and clicks the **Submit** button, they are then redirected back to Auth0 to complete the authentication flow. On future logins they will no longer be prompted since the consent action is stored in their user profile.
+This sample demonstrates a minimal implementation of the `redirect` protocol. It contains an Auth0 [rule](http://auth0.com/docs/rules) that will redirect the user to a simple consent form:
+![](https://cloud.githubusercontent.com/assets/3535918/10492764/5eac3cd2-7273-11e5-9717-b1a8305fb4e6.png)
+If the user checks the "I agree" checkbox on this form and clicks the **Submit** button, they are then redirected back to Auth0 to complete the authentication flow. On future logins they will no longer be prompted since the consent action is stored in their user profile.
 
 The consent form is hosted using a simple [Webtask](https://webtask.io/) that you can easily modify and provision and use in your version of the rule.
 
