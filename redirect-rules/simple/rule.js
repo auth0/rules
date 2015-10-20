@@ -8,9 +8,7 @@ function redirectToConsentForm (user, context, callback) {
     context.redirect = {
       url: configuration.CONSENT_FORM_URL +
         (configuration.CONSENT_FORM_URL.indexOf('?') === -1 ? '?' : '&') +
-        'auth0_domain=' + encodeURIComponent(auth0Domain) +
-        // generate random state string that Auth0 will validate when we return
-        '&state=' + encodeURIComponent(new Buffer(Math.random().toString()).toString('base64'))
+        'auth0_domain=' + encodeURIComponent(auth0Domain)
     };
   }
 
