@@ -16,7 +16,7 @@ function redirectToConsentForm (user, context, callback) {
   // if user clicked 'I agree' on the consent form, persist it to their profile
   // so they don't get prompted again
   if (context.protocol === 'redirect-callback') {
-    if (context.request.body.confirm === 'yes') {
+    if (context.request.query.confirm === 'yes') {
       user.app_metadata = user.app_metadata || {};
       user.app_metadata.has_consented = true;
 
