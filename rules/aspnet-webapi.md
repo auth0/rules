@@ -23,7 +23,7 @@ function (user, context, callback) {
   if (user.app_metadata.customId) {
     console.log("Found ID!");
     return callback(null, user, context);
-  } 
+  }
 
   // You should make your requests over SSL to protect your app secrets.
   request.post({

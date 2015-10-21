@@ -41,7 +41,7 @@ function(user, context, callback) {
     body: JSON.stringify(keenEvent),
   },
   function (error, response, body) {
-    
+
     if( error || (response && response.statusCode !== 200) ) {
       slack.alert({
         channel: '#some_channel',
