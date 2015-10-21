@@ -3,7 +3,7 @@ gallery: true
 categories:
 - webhook
 ---
-## Send events to Keen.io
+## Send events to Keen
 
 This rule is used to send a `signup` event to [Keen IO](http://keen.io)
 

@@ -4,7 +4,7 @@ categories:
 - access control
 ---
 
-## Disable the Resource Owner endpoint.
+## Disable the Resource Owner endpoint
 
 This rule is used to disable the Resource Owner endpoint (to prevent users from bypassing MFA policies).
 

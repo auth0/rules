@@ -3,7 +3,7 @@ gallery: true
 categories:
 - webhook
 ---
-## Custom webhook with ASP.NET WebApi2
+## Custom webhook with ASPNET WebApi2
 
 This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User's profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.
 

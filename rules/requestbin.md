@@ -3,7 +3,7 @@ gallery: true
 categories:
 - debugging
 ---
-## Dump rule variables to RequestB.in
+## Dump rule variables to RequestBin
 
 This rule shows how to post the variables sent to your Rule to http://RequestB.in to help troubleshoot issues with your Rules.
 
