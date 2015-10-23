@@ -21,8 +21,6 @@ function(user, context, callback) {
   var request = require('request');
   var oauth = require('oauth-sign');
 
-  console.log(context);
-
   if (context.connectionStrategy !== 'twitter') {
     return callback(null, user, context);
   }
