@@ -18,7 +18,6 @@ function(user, context, callback) {
   //
   // Remember to set the TWITTER_CONSUMER_KEY and TWITTER_CONSUMER_SECRET configuration variables.
 
-  var querystring = require('querystring');
   var request = require('request');
   var oauth = require('oauth-sign');
 
@@ -39,7 +38,13 @@ function(user, context, callback) {
     oauth_version: '1.0',
   };
 
-  params.oauth_signature = oauth.hmacsign('GET', url, params, configuration.TWITTER_CONSUMER_SECRET, user.identities[0].access_token_secret);
+  params.oauth_signature = oauth.hmacsign(
+      'GET',
+      url,
+      params,
+      configuration.TWITTER_CONSUMER_SECRET,
+      user.identities[0].access_token_secret
+  );
 
   var auth = Object.keys(params).sort().map(function(k) {
     return k + '="' + oauth.rfc3986(params[k]) + '"';
