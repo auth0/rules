@@ -6,12 +6,13 @@ This rule and webtask will add [SMS Passwordless](https://auth0.com/passwordless
 
 1- Create the webtask
     - Follow the instructions to install the `wt-cli` tool and setup it for your [Auth0 account](https://manage.auth0.com/#/account/webtasks) and copy the url generated (without any get param).
-    - Create your SMS MFA webtask: ```js
+    - Create your SMS MFA webtask: 
+```js
     wt create --name passwordless-sms-mfa \
         --secret client_secret=yourclientsecret \
         --secret auth0_domain=yourdomain.auth0.com \
         --output url mfa-passwordless.js --no-parse --no-merge
-    ```
+```
     Parameters:
         - *client_secret*: The secret you want to use to sign the tokens used between the rule and the webtask.
         - *auth0_domain*: Your auth0 subdomain: *domain*.auth0.com
