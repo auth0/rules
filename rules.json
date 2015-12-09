@@ -124,7 +124,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won&#39;t be persistede to the user). This is useful for cases where you want to enrich the user information for a specific application.</p>\n",
+        "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won&#39;t be persisted to the user). This is useful for cases where you want to enrich the user information for a specific application.</p>\n",
         "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    user.vip = true;\n  }\n\n  callback(null, user, context);\n}"
       },
       {
