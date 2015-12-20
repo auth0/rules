@@ -1,6 +1,12 @@
 var util = require('util');
 var ejs = require('ejs');
 
+function hereDoc(f) {
+  return f.toString().
+    replace(/^[^\/]+\/\*!?/, '').
+    replace(/\*\/[^\/]+$/, '');
+}
+
 module.exports = function (context, req, res) {
   if (req.method !== 'GET') {
     res.writeHead(405);
@@ -11,7 +17,7 @@ module.exports = function (context, req, res) {
     'Content-Type': 'text/html',
     'Cache-Control': 'no-cache'
   });
-  res.end(ejs.render(consentForm.stringify(), {
+  res.end(ejs.render(hereDoc(consentForm), {
     title: 'Sample Consent Form',
     action: util.format('https://%s/continue?state=%s',
       context.data.auth0_domain,
