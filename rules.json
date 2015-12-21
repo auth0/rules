@@ -43,12 +43,12 @@
         "code": "function (user, context, callback) {\n  // The currently requested scopes can be accessed as follows:\n  // context.request.query.scope.match(/\\S+/g)\n  var scopeMapping = {\n    contactInfo: [\"name\", \"email\", \"company\"],\n    publicInfo: [\"public_repos\", \"public_gists\"]\n  };\n  context.jwtConfiguration.scopes = scopeMapping;\n  callback(null, user, context);\n}"
       },
       {
-        "title": "Disable the Resource Owner endpoint.",
+        "title": "Disable the Resource Owner endpoint",
         "categories": [
           "access control"
         ],
         "description": "<p>This rule is used to disable the Resource Owner endpoint (to prevent users from bypassing MFA policies).</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.protocol === 'oauth2-resource-owner') {\n    return callback(\n      new UnauthorizedError('The resource owner endpoint cannot be used.'));  \n  }\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n  if (context.protocol === 'oauth2-resource-owner') {\n    return callback(\n      new UnauthorizedError('The resource owner endpoint cannot be used.'));\n  }\n  callback(null, user, context);\n}"
       },
       {
         "title": "Whitelist on the cloud",
@@ -72,7 +72,7 @@
           "access control"
         ],
         "description": "<p>This rule will link any accounts that have the same email address. You will need to create an API token to use this rule and set a configuration value for <code>AUTH0_API_TOKEN</code>. The token you create will need the <code>read:users</code> and <code>update:users</code> scopes.</p>\n<blockquote>\n<p>Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on <a href=\"https://auth0.com/docs/link-accounts\">Linking Accounts</a> for more details.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  var userApiUrl = 'https://YOUR_TENANT.auth0.com/api/v2/users';\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if(err) return callback(err);\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n          request.post({\n            url: userApiUrl + '/' + user.user_id + '/identities',\n            headers: {\n              Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN\n            },\n            json: { provider: provider, user_id: targetUserId }\n          }, function(err, response, body) {\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
+        "code": "function (user, context, callback) {\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  var userApiUrl = 'https://YOUR_TENANT.auth0.com/api/v2/users';\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n          request.post({\n            url: userApiUrl + '/' + user.user_id + '/identities',\n            headers: {\n              Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN\n            },\n            json: { provider: provider, user_id: targetUserId }\n          }, function(err, response, body) {\n              if (response.statusCode >= 400) {\n               cb(new Error('Error linking account: ' + response.statusMessage));  \n              }\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
       },
       {
         "title": "Set roles to a user",
@@ -133,7 +133,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule will add a <code>country</code> attribute to the user based on their ip address.</p>\n",
-        "code": "function (user, context, callback) {\n  user.country = context.request.geoip.country_name;\n\n   // Example geoip object:\n   // \"geoip\": {\n   //    \"country_code\": \"AR\",\n   //    \"country_code3\": \"ARG\",\n   //    \"country_name\": \"Argentina\",\n   //    \"region\": \"05\",\n   //    \"city\": \"Cordoba\",\n   //    \"latitude\": -31.41349983215332,\n   //    \"longitude\": -64.18109893798828,\n   //    \"continent_code\": \"SA\",\n   //    \"time_zone\": \"America/Argentina/Cordoba\"\n   //  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n  if (context.request.geoip) {\n    user.country = context.request.geoip.country_name;\n  }\n\n   // Example geoip object:\n   // \"geoip\": {\n   //    \"country_code\": \"AR\",\n   //    \"country_code3\": \"ARG\",\n   //    \"country_name\": \"Argentina\",\n   //    \"region\": \"05\",\n   //    \"city\": \"Cordoba\",\n   //    \"latitude\": -31.41349983215332,\n   //    \"longitude\": -64.18109893798828,\n   //    \"continent_code\": \"SA\",\n   //    \"time_zone\": \"America/Argentina/Cordoba\"\n   //  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Add zipcode median household income to the user profile",
@@ -160,6 +160,22 @@
         "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n\n  // Queries a table by e-mail and returns associated 'Roles'\n  function getRoles(email, done) {\n    var connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', function (error) {\n      console.log(error.message);\n    });\n\n    var query = \"SELECT Email, Role \" +\n                \"FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', function (err) {\n      if (err) return done(new Error(err));\n\n      var request = new sqlserver.Request(query, function (err, rowCount, rows) {\n        if (err) return done(new Error(err));\n\n        var roles = rows.map(function (row) {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}"
       },
       {
+        "title": "Decrypt sensitive data from the user profile",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>This rule will get a sensitive value in the app_metadata and decrypt it (see the <a href=\"/rules/encrypt-sensitive-data.md\">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>\n<p>Note, for this to work you&#39;ll need to set 2 configuration settings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code>, eg: <strong>S0me,Password!è§</strong></li>\n<li><code>ENCRYPT_IV</code>, eg: <strong>abcjfiekdpaifjfd</strong></li>\n</ul>\n<p>And here&#39;s an example of how you would decrypt this in .NET:</p>\n",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n\n  var private_data = decrypt(user.app_metadata.private_data);\n  if (private_data.license_key === '1234567') {\n    user.role = 'admin';\n  }\n\n  return callback(null, user, context);\n\n  function decrypt(data) {\n    if (!data) {\n      return { };  \n    }\n    var iv = new Buffer(configuration.ENCRYPT_IV);\n    var encodeKey = crypto.createHash('sha256')\n    .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();\n    var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);\n    var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');\n    return JSON.parse(decrypted);\n  }\n}"
+      },
+      {
+        "title": "Encrypt sensitive data in the user profile",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>This rule will set a sensitive value in the app_metadata and encrypt it (see the <a href=\"/rules/decrypt-sensitive-data.md\">Decrypt sensitive data from the user profile</a> rule for information on how to decrypt the data).</p>\n<p>The <code>user</code> will look like this after the encryption:</p>\n<p>Note, for this to work you&#39;ll need to set 2 configuration settings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code>, eg: <strong>S0me,Password!è§</strong></li>\n<li><code>ENCRYPT_IV</code>, eg: <strong>abcjfiekdpaifjfd</strong></li>\n</ul>\n",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n  user.app_metadata.private_data = encrypt({\n    license_key: '1234567',\n    social_security_number: '56789'\n  });\n\n  callback(null, user, context);\n\n  function encrypt(data) {\n    var iv = new Buffer(configuration.ENCRYPT_IV);\n    var decodeKey = crypto.createHash('sha256')\n      .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();\n    var cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);\n    return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');\n  }\n}"
+      },
+      {
         "title": "Enrich profile with FullContact",
         "categories": [
           "enrich profile"
@@ -182,6 +198,14 @@
         ],
         "description": "<p>This rule gets user information from <strong>rapleaf</strong> using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>rapLeafInfo</code> to the user profile and returns. Any other conditions are ignored. See <a href=\"http://www.rapleaf.com/developers/personalization-api/\">RapLeaf docs</a> for full details.</p>\n",
         "code": "function (user, context, callback) {\n\n  //Filter by app\n  //if(context.clientName !== 'AN APP') return callback(null, user, context);\n\n  var rapLeafAPIKey = 'YOUR RAPLEAF API KEY';\n\n  if(user.email){\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://personalize.rapleaf.com/v4/dr',\n    qs: {\n      email: user.email,\n      api_key: rapLeafAPIKey\n    }\n  }, function(err, response, body){\n    if(err) return callback(err);\n\n    if(response.statusCode===200){\n     user.rapLeafData = JSON.parse(body);\n    }\n\n    return callback(null, user, context);\n  });\n\n}"
+      },
+      {
+        "title": "Get email address from Twitter",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>NOTE: For this rule to work, your Twitter application must be whitelisted to access email addresses.</p>\n",
+        "code": "function(user, context, callback) {\n  // NOTE: For this rule to work, your Twitter application must be whitelisted to access email addresses.\n  // See: https://dev.twitter.com/rest/reference/get/account/verify_credentials\n  //\n  // If Twitter does not return an email address, this rule will cause authentication to fail.\n  // This might not be the desired behavior, so make sure to adapt it to your requirements.\n  //\n  // Remember to set the TWITTER_CONSUMER_KEY and TWITTER_CONSUMER_SECRET configuration variables.\n\n  var request = require('request');\n  var oauth = require('oauth-sign');\n\n  if (context.connectionStrategy !== 'twitter') {\n    return callback(null, user, context);\n  }\n\n  var url = 'https://api.twitter.com/1.1/account/verify_credentials.json';\n  var params = {\n    include_email: true,\n    oauth_consumer_key: configuration.TWITTER_CONSUMER_KEY,\n    oauth_nonce: require('uuid').v4().replace(/-/g, ''),\n    oauth_signature_method: 'HMAC-SHA1',\n    oauth_timestamp: Date.now() / 1000 | 0,\n    oauth_token: user.identities[0].access_token,\n    oauth_version: '1.0',\n  };\n\n  params.oauth_signature = oauth.hmacsign(\n      'GET',\n      url,\n      params,\n      configuration.TWITTER_CONSUMER_SECRET,\n      user.identities[0].access_token_secret\n  );\n\n  var auth = Object.keys(params).sort().map(function(k) {\n    return k + '=\"' + oauth.rfc3986(params[k]) + '\"';\n  }).join(', ');\n\n  request({\n    url: url + '?include_email=true',\n    headers: {\n      'Authorization': 'OAuth ' + auth\n    }\n  }, function(err, resp, body) {\n    if (err || resp.statusCode !== 200) {\n      return callback(new Error('Error retrieving email from twitter: ' + body || err));\n    }\n    var result;\n    try {\n      result = JSON.parse(body);\n    } catch (e) {\n      return callback(new Error('Invalid JSON returned by Twitter'));\n    }\n    if (!result.email) {\n      // Might not want to fail in this case\n      return callback(new Error('Twitter did not return an email address'));\n    } else {\n      user.email = result.email;\n      return callback(null, user, context);\n    }\n  });\n}"
       },
       {
         "title": "Store Google Refresh Token",
@@ -245,12 +269,12 @@
     "name": "webhook",
     "templates": [
       {
-        "title": "Custom webhook with ASP.NET WebApi2",
+        "title": "Custom webhook with ASPNET WebApi2",
         "categories": [
           "webhook"
         ],
         "description": "<p>This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User&#39;s profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.</p>\n<p>In this example, we&#39;re going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.</p>\n<p>Within the snippet, the &quot;secretToken&quot; is a simple way to ensure that the communication is coming from Auth0. Just type in a random string into the Rule, and then check for that string in your WebApi request.</p>\n<p>In your WebApi code, complete whatever operations are necessary, then call <code>return Json(new { customId = USERSCUSTOMID });</code> to return the required JSON to the Rule.</p>\n<blockquote>\n<p>Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the <code>[HttpPost]</code> attribute.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.customId) {\n    console.log(\"Found ID!\");\n    return callback(null, user, context);\n  } \n\n  // You should make your requests over SSL to protect your app secrets.\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: \";ojhsajk;h;Kh:Jh\",\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    user.app_metadata.customId = body.customId;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}"
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.customId) {\n    console.log(\"Found ID!\");\n    return callback(null, user, context);\n  }\n\n  // You should make your requests over SSL to protect your app secrets.\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: \";ojhsajk;h;Kh:Jh\",\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    user.app_metadata.customId = body.customId;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}"
       },
       {
         "title": "Creates a new Lead in Salesforce on First Login",
@@ -293,7 +317,7 @@
         "code": "function (user, context, callback) {\n\n  var pusherKey='YOUR PUSHER KEY';\n  var pusherSecret = '{YOUR PUSHER SECRET}';\n\n  if( context.request.query.channel && context.request.query.socket_id)\n  {\n    user.pusherAuth = pusherKey + \":\" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);\n  }\n\n  callback(null, user, context);\n\n  function sign(secret, channel, socket_id)\n  {\n    var string_to_sign = socket_id+\":\"+channel;\n    var sha = crypto.createHmac('sha256',secret);\n    return sha.update(string_to_sign).digest('hex');\n  }\n}"
       },
       {
-        "title": "Send events to Keen.io",
+        "title": "Send events to Keen",
         "categories": [
           "webhook"
         ],
@@ -375,7 +399,7 @@
     "name": "debugging",
     "templates": [
       {
-        "title": "Dump rule variables to RequestB.in",
+        "title": "Dump rule variables to RequestBin",
         "categories": [
           "debugging"
         ],
