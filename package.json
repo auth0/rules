@@ -3,6 +3,9 @@
   "version": "0.1.12",
   "description": "Auth0 Rules Repository =====",
   "main": "./rules",
+  "scripts": {
+    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/auth0/rules.git"
