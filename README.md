@@ -27,6 +27,26 @@ This is the rules editor inside Auth0:
 
 ![](http://cdn.auth0.com/docs/img/rules-editor.png)
 
+
+---
+### Release Notes
+
+1. Update the markdown files to update the rule and commit your changes
+2. Update the version by executing: 
+ 
+ ```bash
+ npm version [patch|minor|mayor]
+ ```
+ 
+ > There is a `preversion` script in the `package.json` file that executes the following command:  `./build && git add rules.json && git commit -m 'update rules.json`
+
+3. Push your changes to master including the tags
+
+ ```bash
+ git push origin master --tags
+ ``` 
+ 
+
 ---
 
 ###Highlighted Rules
