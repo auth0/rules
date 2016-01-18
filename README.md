@@ -32,20 +32,20 @@ This is the rules editor inside Auth0:
 ### Release Notes
 
 1. Update the markdown files to update the rule and commit your changes
-2. Update the version by executing: 
- 
+2. Update the version by executing:
+
  ```bash
  npm version [patch|minor|mayor]
  ```
- 
+
  > There is a `preversion` script in the `package.json` file that executes the following command:  `./build && git add rules.json && git commit -m 'update rules.json`
 
 3. Push your changes to master including the tags
 
  ```bash
  git push origin master --tags
- ``` 
- 
+ ```
+
 
 ---
 
@@ -58,3 +58,15 @@ This is the rules editor inside Auth0:
 * [Get an Appery Session Token](https://github.com/auth0/rules/blob/master/rules/appery.md)
 
 [More information about them here](https://docs.auth0.com/rules).
+
+## Issue Reporting
+
+If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
+
+## Author
+
+[Auth0](auth0.com)
+
+## License
+
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
