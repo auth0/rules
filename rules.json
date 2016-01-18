@@ -407,5 +407,18 @@
         "code": "function (user, context, callback) {\n  request.post({\n    url: 'http://requestb.in/YourBinUrl',\n    json: {\n      user: user,\n      context: context,\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    return callback(null, user, context);\n  });\n}"
       }
     ]
+  },
+  {
+    "name": "saml",
+    "templates": [
+      {
+        "title": "Change your SAML configuration",
+        "categories": [
+          "saml"
+        ],
+        "description": "<p>At some point you may want to add fields to your SAML Configuration. The way to do this is to add specific fields as done in the example code snippet below. <code>samlConfiguration</code> is an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for SAMLP and WS-Fed protocol).</p>\n<p>To know more about SAML configuration options check <a href=\"https://auth0.com/docs/saml-configuration#configuration-options\">this documentation page</a>.</p>\n",
+        "code": "function (user, context, callback) {\n  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);\n\n  context.samlConfiguration = context.samlConfiguration || {};\n  //context.samlConfiguration.audience: \"urn:foo\";\n  //context.samlConfiguration.recipient: \"http://foo\";\n  //context.samlConfiguration.destination: \"http://foo\";\n  //context.samlConfiguration.lifetimeInSeconds: 3600;\n  //context.samlConfiguration.mappings: {\n  //   \"user_id\":     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\",\n  //   \"email\":       \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\",\n  //   \"name\":        \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\",\n  //   \"given_name\":  \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname\",\n  //   \"family_name\": \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname\",\n  //   \"upn\":         \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\",\n  //   \"groups\":      \"http://schemas.xmlsoap.org/claims/Group\"\n  // },\n  //context.samlConfiguration.nameIdentifierFormat: \"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified\";\n  //context.samlConfiguration.nameIdentifierProbes: [\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\"],\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\",\n  // ];\n  //context.samlConfiguration.signatureAlgorithm: \"rsa-sha1\";\n  //context.samlConfiguration.digestAlgorithm: \"sha1\";\n  //context.samlConfiguration.signResponse: false;\n  //context.samlConfiguration.authnContextClassRef: \"urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified\";\n  //context.samlConfiguration.mapIdentities: false;\n  //context.samlConfiguration.mapUnknownClaimsAsIs: false;\n  //context.samlConfiguration.passthroughClaimsWithNoMapping: true;\n  //context.samlConfiguration.createUpnClaim: true;\n  //context.samlConfiguration.logout: {\n  //   \"callback\": \"http://foo/logout\"\n  // }\n\n  //context.samlConfiguration.RelayState: \"foo=bar\"; // SAMLP protocol only\n  //context.samlConfiguration.wctx: \"foo=bar\"; // WS-Fed protocol only\n\n  callback(null, user, context);\n}"
+      }
+    ]
   }
 ]
