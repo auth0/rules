@@ -11,8 +11,6 @@ The way you ask for a `refresh_token` using Lock is by sending the `access_type=
 
 The only caveat is that Google will send you the `refresh_token` only once, and if you haven't stored it, you will have to ask for it again and add `approval_prompt=force` so the user explicitly consent again. Since this would be annoying from a user experience perspective, you should store the refresh token on Auth0 as a persistent property of the user, only if it there is a new one available.
 
-Here's the rule:
-
 ```js
 function (user, context, callback) {
   user.app_metadata = user.app_metadata || {};
@@ -34,6 +32,8 @@ function (user, context, callback) {
       .catch(function(err){
         callback(err);
       });
+  } else {
+    callback(null, user, context);
   }
 }
 ```
