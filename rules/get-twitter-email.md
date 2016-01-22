@@ -7,6 +7,18 @@ categories:
 
 NOTE: For this rule to work, your Twitter application must be whitelisted to access email addresses.
 
+This rule will not perist the returned email to the Auth0 user profile, but it will be returned to your application.
+If you want to persist the email, it will need to be [done with `app_metadata` as described here](https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata).
+For example, you can save it under `app_metadata.social_email`.
+
+When accessing the email, you can do the following from a rule or the equivalent in your application:
+
+```
+user.app_metadata = user.app_metadata || {};
+var email = user.email || user.app_metadata.social_email;
+```
+
+The rule which makes the call to Twitter to retrieve the email is as follows:
 
 ```js
 function(user, context, callback) {
