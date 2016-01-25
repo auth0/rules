@@ -31,7 +31,7 @@ function (user, context, callback) {
   //context.samlConfiguration.nameIdentifierFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
   //context.samlConfiguration.nameIdentifierProbes = [
   //   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
-  //   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+  //   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
   //   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
   // ];
   //context.samlConfiguration.signatureAlgorithm = "rsa-sha1";
