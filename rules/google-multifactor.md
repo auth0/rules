@@ -14,12 +14,14 @@ To reset Google Authenticator for a user, you can go to Users, search for the sp
 
 ```js
 function (user, context, callback) {
+  // Uncomment the following to skip MFA when impersonating a user
+  // if (user.impersonated) { return callback(null, user, context); }
 
   var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];
   // run only for the specified clients
   if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {
-    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true
-    // if (user.user_metadata && user.user_metadata.use_mfa){
+    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true
+    // if (user.app_metadata && user.app_metadata.use_mfa){
       context.multifactor = {
         provider: 'google-authenticator',
         // issuer: 'Label on Google Authenticator App', // optional
