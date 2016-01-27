@@ -11,6 +11,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 var Promise = require("bluebird");
 var request = Promise.promisify(require("request"));
 
+function hereDoc(f) {
+  return f.toString().
+    replace(/^[^\/]+\/\*!?/, '').
+    replace(/\*\/[^\/]+$/, '');
+}
+
 app.get('/', function (req, res) {
 
   var callback_url = "https://webtask.it.auth0.com/api/run/"+req.x_wt.container+"/"+req.x_wt.jtn+"/widget-callback";
@@ -104,7 +110,7 @@ function showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_t
     'Content-Type': 'text/html'
   });
 
-  res.end(require('ejs').render(passwordlessSecondStepForm.stringify(), {
+  res.end(require('ejs').render(hereDoc(passwordlessSecondStepForm), {
       token: decoded_token.token,
       phone_number: decoded_token.sms_identity.profileData.phone_number
     }

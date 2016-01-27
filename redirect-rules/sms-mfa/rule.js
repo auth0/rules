@@ -1,4 +1,5 @@
 function (user, context, callback) {
+  var jwt = require('jsonwebtoken');
 
   //check SMS MFA is enabled for the client
   var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];
