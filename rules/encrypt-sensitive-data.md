@@ -42,7 +42,7 @@ The `user` will look like this after the encryption:
 }
 ```
 
-Note, for this to work you'll need to set 2 configuration settings:
+Note, for this to work you'll need to set two configuration settings. Both should be random strings:
 
-- `ENCRYPT_PASSWORD`, eg: **S0me,Password!è§**
-- `ENCRYPT_IV`, eg: **abcjfiekdpaifjfd**
+- `ENCRYPT_PASSWORD`
+- `ENCRYPT_IV`
