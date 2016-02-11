@@ -19,7 +19,7 @@ function (user, context, callback) {
   }
 
   //CHECK FOR SMS IDENTITY
-  var sms_connections = user.identities.filter(function(id){ return id.provider === 'sms' && id.profileData.phone_verified; });
+  var sms_connections = user.identities.filter(function(id){ return id.provider === 'sms' && id.profileData && id.profileData.phone_verified; });
   var token_payload = {};
 
   //IF NO SMS IDENTITY, SKIP
