@@ -10,13 +10,13 @@ function (user, context, callback) {
 
   //Copies user profile attributes needed in the API (equivalent to `scope`)
   var api_user = {
-  	user_id: user.id,
+  	user_id: user.user_id,
   	email: user.email,
   	name: user.name
   };
 
   var options = {
-  	subject: user.id,
+  	subject: user.user_id,
   	expiresInMinutes: 600, //Should be greater than the SAML token expiration
   	audience: CLIENT_ID,
   	issuer: 'https://{your auth0 account}.auth0.com'
