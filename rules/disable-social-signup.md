@@ -24,7 +24,7 @@ function (user, context, callback) {
   if (context.stats.loginsCount === 1 && user.identities[0].isSocial) {
     
     // turn on the flag
-    user.app_metadata.is_singup = true; 
+    user.app_metadata.is_signup = true; 
     
     // store the app_metadata
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
@@ -40,7 +40,7 @@ function (user, context, callback) {
   } 
   
   // if flag is enabled, throw error
-  if (user.app_metadata.is_singup) {
+  if (user.app_metadata.is_signup) {
     return callback('Signup disabled');
   }
   
