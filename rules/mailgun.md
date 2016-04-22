@@ -12,7 +12,7 @@ We use a persistent property `SignedUp` to track whether this is the first login
 ```js
 function(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
-  if (!user.app_metadata.signedUp) {
+  if (user.app_metadata.signedUp) {
     return callback(null, user, context);
   }
 
