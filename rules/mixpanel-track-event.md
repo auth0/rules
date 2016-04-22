@@ -27,9 +27,9 @@ function (user, context, callback) {
     qs: {
       data: base64Event
     }
+  }, function (e, r, b){
+      // don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`
+      callback(null, user, context);
   });
 }
-
-// don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`
-callback(null,user,context);
 ```
