@@ -14,6 +14,11 @@ The `sendEvent` function is a simple wrapper around the [segment.io Track REST A
 
 ```js
 function(user, context, callback) {
+
+  if(context.protocol === 'delegation') {
+    return callback(null, user, context);
+  }
+
   if(context.stats.loginsCount > 1){
     sendEvent('Logged in');
   } else {
