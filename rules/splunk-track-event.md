@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Send SignUp and Login events to Splunk, including some contextual information of the user
 categories:
 - webhook
 ---

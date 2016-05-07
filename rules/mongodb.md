@@ -1,4 +1,5 @@
 ---
+short_description: Query mongoDB and add a property to the user
 categories:
 - database
 ---

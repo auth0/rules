@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Send email with Mandrill
 categories:
 - webhook
 ---

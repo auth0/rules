@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Get the user locations based on IP address and add to the app_metadata in the geoip attribute
 categories:
 - enrich profile
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Prevent access to app during weekends.
 categories:
 - access control
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Add attributes to a user for specific connection
 categories:
 - enrich profile
 ---

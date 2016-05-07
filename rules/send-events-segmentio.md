@@ -1,5 +1,6 @@
 ---
 icon: segmentio.png
+short_description: Send events to segment.io
 categories:
 - webhook
 ---

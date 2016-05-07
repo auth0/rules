@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Shows how to post the variables sent to your Rule to http://RequestB.in to help troubleshoot rule issues 
 categories:
 - debugging
 ---

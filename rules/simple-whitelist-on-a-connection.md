@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Only allow access to users coming from a whitelist on specific connection
 categories:
 - access control
 ---

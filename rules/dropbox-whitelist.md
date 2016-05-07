@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Determine access to users based on a whitelist of emails stored in Dropbox.
 categories:
 - access control
 ---

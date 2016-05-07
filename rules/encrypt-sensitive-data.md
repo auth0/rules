@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Set a sensitive value in the app_metadata and encrypt it
 categories:
 - enrich profile
 ---

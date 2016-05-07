@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Only allow access to an app from a specific set of IP addresses
 categories:
 - access control
 ---

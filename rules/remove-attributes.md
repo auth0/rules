@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Remove attributes from a user
 categories:
 - enrich profile
 ---

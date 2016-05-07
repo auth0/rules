@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Check the last time that a user changed his or her account password
 categories:
 - access control
 ---

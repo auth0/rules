@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Only allow access to users with verified emails
 categories:
 - access control
 ---

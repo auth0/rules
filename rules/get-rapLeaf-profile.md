@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Get user information from rapleaf using email and add rapLeafInfo property to user profile
 categories:
 - enrich profile
 ---

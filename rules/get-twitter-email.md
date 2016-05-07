@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Get user email address from Twitter
 categories:
 - enrich profile
 ---
@@ -7,7 +8,7 @@ categories:
 
 NOTE: For this rule to work, your Twitter application must be whitelisted to access email addresses.
 
-This rule will not perist the returned email to the Auth0 user profile, but it will be returned to your application.
+This rule will not persist the returned email to the Auth0 user profile, but it will be returned to your application.
 If you want to persist the email, it will need to be [done with `app_metadata` as described here](https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata).
 For example, you can save it under `app_metadata.social_email`.
 

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Disable signups from social connections
 categories:
 - access control
 ---

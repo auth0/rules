@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Show how to query a basic profile http binding SOAP web service for roles
 categories:
 - enrich profile
 ---

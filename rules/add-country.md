@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: This rule will add a `country` attribute to the user based on their IP address.
 categories:
 - enrich profile
 ---

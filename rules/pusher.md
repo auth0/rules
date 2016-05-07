@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Obtain a Pusher token for subscribing/publishing to private channels
 categories:
 - webhook
 ---

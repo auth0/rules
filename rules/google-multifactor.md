@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Trigger multifactor authentication with Google Authenticator when a condition is met
 categories:
 - multifactor
 ---

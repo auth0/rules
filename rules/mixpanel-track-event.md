@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Send a Sign In event to MixPanel to track logins
 categories:
 - webhook
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Only allow access to users with whitelist email addresses on a specific app
 categories:
 - access control
 ---

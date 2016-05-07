@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Query a SQL server database on each login and add a roles array to the user.
 categories:
 - enrich profile
 ---
