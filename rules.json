@@ -16,7 +16,7 @@
           "access control"
         ],
         "description": "<p>This rule checks if a user belongs to an AD group and if not, it will return Access Denied.</p>\n<blockquote>\n<p>Note: you can mix this with <code>context.clientID</code> or <code>clientName</code> to do it only for specific application</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = !!user.groups && user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
         "title": "Check user email domain matches domains configured in connection",
