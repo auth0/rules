@@ -26,7 +26,7 @@ function (user, context, callback) {
         provider: 'google-authenticator',
         // issuer: 'Label on Google Authenticator App', // optional
         // key: '{YOUR_KEY_HERE}', //  optional, the key to use for TOTP. by default one is generated for you
-        // ignoreCookie: true // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
+        ignoreCookie: true // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
       };
     // }
   }

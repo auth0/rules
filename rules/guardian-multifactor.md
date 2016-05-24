@@ -21,7 +21,7 @@ function (user, context, callback) {
       context.multifactor = {
         provider: 'guardian', //required
 
-        // ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
+        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
       };
     // }
   //}
