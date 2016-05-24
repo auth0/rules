@@ -28,7 +28,7 @@ function (user, context, callback) {
         host: 'api-3....049.duosecurity.com',
 
         // optional. Force DuoSecurity everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
-        // ignoreCookie: true,
+        ignoreCookie: true,
 
         // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.
         // username: user.nickname,
