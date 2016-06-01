@@ -31,7 +31,7 @@ function (user, context, callback) {
   function(err, response, body) {
     if (err) return callback(err);
     if (response.statusCode !== 200) return callback(new Error(body));
-
+    var userApiUrl = "https://YOUR_DOMAIN_NAME.auth0.com/api/v2/users"; //provide your domain name
     var data = JSON.parse(body);
     if (data.length > 0) {
       async.each(data, function(targetUser, cb) {
