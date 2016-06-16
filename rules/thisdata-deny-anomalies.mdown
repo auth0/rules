@@ -19,10 +19,9 @@ algorithms which take into account many behavioural factors including:
 * Risky IP addresses
 * And more...
 
-###What happens if an anomaly is detected?**
-It uses to get a risk score for the
-login and then blocks the login by raising an `UnauthorizedError`
-error if the risk is very high.
+###What happens if an anomaly is detected?
+It uses to get a risk score for the login and then blocks the
+login by raising an `UnauthorizedError`error if the risk is very high.
 
 ###Prerequisites
 You will need a ThisData API Key. Sign up for a free ThisData
