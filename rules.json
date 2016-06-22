@@ -129,6 +129,14 @@
         ],
         "description": "<p>This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).</p>\n",
         "code": "function (user, context, callback) {\n\n    // We check users only authenticated with 'fitbit'\n    if(context.connection === 'fitbit'){\n\n      var whitelist = [ 'user1', 'user2' ]; //authorized users\n      var userHasAccess = whitelist.some(\n        function (name) {\n          return name === user.name;\n        });\n\n      if (!userHasAccess) {\n        return callback(new UnauthorizedError('Access denied.'));\n      }\n    }\n\n    callback(null, user, context);\n}"
+      },
+      {
+        "title": "Login Anomaly Detection via ThisData",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule is designed to detect phished or compromised user accounts.\nEven if the primary user authentication is approved it will deny\naccess to a user if the login appears to be highly suspicious.</p>\n<p>It relies on the <a href=\"https://thisdata.com\">ThisData</a> anomaly detection\nalgorithms which take into account many behavioural factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>It uses to get a risk score for the login and then blocks the\nlogin by raising an <code>UnauthorizedError</code>error if the risk is very high.</p>\n<p>You will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n",
+        "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  // 0.85 will generally block irregular Tor usage\n  // or sudden changes in location and device\n  var riskLimit = 0.85;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/verify?api_key=' + apiKey,\n    json: {\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options, function(e, r, b){\n    if(e || r.statusCode !== 200){\n      // If anything fails dont block the login\n      callback(null, user, context);\n    } else {\n\n      // If the risk is high then block the login\n      if(b.score >= riskLimit){\n        return callback(new UnauthorizedError('Login anomaly detected by ThisData. Risk: ' + b.score));\n      }\n\n      callback(null, user, context);\n    }\n  });\n}"
       }
     ]
   },
@@ -182,6 +190,14 @@
         ],
         "description": "<p>This rule will get a sensitive value in the app_metadata and decrypt it (see the <a href=\"/rules/encrypt-sensitive-data.md\">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>\n<p>Note, for this to work you&#39;ll need to set 2 configuration settings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code>, eg: <strong>S0me,Password!è§</strong></li>\n<li><code>ENCRYPT_IV</code>, eg: <strong>abcjfiekdpaifjfd</strong></li>\n</ul>\n<p>And here&#39;s an example of how you would decrypt this in .NET:</p>\n",
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n\n  var private_data = decrypt(user.app_metadata.private_data);\n  if (private_data.license_key === '1234567') {\n    user.role = 'admin';\n  }\n\n  return callback(null, user, context);\n\n  function decrypt(data) {\n    if (!data) {\n      return { };  \n    }\n    var iv = new Buffer(configuration.ENCRYPT_IV);\n    var encodeKey = crypto.createHash('sha256')\n    .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();\n    var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);\n    var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');\n    return JSON.parse(decrypted);\n  }\n}"
+      },
+      {
+        "title": "Default picture for null avatars",
+        "categories": [
+          "enrich profile"
+        ],
+        "description": "<p>Here is how to set a default picture for null avatars via a rule. \nHere&#39;s an example that does this for email-based logins:</p>\n",
+        "code": "function (user, context, callback) {\n  if (user.picture.indexOf('cdn.auth0.com') > -1) {\n    var url = require('url');\n    var u = url.parse(user.picture, true);\n    u.query.d = '<URL TO YOUR DEFAULT PICTURE HERE>';\n    delete u.search;\n    user.picture = url.format(u);\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Encrypt sensitive data in the user profile",
@@ -379,6 +395,14 @@
         ],
         "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>Events will show up on the Splunk console shortly after user access:</p>\n<p><img src=\"http://puu.sh/7R1EW.png\" alt=\"\"></p>\n",
         "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  var splunkBaseUrl = 'YOUR SPLUNK SERVER, like: https://your server:8089';\n\n  //Add any interesting info to the event\n  var event = {\n    message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n    application: context.clientName,\n    clientIP: context.request.ip,\n    protocol: context.protocol,\n    userName: user.name,\n    userId: user.user_id\n  };\n\n  request.post( {\n    url: splunkBaseUrl + '/services/receivers/simple',\n    auth: {\n        'user': 'YOUR SPLUNK USER',\n        'pass': 'YOUR SPLUNK PASSWORD',\n      },\n    json: event,\n    qs: {\n      'source': 'auth0',\n      'sourcetype': 'auth0_activity'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n\n}"
+      },
+      {
+        "title": "Send login anomaly emails",
+        "categories": [
+          "webhook"
+        ],
+        "description": "<p>This rule is designed to detect phished or compromised accounts\nand notify the user with a &quot;was this you?&quot; email notification.</p>\n<p>It relies on the <a href=\"https://thisdata.com\">ThisData</a> anomaly detection\nalgorithms which take into account many behavioural factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>You will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n",
+        "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/events?api_key=' + apiKey,\n    json: {\n      verb: 'log-in',\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options);\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Update user profile identity in Firebase",
