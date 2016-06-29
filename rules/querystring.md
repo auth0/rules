@@ -1,5 +1,5 @@
 ---
-gallery: true
+gallery: false
 categories:
 - enrich profile
 ---
