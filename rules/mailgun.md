@@ -18,15 +18,15 @@ function(user, context, callback) {
 
   request.post( {
     url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',
-	  auth: 
+	  auth:
 	  {
   		user: 'api',
 	  	pass: '{YOUR MAILGUN KEY}'
 	  },
     form: {
-      'to': 'admin@myapp.com',
+      'to': 'admin@example.com',
       'subject': 'NEW SIGNUP',
-      'from': 'admin@myapp.com',
+      'from': 'admin@example.com',
       'text': 'We have got a new sign up from: ' + user.email + '.'
     }
   }, function(e,r,b) {
