@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Only allow access to users with specific whitelist email addresses
 categories:
 - access control
 ---

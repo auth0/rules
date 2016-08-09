@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Slack notification on user signup
 categories:
 - webhook
 ---

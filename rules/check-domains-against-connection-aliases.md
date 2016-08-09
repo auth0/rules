@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description:  Check if user email domain matches configured domain
 categories:
 - access control
 ---

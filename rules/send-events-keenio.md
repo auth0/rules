@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Send a signup event to Keen IO, tracked by the user.signedUp property
 categories:
 - webhook
 ---

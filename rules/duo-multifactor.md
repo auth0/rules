@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Trigger multifactor authentication with Duo Security when a condition is met
 categories:
 - multifactor
 ---

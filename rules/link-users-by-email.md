@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Link any accounts that have the same email address
 categories:
   - access control
 ---

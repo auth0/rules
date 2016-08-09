@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Add a Roles field to the user based on some pattern
 categories:
 - access control
 ---

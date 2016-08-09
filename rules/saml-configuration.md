@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Change SAML configuration
 categories:
 - saml
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Send an email to an administrator through SendGrind on the first login of a user
 categories:
 - webhook
 ---

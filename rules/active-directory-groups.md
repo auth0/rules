@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Check Active Directory membership, else return Access Denied
 categories:
 - access control
 ---

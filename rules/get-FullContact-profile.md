@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Get the user profile from FullContact using the email then add a new property to user_metadata
 categories:
 - enrich profile
 ---

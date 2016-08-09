@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Set a custom sized profile picture for Facebook connections
 categories:
 - enrich profile
 ---

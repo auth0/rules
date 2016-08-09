@@ -1,3 +1,6 @@
+---
+short_description: Notify users if login happens from a different IP or machine
+---
 # Notify users if login happens from a different IP or machine
 
 This rule checks if the user has changed device or location since last login and sends him an SMS if that happened. Location & device are computed as a hash of the `userAgent` and the `IP address`. SMS are sent through [Twilio](http://www.twilio.com) and uses the `user.phone` property.

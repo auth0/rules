@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Set the picture to the profile picture for users who login with LinkedIn
 categories:
 - enrich profile
 ---

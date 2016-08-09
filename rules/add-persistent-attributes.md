@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Set the default color of a user's user_metadata field.
 categories:
 - enrich profile
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Decrypt a sensitive value from the app_metadata
 categories:
 - enrich profile
 ---

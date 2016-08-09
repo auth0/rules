@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: In a SAML application customize the mapping between the Auth0 user and the SAML attributes
 categories:
 - enrich profile
 ---
