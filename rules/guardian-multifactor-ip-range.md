@@ -1,6 +1,6 @@
 ---
 gallery: true
-short_description: Trigger multifactor authentication with Auth0 IP is outside the expected range
+short_description: Trigger multifactor authentication when IP is outside the expected range
 categories:
 - multifactor
 - guardian
