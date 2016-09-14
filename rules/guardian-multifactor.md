@@ -3,6 +3,7 @@ gallery: true
 short_description: Trigger multifactor authentication with Auth0 when a condition is met
 categories:
 - multifactor
+- guardian
 ---
 
 ## Multifactor with Auth0 Guardian
