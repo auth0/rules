@@ -6,7 +6,7 @@ categories:
 - guardian
 ---
 
-## Multifactor with Auth0 Guardian
+## Multifactor when request comes from outside an IP range
 
 This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.
 

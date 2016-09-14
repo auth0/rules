@@ -6,7 +6,7 @@ categories:
 - guardian
 ---
 
-## Multifactor with Auth0 Guardian
+## Multifactor when device changes
 
 This rule is used to trigger multifactor authentication when the user has changed devices since the last request.
 

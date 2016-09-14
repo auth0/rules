@@ -6,7 +6,7 @@ categories:
 - guardian
 ---
 
-## Multifactor with Auth0 Guardian
+## Multifactor when country changes
 
 This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session
 
