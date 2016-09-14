@@ -474,6 +474,15 @@
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the user has changed countries since the last request..</p>\n",
         "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {};\n  \n  if(user.app_metadata.last_location !== context.request.geoip.country_code){\n    context.multifactor = {\n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  \n  callback(null, user, context);\n}\n"
+      },
+      {
+        "title": "Force multifactor when device has changed",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the user has changed devices since the last request..</p>\n",
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  var currentFingerprint = clientFingerprint();\n\n  if(user.app_metadata.previous_fingerprint !== currentFingerprint){\n    context.multifactor = {\n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Computes user device fingerprint with userAgent + IP address\n  function clientFingerprint()\n  {\n    var shasum = crypto.createHash('sha1');\n    shasum.update(context.request.userAgent);\n    shasum.update(context.request.ip);\n    return shasum.digest('hex');\n  }\n\n  //Set the device context for next time\n  user.app_metadata.previous_fingerprint = currentFingerprint;\n  \n  callback(null, user, context);\n}\n"
       }
     ]
   },
