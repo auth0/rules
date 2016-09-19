@@ -465,7 +465,7 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
-        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = '192.168.1.134/26';\n\n  var current_ip = ipaddr.parse(c  ontext.request.ip); \n  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){\n    context.multifactor = {\n        provider: 'guardian',\n        ignoreCookie: true, \n        };  \n  }\n  \n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = '192.168.1.134/26';\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){\n    context.multifactor = {\n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  callback(null, user, context);\n}\n"
       },
       {
         "title": "Force multifactor when country has changed",
@@ -474,7 +474,7 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the user has changed countries since the last request..</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  \n  if(user.app_metadata.last_location !== context.request.geo  ip.country_code){\n    context.multifactor = { \n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Set the location context for next time\n    user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      cal  lback(null, user, context);\n    })  \n    .catch(function(err){\n      callback(err);\n  }); \n}\n"
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  \n  if(user.app_metadata.last_location !== context.request.geoip.country_code){\n    context.multifactor = { \n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Set the location context for next   time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })  \n    .catch(function(err){\n      callback(err);\n  }); \n}\n"
       }, 
       {
         "title": "Multifactor with Auth0 Guardian",
@@ -506,7 +506,7 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
-        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = '192.168.1.134/26';\n\n  var current_ip = ipaddr.parse(c  ontext.request.ip); \n  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){\n    context.multifactor = {\n        provider: 'guardian',\n        ignoreCookie: true, \n        };  \n  }\n  \n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = '192.168.1.134/26';\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){\n    context.multifactor = {\n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  callback(null, user, context);\n}\n"
       },
       {
         "title": "Force multifactor when country has changed",
@@ -515,7 +515,7 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the user has changed countries since the last request..</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  \n  if(user.app_metadata.last_location !== context.request.geo  ip.country_code){\n    context.multifactor = { \n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Set the location context for next time\n    user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      cal  lback(null, user, context);\n    })  \n    .catch(function(err){\n      callback(err);\n  }); \n}\n"
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  \n  if(user.app_metadata.last_location !== context.request.geoip.country_code){\n    context.multifactor = { \n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Set the location context for next   time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })  \n    .catch(function(err){\n      callback(err);\n  }); \n}\n"
       }, 
       {
         "title": "Multifactor with Auth0 Guardian",
