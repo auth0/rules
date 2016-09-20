@@ -15,21 +15,21 @@ function (user, context, callback) {
 
   user.app_metadata = user.app_metadata || {}; 
   
-  if(user.app_metadata.last_location !== context.request.geoip.country_code){
+  if (user.app_metadata.last_location !== context.request.geoip.country_code) {
     context.multifactor = { 
       provider: 'guardian',
-      ignoreCookie: true, 
+      ignoreCookie: true
     };  
   }
   
   //Set the location context for next time
   user.app_metadata.last_location = context.request.geoip.country_code;
   auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-    .then(function(){
+    .then( function() {
       callback(null, user, context);
-    })  
-    .catch(function(err){
+    })
+    .catch( function(err) {
       callback(err);
-  }); 
+    }); 
 }
 ```

@@ -16,11 +16,11 @@ function (user, context, callback) {
   var corp_network = "192.168.1.134/26";
 
   var current_ip = ipaddr.parse(context.request.ip); 
-  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){
+  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {
     context.multifactor = {
         provider: 'guardian',
-        ignoreCookie: true, 
-      };  
+        ignoreCookie: true
+    };  
   }
   
   callback(null, user, context);
