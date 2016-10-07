@@ -19,7 +19,10 @@ function (user, context, callback) {
   if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {
     context.multifactor = {
         provider: 'guardian',
-        ignoreCookie: true
+       
+        // optional, defaults to true. Set to false to force Guardian authentication every time. 
+        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
+        allowRememberBrowser: false
     };  
   }
   

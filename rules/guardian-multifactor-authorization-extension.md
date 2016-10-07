@@ -33,9 +33,12 @@ function (user, context, callback) {
 
   if (needsMFA){
       context.multifactor = {
+        // required
         provider: 'guardian', //required
 
-        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
+        // optional, defaults to true. Set to false to force Guardian authentication every time. 
+        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
+        allowRememberBrowser: false
       };
   }
 
