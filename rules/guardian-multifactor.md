@@ -21,9 +21,12 @@ function (user, context, callback) {
     // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true
     // if (user.user_metadata && user.user_metadata.use_mfa){
       context.multifactor = {
-        provider: 'guardian', //required
+        // required
+        provider: 'guardian', 
 
-        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
+        // optional, defaults to true. Set to false to force Guardian authentication every time. 
+        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
+        allowRememberBrowser: false
       };
     // }
   //}
