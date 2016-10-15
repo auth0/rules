@@ -439,7 +439,7 @@
           "multifactor"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        //required\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        // optional. Force DuoSecurity everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n        ignoreCookie: true,\n\n        // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n        // username: user.nickname,\n\n        // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.\n        // admin: {\n        //  ikey: 'DIAN...NV6UM',\n        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n        // },\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        //required\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        // optional, defaults to true. Set to false to force DuoSecurity every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false,\n\n        // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n        // username: user.nickname,\n\n        // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.\n        // admin: {\n        //  ikey: 'DIAN...NV6UM',\n        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n        // },\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Multifactor with Google Authenticator",
@@ -447,7 +447,7 @@
           "multifactor"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -&gt; Multifactor.</p>\n",
-        "code": "function (user, context, callback) {\n  // Uncomment the following to skip MFA when impersonating a user\n  // if (user.impersonated) { return callback(null, user, context); }\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true\n    // if (user.app_metadata && user.app_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n        // issuer: 'Label on Google Authenticator App', // optional\n        // key: '{YOUR_KEY_HERE}', //  optional, the key to use for TOTP. by default one is generated for you\n        ignoreCookie: true // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n  // Uncomment the following to skip MFA when impersonating a user\n  // if (user.impersonated) { return callback(null, user, context); }\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true\n    // if (user.app_metadata && user.app_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        // optional\n        // issuer: 'Label on Google Authenticator App', \n\n        // optional, the key to use for TOTP. By default one is generated for you\n        // key: '{YOUR_KEY_HERE}', \n\n        // optional, defaults to true. Set to false to force Google Authenticator every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false \n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Multifactor with Auth0 Guardian + Authorization Extension",
@@ -456,26 +456,26 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        provider: 'guardian', //required\n\n        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
       },
       {
-        "title": "Force multifactor when IP outside an expected range",
+        "title": "Multifactor when country changes",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session</p>\n",
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
+      },
+      {
+        "title": "Multifactor when request comes from outside an IP range",
         "categories": [
           "multifactor",
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
-        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = '192.168.1.134/26';\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){\n    context.multifactor = {\n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
       },
-      {
-        "title": "Force multifactor when country has changed",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the user has changed countries since the last request..</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  \n  if(user.app_metadata.last_location !== context.request.geoip.country_code){\n    context.multifactor = { \n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Set the location context for next   time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })  \n    .catch(function(err){\n      callback(err);\n  }); \n}\n"
-      }, 
       {
         "title": "Multifactor with Auth0 Guardian",
         "categories": [
@@ -483,7 +483,7 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'guardian', //required\n\n        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        // required\n        provider: 'guardian', \n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
       }
     ]
   },
@@ -497,26 +497,26 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        provider: 'guardian', //required\n\n        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
       },
       {
-        "title": "Force multifactor when IP outside an expected range",
+        "title": "Multifactor when country changes",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session</p>\n",
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
+      },
+      {
+        "title": "Multifactor when request comes from outside an IP range",
         "categories": [
           "multifactor",
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
-        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = '192.168.1.134/26';\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if(!current_ip.match(ipaddr.parseCIDR(corp_network))){\n    context.multifactor = {\n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
       },
-      {
-        "title": "Force multifactor when country has changed",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the user has changed countries since the last request..</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n  \n  if(user.app_metadata.last_location !== context.request.geoip.country_code){\n    context.multifactor = { \n      provider: 'guardian',\n      ignoreCookie: true, \n    };  \n  }\n  \n  //Set the location context for next   time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })  \n    .catch(function(err){\n      callback(err);\n  }); \n}\n"
-      }, 
       {
         "title": "Multifactor with Auth0 Guardian",
         "categories": [
@@ -524,7 +524,7 @@
           "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'guardian', //required\n\n        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        // required\n        provider: 'guardian', \n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
       }
     ]
   },
