@@ -15,7 +15,6 @@ function hereDoc(f) {
 }
 
 app.get('/', function (req, res) {
-  var callback_url = 'https://webtask.it.auth0.com/api/run/' + req.x_wt.container + '/' + req.x_wt.jtn + 'widget-callback';
   var token = req.query.token;
   var state = req.query.state;
 
@@ -30,7 +29,7 @@ app.get('/', function (req, res) {
       res.end('error');
       return;
     } else {
-      sendCodeAndShowPasswordlessSecondStep(res, callback_url, req.webtaskContext, decoded, state);
+      sendCodeAndShowPasswordlessSecondStep(res, req.webtaskContext, decoded, state);
     }
   });
 });
@@ -62,7 +61,7 @@ app.post('/', function (req, res) {
   });
 });
 
-function redirectBack (res, webtaskContext, decoded, success, state) {
+function redirectBack(res, webtaskContext, decoded, success, state) {
   var token = jwt.sign({
       status: success ? 'ok' : 'fail'
     },
@@ -80,7 +79,7 @@ function redirectBack (res, webtaskContext, decoded, success, state) {
   res.end();
 }
 
-function sendCodeAndShowPasswordlessSecondStep (res, callback_url, webtaskContext, decoded_token, state) {
+function sendCodeAndShowPasswordlessSecondStep(res, webtaskContext, decoded_token, state) {
   request({
     method: 'POST',
     url: "https://" + webtaskContext.data.auth0_domain + "/passwordless/start",
@@ -90,14 +89,14 @@ function sendCodeAndShowPasswordlessSecondStep (res, callback_url, webtaskContex
       phone_number: decoded_token.sms_identity.profileData.phone_number
     }
   }).then(function(response){
-    showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_token, state);
+    showPasswordlessSecondStep(res, webtaskContext, decoded_token, state);
   }).catch(function(e){
     console.log('ERROR SENDING SMS', e);
      //A client error like 400 Bad Request happened
   });
 }
 
-function showPasswordlessSecondStep (res, callback_url, webtaskContext, decoded_token, state) {
+function showPasswordlessSecondStep(res, webtaskContext, decoded_token, state) {
   res.writeHead(200, {
     'Content-Type': 'text/html'
   });
@@ -109,7 +108,7 @@ function showPasswordlessSecondStep (res, callback_url, webtaskContext, decoded_
   }));
 }
 
-function passwordlessSecondStepForm () {
+function passwordlessSecondStepForm() {
 /*
 <!DOCTYPE html>
 <html lang="en">
