@@ -1,15 +1,12 @@
 var Express = require('express');
 var Webtask = require('webtask-tools');
 var jwt = require('jsonwebtoken');
+var bodyParser = require('body-parser');
+var Bluebird = require('bluebird');
+var request = Bluebird.promisify(require('request'));
 
 var app = Express();
-
-var bodyParser = require('body-parser');
-
 app.use(bodyParser.urlencoded({ extended: false }));
-
-var Promise = require("bluebird");
-var request = Promise.promisify(require("request"));
 
 function hereDoc(f) {
   return f.toString().
@@ -18,13 +15,10 @@ function hereDoc(f) {
 }
 
 app.get('/', function (req, res) {
-
-  var callback_url = "https://webtask.it.auth0.com/api/run/"+req.x_wt.container+"/"+req.x_wt.jtn+"/widget-callback";
-
+  var callback_url = 'https://webtask.it.auth0.com/api/run/' + req.x_wt.container + '/' + req.x_wt.jtn + 'widget-callback';
   var token = req.query.token;
 
   jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret,'base64'), function(err, decoded) {
-
     if (err) {
       res.end('error');
       return;
@@ -35,18 +29,15 @@ app.get('/', function (req, res) {
       res.end('error');
       return;
     } else {
-
       sendCodeAndShowPasswordlessSecondStep(res, callback_url, req.webtaskContext, decoded);
     }
   });
-
 });
 
 app.post('/', function (req, res) {
   var token = req.body.token;
 
-  jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret,'base64'), function(err, decoded) {
-
+  jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret, 'base64'), function(err, decoded) {
     if (err) {
       res.end('error on callback token verification');
       return;
@@ -54,9 +45,9 @@ app.post('/', function (req, res) {
 
     request({
       method: 'POST',
-      url: "https://" + req.webtaskContext.data.auth0_domain + "/passwordless/verify",
+      url: 'https://' + req.webtaskContext.data.auth0_domain + '/passwordless/verify',
       json: {
-        connection: "sms",
+        connection: 'sms',
         phone_number: decoded.sms_identity.profileData.phone_number,
         verification_code: req.body.code
       }
@@ -66,7 +57,6 @@ app.post('/', function (req, res) {
       console.log('ERROR VERIFYING', e);
        //A client error like 400 Bad Request happened
     });
-
   });
 });
 
@@ -82,7 +72,9 @@ function redirectBack(res, webtaskContext, decoded, success) {
       issuer: 'urn:auth0:sms:mfa'
     });
 
-  res.writeHead(301, {Location: 'https://'+ webtaskContext.data.auth0_domain + "/continue" + "?id_token=" + token});
+  res.writeHead(301, {
+    Location: 'https://'+ webtaskContext.data.auth0_domain + '/continue' + '?id_token=' + token
+  });
   res.end();
 }
 
@@ -96,9 +88,7 @@ function sendCodeAndShowPasswordlessSecondStep(res, callback_url, webtaskContext
       phone_number: decoded_token.sms_identity.profileData.phone_number
     }
   }).then(function(response){
-
     showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_token);
-
   }).catch(function(e){
     console.log('ERROR SENDING SMS', e);
      //A client error like 400 Bad Request happened
@@ -117,7 +107,7 @@ function showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_t
   ));
 }
 
-function passwordlessSecondStepForm() {
+function passwordlessSecondStepForm () {
 /*
 <!DOCTYPE html>
 <html lang="en">
