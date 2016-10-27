@@ -11,7 +11,7 @@ function performSmsMfa (user, context, callback) {
 
   //Returning from MFA validation
   if(context.protocol === 'redirect-callback') {
-    var decoded = jwt.verify(context.request.query.id_token, new Buffer(configuration.sms_passwordless_mfa_secret, 'base64'));
+    var decoded = jwt.verify(context.request.query.id_token, new Buffer(configuration.SMS_MFA_TOKEN_SECRET, 'base64'));
     if(!decoded) return callback(new Error('Invalid Token'));
     if(decoded.status !== 'ok') return callback(new Error('Invalid Token Status'));
 
@@ -32,7 +32,7 @@ function performSmsMfa (user, context, callback) {
   token_payload.sms_identity = sms_connections[0];
 
   var token = jwt.sign(token_payload,
-    new Buffer(configuration.sms_passwordless_mfa_secret, 'base64'),
+    new Buffer(configuration.SMS_MFA_TOKEN_SECRET, 'base64'),
     {
       subject: user.user_id,
       expiresInMinutes: 15,
@@ -43,7 +43,7 @@ function performSmsMfa (user, context, callback) {
 
   //Trigger MFA
   context.redirect = {
-    url: configuration.sms_passwordless_mfa_url + '?token=' + token // check this
+    url: configuration.SMS_MFA_URL + '?token=' + token // check this
   };
 
   callback(null,user,context);

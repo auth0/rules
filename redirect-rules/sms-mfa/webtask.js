@@ -18,7 +18,7 @@ app.get('/', function (req, res) {
   var token = req.query.token;
   var state = req.query.state;
 
-  jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret,'base64'), function(err, decoded) {
+  jwt.verify(token, new Buffer(req.webtaskContext.secrets.token_secret, 'base64'), function(err, decoded) {
     if (err) {
       res.end('error');
       return;
@@ -38,7 +38,7 @@ app.post('/', function (req, res) {
   var token = req.body.token;
   var state = req.body.state;
 
-  jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret, 'base64'), function(err, decoded) {
+  jwt.verify(token, new Buffer(req.webtaskContext.secrets.token_secret, 'base64'), function(err, decoded) {
     if (err) {
       res.end('error on callback token verification');
       return;
@@ -46,7 +46,7 @@ app.post('/', function (req, res) {
 
     request({
       method: 'POST',
-      url: 'https://' + req.webtaskContext.data.auth0_domain + '/passwordless/verify',
+      url: 'https://' + req.webtaskContext.secrets.auth0_domain + '/passwordless/verify',
       json: {
         connection: 'sms',
         phone_number: decoded.sms_identity.profileData.phone_number,
@@ -65,7 +65,7 @@ function redirectBack(res, webtaskContext, decoded, success, state) {
   var token = jwt.sign({
       status: success ? 'ok' : 'fail'
     },
-    new Buffer(webtaskContext.data.client_secret, 'base64'),
+    new Buffer(webtaskContext.secrets.token_secret, 'base64'),
     {
       subject: decoded.sub,
       expiresInMinutes: 1,
@@ -74,7 +74,7 @@ function redirectBack(res, webtaskContext, decoded, success, state) {
     });
 
   res.writeHead(301, {
-    Location: 'https://'+ webtaskContext.data.auth0_domain + '/continue' + '?id_token=' + token + '&state=' + state
+    Location: 'https://'+ webtaskContext.secrets.auth0_domain + '/continue' + '?id_token=' + token + '&state=' + state
   });
   res.end();
 }
@@ -82,7 +82,7 @@ function redirectBack(res, webtaskContext, decoded, success, state) {
 function sendCodeAndShowPasswordlessSecondStep(res, webtaskContext, decoded_token, state) {
   request({
     method: 'POST',
-    url: "https://" + webtaskContext.data.auth0_domain + "/passwordless/start",
+    url: "https://" + webtaskContext.secrets.auth0_domain + "/passwordless/start",
     json: {
       client_id: decoded_token.aud,
       connection: "sms",
