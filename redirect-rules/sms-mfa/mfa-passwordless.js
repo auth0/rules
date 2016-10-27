@@ -17,6 +17,7 @@ function hereDoc(f) {
 app.get('/', function (req, res) {
   var callback_url = 'https://webtask.it.auth0.com/api/run/' + req.x_wt.container + '/' + req.x_wt.jtn + 'widget-callback';
   var token = req.query.token;
+  var state = req.query.state;
 
   jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret,'base64'), function(err, decoded) {
     if (err) {
@@ -29,13 +30,14 @@ app.get('/', function (req, res) {
       res.end('error');
       return;
     } else {
-      sendCodeAndShowPasswordlessSecondStep(res, callback_url, req.webtaskContext, decoded);
+      sendCodeAndShowPasswordlessSecondStep(res, callback_url, req.webtaskContext, decoded, state);
     }
   });
 });
 
 app.post('/', function (req, res) {
   var token = req.body.token;
+  var state = req.body.state;
 
   jwt.verify(token, new Buffer(req.webtaskContext.data.client_secret, 'base64'), function(err, decoded) {
     if (err) {
@@ -52,7 +54,7 @@ app.post('/', function (req, res) {
         verification_code: req.body.code
       }
     }).then(function(response){
-      redirectBack(res, req.webtaskContext, decoded, response[0].statusCode === 200);
+      redirectBack(res, req.webtaskContext, decoded, response[0].statusCode === 200, state);
     }).catch(function(e){
       console.log('ERROR VERIFYING', e);
        //A client error like 400 Bad Request happened
@@ -60,7 +62,7 @@ app.post('/', function (req, res) {
   });
 });
 
-function redirectBack(res, webtaskContext, decoded, success) {
+function redirectBack (res, webtaskContext, decoded, success, state) {
   var token = jwt.sign({
       status: success ? 'ok' : 'fail'
     },
@@ -73,12 +75,12 @@ function redirectBack(res, webtaskContext, decoded, success) {
     });
 
   res.writeHead(301, {
-    Location: 'https://'+ webtaskContext.data.auth0_domain + '/continue' + '?id_token=' + token
+    Location: 'https://'+ webtaskContext.data.auth0_domain + '/continue' + '?id_token=' + token + '&state=' + state
   });
   res.end();
 }
 
-function sendCodeAndShowPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_token) {
+function sendCodeAndShowPasswordlessSecondStep (res, callback_url, webtaskContext, decoded_token, state) {
   request({
     method: 'POST',
     url: "https://" + webtaskContext.data.auth0_domain + "/passwordless/start",
@@ -88,23 +90,23 @@ function sendCodeAndShowPasswordlessSecondStep(res, callback_url, webtaskContext
       phone_number: decoded_token.sms_identity.profileData.phone_number
     }
   }).then(function(response){
-    showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_token);
+    showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_token, state);
   }).catch(function(e){
     console.log('ERROR SENDING SMS', e);
      //A client error like 400 Bad Request happened
   });
 }
 
-function showPasswordlessSecondStep(res, callback_url, webtaskContext, decoded_token){
+function showPasswordlessSecondStep (res, callback_url, webtaskContext, decoded_token, state) {
   res.writeHead(200, {
     'Content-Type': 'text/html'
   });
 
   res.end(require('ejs').render(hereDoc(passwordlessSecondStepForm), {
-      token: decoded_token.token,
-      phone_number: decoded_token.sms_identity.profileData.phone_number
-    }
-  ));
+    token: decoded_token.token,
+    phone_number: decoded_token.sms_identity.profileData.phone_number,
+    state: state
+  }));
 }
 
 function passwordlessSecondStepForm () {
@@ -124,6 +126,7 @@ function passwordlessSecondStepForm () {
         <div class="modal">
           <form onsubmit="showSpinner();" action="" method="POST" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="token" value="<%- token %>" />
+            <input type="hidden" name="state" value="<%- state %>" />
             <div class="head"><img src="https://cdn.auth0.com/styleguide/2.0.9/lib/logos/img/badge.png" class="logo auth0"><span class="first-line">Auth0</span></div>
             <div class="body"><span class="description">An SMS with the code has been sent to <%- phone_number %>.</span>
               <div class="auth0-lock-input-wrap"><span>
