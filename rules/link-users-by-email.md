@@ -5,9 +5,8 @@ categories:
   - access control
 ---
 
-# Link Accounts with Same Email Address
-This rule will link any accounts that have the same email address.
-
+# Link Accounts with Same Email Address kamaljitc9830973464c@gmail.com with kamaljit1ccu3464@gmail.com 
+This rule will link any accounts that have the same email address.,previously belongs with kamaljitchakraborty@Gmail.Com
 > Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on [Linking Accounts](https://auth0.com/docs/link-accounts) for more details.
 
 ```js
