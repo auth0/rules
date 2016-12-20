@@ -11,6 +11,8 @@ This rule will link any accounts that have the same email address while merging 
 ```js
 function (user, context, callback) {
   var request = require('request@2.56.0');
+  var async = require('async@2.1.2');
+
   // Check if email is verified, we shouldn't automatically
   // merge accounts if this is not the case.
   if (!user.email_verified) {
@@ -25,7 +27,7 @@ function (user, context, callback) {
    },
    qs: {
      search_engine: 'v2',
-     q: 'email:"' + user.email + '" -user_id:"' + user.user_id + '"',
+     q: 'email.raw:"' + user.email + '" -user_id:"' + user.user_id + '"',
    }
   },
   function(err, response, body) {
