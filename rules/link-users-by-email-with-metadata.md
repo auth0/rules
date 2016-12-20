@@ -5,7 +5,7 @@ categories:
   - access control
 ---
 
-# Link Accounts with Same Email Address
+# Link Accounts with Same Email Address while Merging Metadata
 This rule will link any accounts that have the same email address while merging metadata.
 
 ```js
