@@ -24,17 +24,33 @@ function (user, context, callback) {
   // }
 
   // if the user that just logged in has a refresh_token, persist it
-  if (user.refresh_token) {
-    user.app_metadata.refresh_token = user.refresh_token;
+  function (user, context, callback) {
+  var refresh_token = null;
+  user.app_metadata = user.app_metadata || {};
+  
+  if (user && user.identities) {
+    for (var i = 0; i < user.identities.length; i++) {
+      if (user.identities[i].refresh_token) {
+        refresh_token = user.identities[i].refresh_token;
+        i = user.identities.length;
+      }
+    }
+  }
+
+  if (refresh_token) {
+    user.app_metadata.refresh_token = refresh_token;
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function(){
+      .then(function () {
         callback(null, user, context);
       })
-      .catch(function(err){
+      .catch(function (err) {
         callback(err);
       });
   } else {
     callback(null, user, context);
   }
+}
+
+
 }
 ```
