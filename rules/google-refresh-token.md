@@ -22,9 +22,9 @@ function (user, context, callback) {
   //   crypted += cipher.final('hex');
   //   return crypted;
   // }
-  
+
   // get the google identity
-  var googleIdentity = _.find(user.identities, 'provider', 'google-oauth2');
+  var googleIdentity = _.find(user.identities, {'provider': 'google-oauth2'});
 
   // if the user that just logged in has a refresh_token, persist it
   if (googleIdentity && googleIdentity.refresh_token) {
