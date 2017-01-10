@@ -16,7 +16,7 @@
           "access control"
         ],
         "description": "<p>This rule checks if a user belongs to an AD group and if not, it will return Access Denied.</p>\n<blockquote>\n<p>Note: you can mix this with <code>context.clientID</code> or <code>clientName</code> to do it only for specific application</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = !!user.groups && user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
         "title": "Check user email domain matches domains configured in connection",
@@ -83,12 +83,20 @@
         "code": "function (user, context, callback) {\n    var whitelist = ['1.2.3.4', '2.3.4.5']; //authorized IPs\n    var userHasAccess = whitelist.some(\n      function (ip) {\n        return context.request.ip === ip;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied from this IP address.'));\n    }\n\n    return callback(null, user, context);\n}"
       },
       {
+        "title": "Link Accounts with Same Email Address while Merging Metadata",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule will link any accounts that have the same email address while merging metadata.</p>\n",
+        "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  var async = require('async@2.1.2');\n\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n  var userApiUrl = auth0.baseUrl + '/users';\n\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email.raw:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n\n          targetUser.app_metadata = targetUser.app_metadata || {};\n          targetUser.user_metadata = targetUser.user_metadata || {};\n          auth0.users.updateAppMetadata(user.user_id, targetUser.app_metadata)\n          .then(auth0.users.updateUserMetadata(user.user_id, targetUser.user_metadata))\n          .then(function(){\n            request.post({\n              url: userApiUrl + '/' + user.user_id + '/identities',\n              headers: {\n                Authorization: 'Bearer ' + auth0.accessToken\n              },\n              json: { provider: provider, user_id: targetUserId }\n            }, function(err, response, body) {\n                if (response.statusCode >= 400) {\n                  cb(new Error('Error linking account: ' + response.statusMessage));  \n                }\n                cb(err);\n            });\n          })\n          .catch(function(err){\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
+      },
+      {
         "title": "Link Accounts with Same Email Address",
         "categories": [
           "access control"
         ],
         "description": "<p>This rule will link any accounts that have the same email address.</p>\n<blockquote>\n<p>Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on <a href=\"https://auth0.com/docs/link-accounts\">Linking Accounts</a> for more details.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  request({\n   url: auth0.baseUrl + '/users',\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n          request.post({\n            url: userApiUrl + '/' + user.user_id + '/identities',\n            headers: {\n              Authorization: 'Bearer ' + auth0.accessToken\n            },\n            json: { provider: provider, user_id: targetUserId }\n          }, function(err, response, body) {\n              if (response.statusCode >= 400) {\n               cb(new Error('Error linking account: ' + response.statusMessage));  \n              }\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
+        "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n  var userApiUrl = auth0.baseUrl + '/users';\n\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n          request.post({\n            url: userApiUrl + '/' + user.user_id + '/identities',\n            headers: {\n              Authorization: 'Bearer ' + auth0.accessToken\n            },\n            json: { provider: provider, user_id: targetUserId }\n          }, function(err, response, body) {\n              if (response.statusCode >= 400) {\n               cb(new Error('Error linking account: ' + response.statusMessage));  \n              }\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
       },
       {
         "title": "Set roles to a user",
@@ -96,7 +104,7 @@
           "access control"
         ],
         "description": "<p>This rule adds a Roles field to the user based on some pattern</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@gonto.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@example.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
       },
       {
         "title": "Email domain whitelist",
@@ -112,7 +120,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email addresses on a specific app.</p>\n",
-        "code": "function (user, context, callback) {\n    //we just care about NameOfTheAppWithWhiteList\n    //bypass this rule for every other app\n    if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n      return callback(null, user, context);\n    }\n\n    var whitelist = [ 'user1@mail.com', 'user2@mail.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n    //we just care about NameOfTheAppWithWhiteList\n    //bypass this rule for every other app\n    if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n      return callback(null, user, context);\n    }\n\n    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
         "title": "Whitelist",
@@ -120,7 +128,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email addresses.</p>\n",
-        "code": "function (user, context, callback) {\n    var whitelist = [ 'user1@mail.com', 'user2@mail.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
         "title": "Whitelist on Specific Connection",
@@ -135,7 +143,7 @@
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule is designed to detect phished or compromised user accounts.\nEven if the primary user authentication is approved it will deny\naccess to a user if the login appears to be highly suspicious.</p>\n<p>It relies on the <a href=\"https://thisdata.com\">ThisData</a> anomaly detection\nalgorithms which take into account many behavioural factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>It uses to get a risk score for the login and then blocks the\nlogin by raising an <code>UnauthorizedError</code>error if the risk is very high.</p>\n<p>You will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n",
+        "description": "<p>This rule is designed to detect phished or compromised user accounts.\nEven if the primary user authentication is approved it will deny\naccess to a user if the login appears to be highly suspicious.</p>\n<p>It relies on the <a href=\"https://thisdata.com\">ThisData</a> anomaly detection\nalgorithms which take into account many behavioural factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>###What happens if an anomaly is detected?\nIt uses to get a risk score for the login and then blocks the\nlogin by raising an <code>UnauthorizedError</code>error if the risk is very high.</p>\n<p>###Prerequisites\nYou will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n",
         "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  // 0.85 will generally block irregular Tor usage\n  // or sudden changes in location and device\n  var riskLimit = 0.85;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/verify?api_key=' + apiKey,\n    json: {\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options, function(e, r, b){\n    if(e || r.statusCode !== 200){\n      // If anything fails dont block the login\n      callback(null, user, context);\n    } else {\n\n      // If the risk is high then block the login\n      if(b.score >= riskLimit){\n        return callback(new UnauthorizedError('Login anomaly detected by ThisData. Risk: ' + b.score));\n      }\n\n      callback(null, user, context);\n    }\n  });\n}"
       }
     ]
@@ -204,7 +212,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will set a sensitive value in the app_metadata and encrypt it (see the <a href=\"/rules/decrypt-sensitive-data.md\">Decrypt sensitive data from the user profile</a> rule for information on how to decrypt the data).</p>\n<p>The <code>user</code> will look like this after the encryption:</p>\n<p>Note, for this to work you&#39;ll need to set two configuration settings. Both should be random strings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code></li>\n<li><code>ENCRYPT_IV</code></li>\n</ul>\n",
+        "description": "<p>This rule will set a sensitive value in the app_metadata and encrypt it (see the <a href=\"/rules/decrypt-sensitive-data\">Decrypt sensitive data from the user profile</a> rule for information on how to decrypt the data).</p>\n<p>The <code>user</code> will look like this after the encryption:</p>\n<p>Note, for this to work you&#39;ll need to set two configuration settings. Both should be random strings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code></li>\n<li><code>ENCRYPT_IV</code></li>\n</ul>\n",
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n  user.app_metadata.private_data = encrypt({\n    license_key: '1234567',\n    social_security_number: '56789'\n  });\n\n  callback(null, user, context);\n\n  function encrypt(data) {\n    var iv = new Buffer(configuration.ENCRYPT_IV);\n    var decodeKey = crypto.createHash('sha256')\n      .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();\n    var cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);\n    return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');\n  }\n}"
       },
       {
@@ -244,7 +252,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>NOTE: For this rule to work, your Twitter application must be whitelisted to access email addresses.</p>\n<p>This rule will not perist the returned email to the Auth0 user profile, but it will be returned to your application.\nIf you want to persist the email, it will need to be <a href=\"https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata\">done with <code>app_metadata</code> as described here</a>.\nFor example, you can save it under <code>app_metadata.social_email</code>.</p>\n<p>When accessing the email, you can do the following from a rule or the equivalent in your application:</p>\n<p>The rule which makes the call to Twitter to retrieve the email is as follows:</p>\n",
+        "description": "<p>NOTE: For this rule to work, your Twitter application must be whitelisted to access email addresses.</p>\n<p>This rule will not persist the returned email to the Auth0 user profile, but it will be returned to your application.\nIf you want to persist the email, it will need to be <a href=\"https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata\">done with <code>app_metadata</code> as described here</a>.\nFor example, you can save it under <code>app_metadata.social_email</code>.</p>\n<p>When accessing the email, you can do the following from a rule or the equivalent in your application:</p>\n<p>The rule which makes the call to Twitter to retrieve the email is as follows:</p>\n",
         "code": "user.app_metadata = user.app_metadata || {};\nvar email = user.email || user.app_metadata.social_email;"
       },
       {
@@ -338,7 +346,7 @@
           "webhook"
         ],
         "description": "<p>This rule will send an email to an administrator on the first login of a user using <a href=\"https://mailgun.com\">Mailgun</a>.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',\n      auth: \n      {\n          user: 'api',\n          pass: '{YOUR MAILGUN KEY}'\n      },\n    form: {\n      'to': 'admin@myapp.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@myapp.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
+        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',\n      auth:\n      {\n          user: 'api',\n          pass: '{YOUR MAILGUN KEY}'\n      },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
       },
       {
         "title": "Send email with Mandrill",
@@ -378,7 +386,7 @@
           "webhook"
         ],
         "description": "<p>This rule will send an email to an administrator on the first login of a user.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>In the same way you can use other services like <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a>, <a href=\"mandrill.md\">Mandrill</a> and few others.</p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (!user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ...'\n    },\n    form: {\n      'to': 'admin@myapp.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@myapp.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
+        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (!user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ...'\n    },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
       },
       {
         "title": "Slack Notification on User Signup",
@@ -401,7 +409,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule is designed to detect phished or compromised accounts\nand notify the user with a &quot;was this you?&quot; email notification.</p>\n<p>It relies on the <a href=\"https://thisdata.com\">ThisData</a> anomaly detection\nalgorithms which take into account many behavioural factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>You will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n",
+        "description": "<p>This rule is designed to detect phished or compromised accounts\nand notify the user with a &quot;was this you?&quot; email notification.</p>\n<p>It relies on the <a href=\"https://thisdata.com\">ThisData</a> anomaly detection\nalgorithms which take into account many behavioural factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>###Prerequisites\nYou will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n",
         "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/events?api_key=' + apiKey,\n    json: {\n      verb: 'log-in',\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options);\n\n  callback(null, user, context);\n}"
       },
       {
@@ -439,7 +447,7 @@
           "multifactor"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        //required\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        // optional. Force DuoSecurity everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n        ignoreCookie: true,\n\n        // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n        // username: user.nickname,\n\n        // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.\n        // admin: {\n        //  ikey: 'DIAN...NV6UM',\n        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n        // },\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        //required\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        // optional, defaults to true. Set to false to force DuoSecurity every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false,\n\n        // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n        // username: user.nickname,\n\n        // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.\n        // admin: {\n        //  ikey: 'DIAN...NV6UM',\n        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n        // },\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Multifactor with Google Authenticator",
@@ -447,15 +455,84 @@
           "multifactor"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -&gt; Multifactor.</p>\n",
-        "code": "function (user, context, callback) {\n  // Uncomment the following to skip MFA when impersonating a user\n  // if (user.impersonated) { return callback(null, user, context); }\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true\n    // if (user.app_metadata && user.app_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n        // issuer: 'Label on Google Authenticator App', // optional\n        // key: '{YOUR_KEY_HERE}', //  optional, the key to use for TOTP. by default one is generated for you\n        ignoreCookie: true // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n  // Uncomment the following to skip MFA when impersonating a user\n  // if (user.impersonated) { return callback(null, user, context); }\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true\n    // if (user.app_metadata && user.app_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        // optional\n        // issuer: 'Label on Google Authenticator App', \n\n        // optional, the key to use for TOTP. By default one is generated for you\n        // key: '{YOUR_KEY_HERE}', \n\n        // optional, defaults to true. Set to false to force Google Authenticator every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false \n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "title": "Multifactor when country changes",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session</p>\n",
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
+      },
+      {
+        "title": "Multifactor when request comes from outside an IP range",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
+        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "title": "Multifactor with Auth0 Guardian",
         "categories": [
-          "multifactor"
+          "multifactor",
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'guardian', //required\n\n        ignoreCookie: true, // optional. Force Auth0 MFA everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        // required\n        provider: 'guardian', \n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
+      }
+    ]
+  },
+  {
+    "name": "guardian",
+    "templates": [
+      {
+        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "title": "Multifactor when country changes",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session</p>\n",
+        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
+      },
+      {
+        "title": "Multifactor when request comes from outside an IP range",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
+        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "title": "Multifactor with Auth0 Guardian",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
+        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        // required\n        provider: 'guardian', \n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
       }
     ]
   },

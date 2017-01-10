@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Add income attribute based on user's IP zipcode
 categories:
 - enrich profile
 ---

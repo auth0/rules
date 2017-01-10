@@ -1,3 +1,6 @@
+---
+short_description: Generate a session token for accessing the Parse API
+---
 ## Generate an Parse Session Token
 
 This rule is used to generate a session token for accessing [Parse API](http://parse.com/). The rule

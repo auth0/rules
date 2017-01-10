@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Trigger a Zap on every new user signup to Zapier
 categories:
 - webhook
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Store refresh token from Google for access to Google APIs
 categories:
 - enrich profile
 ---
@@ -22,9 +23,12 @@ function (user, context, callback) {
   //   return crypted;
   // }
 
+  // get the google identity
+  var googleIdentity = _.find(user.identities, {'provider': 'google-oauth2'});
+
   // if the user that just logged in has a refresh_token, persist it
-  if (user.refresh_token) {
-    user.app_metadata.refresh_token = user.refresh_token;
+  if (googleIdentity && googleIdentity.refresh_token) {
+    user.app_metadata.refresh_token = googleIdentity.refresh_token;
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
       .then(function(){
         callback(null, user, context);

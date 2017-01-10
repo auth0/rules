@@ -53,7 +53,7 @@ function consentForm() {
 
           <p>To continue, please accept this consent form.</p>
 
-          <form action="<%-action %>" method="get">
+          <form action="<%-action %>" method="post">
             <div class="checkbox">
               <label>
                 <input type="checkbox" name="confirm" value="yes"> I agree

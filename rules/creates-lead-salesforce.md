@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: On first login call the Salesforce API to record the contact as a new Lead
 categories:
 - webhook
 ---

@@ -1,5 +1,6 @@
 ---
 gallery: false
+short_description: Zendesk SSO for users using JWT
 categories:
 - access control
 ---

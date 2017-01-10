@@ -1,5 +1,6 @@
 ---
 gallery: false
+short_description: Add Box.com access_token to the user profile
 categories:
 - enrich profile
 ---

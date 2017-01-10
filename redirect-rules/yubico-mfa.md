@@ -34,95 +34,96 @@ return function (context, req, res) {
      */
     function(callback) {
       if (req.method === 'POST') {
-
-      yubico_validate(context.data.yubikey_clientid, context.body.otp, function(err,resp) {
-        if (err) {
+        yubico_validate(context.data.yubikey_clientid, context.data.otp, function(err,resp) {
+          if (err) {
             return callback(err);
-        }
+          }
 
-        if(resp.status==='OK'){
+          if(resp.status==='OK'){
           //Return result to Auth0 (includes OTP and Status. Only when OK)
-          var token = jwt.sign({
-                status: resp.status,
-                otp: resp.otp
-                },
+            var token = jwt.sign({
+              status: resp.status,
+              otp: resp.otp
+            },
                 new Buffer(context.data.yubikey_secret, 'base64'),
-                      {
+              {
                 subject: context.data.user,
-                expiresInMinutes: 1,
+                expiresIn: 60,
                 audience: context.data.yubikey_clientid,
                 issuer: 'urn:auth0:yubikey:mfa'
-            });
+              });
+            res.writeHead(301, {Location: context.data.returnUrl + "?id_token=" + token + "&state=" + context.data.state});
+            res.end();
+            callback();
+          } else {
+            return callback([resp.status]);
+          }
+        });
 
-        res.writeHead(301, {Location: context.data.returnUrl + "?id_token=" + token + "&state=" + context.data.state});
-        res.end();
-        }
-        return callback([resp.status]);
-      });
-
-    return callback();
-     }
+      //return callback();
+      }
     },
   ], function(err) {
+    if (Array.isArray(err)) {
+      return renderOtpView(err);
+    }
 
-      if (Array.isArray(err)) {
-          return renderOtpView(err);
-      }
+    if (typeof err === 'string') {
+      return renderOtpView([err]);
+    }
 
-      if (typeof err === 'string') {
-          return renderOtpView([err]);
-      }
-
-      if (typeof err === 'object') {
-          var errors = [];
-          errors.push(err.message || err);
-          return renderOtpView(errors);
-        }
+    if (err !== null && typeof err === 'object') {
+      var errors = [];
+      errors.push(err.message || err);
+      return renderOtpView(errors);
+    }
   });
 
   function yubico_validate(clientId, otp, done){
     var params = {
-        id: clientId,
-        otp: otp,
-        nonce: uid(16)
-      };
+      id: clientId,
+      otp: otp,
+      nonce: uid(16)
+    };
 
     request.get('http://api.yubico.com/wsapi/2.0/verify',
-    {
-      qs: params
-    },function(e,r,b){
-      if(e) return done(e);
-      if(r.statusCode !== 200) return done(new Error('Error: ' + r.statusCode));
-      var yubico_response=qs.parse(b.replace(/\r\n/g, '&'));
-      if(yubico_response.nonce !== params.nonce) return done(new Error('Invalid response - nonce doesn\'t match'));
-      done(null,yubico_response);
-    });
+      {
+        qs: params
+      },function(e,r,b){
+        if (e) { return done(e); }
+        if (r.statusCode !== 200) { return done(new Error('Error: ' + r.statusCode)); }
+        var yubico_response = qs.parse(b.replace(/\r\n/g, '&'));
+        if (yubico_response.nonce !== params.nonce) {
+          return done(new Error('Invalid response - nonce doesn\'t match'));
+        }
+        done(null,yubico_response);
+      });
   }
 
   function uid(len) {
-      var buf = []
-      , chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-      , charlen = chars.length;
+    var buf = [],
+      chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+      charlen = chars.length;
 
-      for (var i = 0; i < len; ++i) {
-        buf.push(chars[getRandomInt(0, charlen - 1)]);
-      }
+    for (var i = 0; i < len; ++i) {
+      buf.push(chars[getRandomInt(0, charlen - 1)]);
+    }
 
-      return buf.join('');
+    return buf.join('');
   }
 
   function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   function renderOtpView(errors) {
-      res.writeHead(200, {
-        'Content-Type': 'text/html'
-      });
-      res.end(require('ejs').render(otpForm.stringify(), {
-        user: context.data.user,
-        errors: errors || []
-      }));
+    res.writeHead(200, {
+      'Content-Type': 'text/html'
+    });
+    res.end(require('ejs').render(otpForm.toString().match(/[^]*\/\*([^]*)\*\/\s*\}$/)[1], {
+      user: context.data.user,
+      errors: errors || []
+    }));
   }
 
   function otpForm() {

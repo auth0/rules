@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Create or update identity information for a user profile stored in Firebase using the Firebase REST API
 categories:
 - webhook
 ---

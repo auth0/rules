@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Map arbitrary `scope` values to actual properties in the user profile
 categories:
 - access control
 ---

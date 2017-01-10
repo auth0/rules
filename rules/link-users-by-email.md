@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Link any accounts that have the same email address
 categories:
   - access control
 ---
@@ -17,9 +18,10 @@ function (user, context, callback) {
   if (!user.email_verified) {
     return callback(null, user, context);
   }
-
+  var userApiUrl = auth0.baseUrl + '/users';
+  
   request({
-   url: auth0.baseUrl + '/users',
+   url: userApiUrl,
    headers: {
      Authorization: 'Bearer ' + auth0.accessToken
    },

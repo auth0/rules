@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Only allow access to users with whitelist email addresses on a specific app
 categories:
 - access control
 ---
@@ -15,7 +16,7 @@ function (user, context, callback) {
       return callback(null, user, context);
     }
 
-    var whitelist = [ 'user1@mail.com', 'user2@mail.com' ]; //authorized users
+    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users
     var userHasAccess = whitelist.some(
       function (email) {
         return email === user.email;

@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Trigger multifactor authentication with Google Authenticator when a condition is met
 categories:
 - multifactor
 ---
@@ -24,9 +25,16 @@ function (user, context, callback) {
     // if (user.app_metadata && user.app_metadata.use_mfa){
       context.multifactor = {
         provider: 'google-authenticator',
-        // issuer: 'Label on Google Authenticator App', // optional
-        // key: '{YOUR_KEY_HERE}', //  optional, the key to use for TOTP. by default one is generated for you
-        ignoreCookie: true // optional, force Google Authenticator everytime this rule runs. Defaults to false. if accepted by users the cookie lasts for 30 days (this cannot be changed)
+
+        // optional
+        // issuer: 'Label on Google Authenticator App', 
+
+        // optional, the key to use for TOTP. By default one is generated for you
+        // key: '{YOUR_KEY_HERE}', 
+
+        // optional, defaults to true. Set to false to force Google Authenticator every time. 
+        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
+        allowRememberBrowser: false 
       };
     // }
   }

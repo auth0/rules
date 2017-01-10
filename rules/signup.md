@@ -1,3 +1,6 @@
+---
+short_description: Detect whether if it's a user's first login/signup
+---
 ## Detect whether it's a first time login/signup
 
 This rule will create a persistent property `signed_up` when the user logs in for the first time (i.e. a new user). The next time the user logs in, this rule will be skipped.

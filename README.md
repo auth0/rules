@@ -12,6 +12,7 @@ A rule will run on Step 4 and this is the information each rule will get:
 * `user`: the user object as it comes from the identity provider.
 * `context`: an object containing contextual information of the current authentication transaction. It has the following properties:
   * `clientID`: the client id of the application the user is logging in to.
+  * `client_metadata`: an optional object containing up to 10 key/value pairs
   * `clientName`: the name of the application (as defined on the dashboard).
   * `connection`: the name of the connection used to authenticate the user (e.g.: `twitter` or `some-google-apps-domain`)
   * `connectionStrategy`: the type of connection. For social connection `connectionStrategy` === `connection`. For enterprise connections, the strategy will be `waad` (Windows Azure AD), `ad` (Active Directory/LDAP), `auth0` (database connections), etc.

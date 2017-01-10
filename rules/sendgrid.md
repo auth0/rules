@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Send an email to an administrator through SendGrind on the first login of a user
 categories:
 - webhook
 ---
@@ -24,9 +25,9 @@ function(user, context, callback) {
       'Authorization': 'Bearer ...'
     },
     form: {
-      'to': 'admin@myapp.com',
+      'to': 'admin@example.com',
       'subject': 'NEW SIGNUP',
-      'from': 'admin@myapp.com',
+      'from': 'admin@example.com',
       'text': 'We have got a new sign up from: ' + user.email + '.'
     }
   }, function(e,r,b) {

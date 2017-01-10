@@ -1,5 +1,6 @@
 ---
 gallery: true
+short_description: Disable the Resource Owner endpoint to prevent users from bypassing MFA policies
 categories:
 - access control
 ---
