@@ -1,5 +1,5 @@
 ---
-gallery: true
+gallery: false
 short_description: Show how to check for variables in the querystring
 categories:
 - enrich profile
