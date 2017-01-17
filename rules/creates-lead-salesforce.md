@@ -41,12 +41,12 @@ function (user, context, done) {
       }
 
       createLead(r.instance_url, r.access_token, function (e, result) {
-        if (!result.id) {
+        if (e || !result || !result.id) {
           slack.alert({
             channel: '#some_channel',
             text: 'Error Creating SALESFORCE Lead',
             fields: {
-              error: result
+              error: e || result
             }
           });
 
@@ -73,7 +73,7 @@ function (user, context, done) {
       },
       json: data
       }, function(e,r,b) {
-        return callback(b);
+        return callback(e, b);
       });
   }
 
