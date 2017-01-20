@@ -6,7 +6,7 @@ categories:
 ---
 ## Tracks Logins/SignUps with Splunk
 
-This rule will send a `SignUp` & `Login` events to Splunk, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.
+This rule will send a `SignUp` & `Login` events to Splunk's HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.
 
 We use a persistent property `SignedUp` to track whether this is the first login or subsequent ones.
 
