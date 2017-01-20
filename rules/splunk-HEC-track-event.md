@@ -45,7 +45,7 @@ function(user, context, callback) {
     headers: {
         'Authorization': 'Splunk ' + token
       },
-    stringSSL: true // set to false if using a self-signed cert
+    strictSSL: true // set to false if using a self-signed cert
     json: hec_event
   }, function(e,r,b) {
     if (e) return callback(e);
