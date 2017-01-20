@@ -4,7 +4,7 @@ short_description: Send SignUp and Login events to Splunk's [HTTP Event Collecto
 categories:
 - webhook
 ---
-## Tracks Logins/SignUps with Splunk
+## Tracks Logins/SignUps with Splunk HEC
 
 This rule will send a `SignUp` & `Login` events to Splunk's HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.
 
