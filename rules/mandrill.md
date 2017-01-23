@@ -8,7 +8,7 @@ categories:
 
 This rule will send an email to an administrator on a user's first login. We use a persistent `signedUp` property to track whether this is the case or not. This rule assumes you've stored a secure value named `MANDRILL_API_KEY`, which contains your secret API key for Mandrill. It is sent in each request.
 
-In the same way, other services such as [Amazon SES](http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html) and [SendGrid](sendgrid.md) can be used.
+In the same way, other services such as [Amazon SES](http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html) and [SendGrid](https://auth0.com/rules/sendgrid) can be used.
 
 Make sure to change the sender and destination emails.
 
