@@ -6,7 +6,7 @@ categories:
 ---
 ## Decrypt sensitive data from the user profile
 
-This rule will get a sensitive value in the app_metadata and decrypt it (see the [Encrypt sensitive data in the user profile](/rules/encrypt-sensitive-data.md) rule for information on how to encrypt the data).
+This rule will get a sensitive value in the app_metadata and decrypt it (see the [Encrypt sensitive data in the user profile](https://auth0.com/rules/encrypt-sensitive-data) rule for information on how to encrypt the data).
 
 ```js
 function (user, context, callback) {
@@ -21,7 +21,7 @@ function (user, context, callback) {
 
   function decrypt(data) {
     if (!data) {
-      return { };  
+      return { };
     }
     var iv = new Buffer(configuration.ENCRYPT_IV);
     var encodeKey = crypto.createHash('sha256')
