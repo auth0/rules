@@ -3,6 +3,7 @@
     "name": "access control",
     "templates": [
       {
+        "id": "access-on-weekdays-only-for-an-app",
         "title": "Allow Access during weekdays for a specific App",
         "categories": [
           "access control"
@@ -11,6 +12,7 @@
         "code": "function (user, context, callback) {\n\n  if (context.clientName === 'TheAppToCheckAccessTo') {\n    var d = new Date().getDay();\n\n    if (d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "active-directory-groups",
         "title": "Active Directory group membership",
         "categories": [
           "access control"
@@ -19,6 +21,7 @@
         "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
+        "id": "check-domains-against-connection-aliases",
         "title": "Check user email domain matches domains configured in connection",
         "categories": [
           "access control"
@@ -27,6 +30,7 @@
         "code": "function (user, context, callback) {\n  request('https://login.auth0.com/api/v2/connections', {\n    headers: {\n      Authorization: 'Bearer ' + configuration.AUTH0_API_TOKEN  //TODO: replace with your own Auth0 APIv2 token\n    }  \n  },\n  function(e,r,b){\n    if(e) return callback(e);\n\n    var connections = JSON.parse(b);\n    var connection = connections[_.findIndex(connections,function(c){\n      return (c.name === context.connection);\n    })];\n\n    //No domains -> access allowed\n    if( !connection.options.tenant_domain ) return callback(null, user, context);\n\n    //Access allowed if domains is found.\n    if( _.findIndex(connection.options.domain_aliases,function(d){\n     return user.email.indexOf(d) >= 0; \n    }) >= 0 ) return callback(null, user, context);\n\n    return callback('Access denied');\n  });\n}"
       },
       {
+        "id": "check_last_password_reset",
         "title": "Check last password reset",
         "categories": [
           "access control"
@@ -35,6 +39,7 @@
         "code": "function (user, context, callback) {\n\n  function daydiff (first, second) {\n    return (second-first)/(1000*60*60*24);\n  }\n\n  var last_password_change = user.last_password_reset || user.created_at;\n\n  if (daydiff(new Date(last_password_change), new Date()) > 30) {\n    return callback(new UnauthorizedError('please change your password'));\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "custom-scopes",
         "title": "Custom authorization scopes",
         "categories": [
           "access control"
@@ -43,6 +48,7 @@
         "code": "function (user, context, callback) {\n  // The currently requested scopes can be accessed as follows:\n  // context.request.query.scope.match(/\\S+/g)\n  var scopeMapping = {\n    contactInfo: [\"name\", \"email\", \"company\"],\n    publicInfo: [\"public_repos\", \"public_gists\"]\n  };\n  context.jwtConfiguration.scopes = scopeMapping;\n  callback(null, user, context);\n}"
       },
       {
+        "id": "disable-resource-owner",
         "title": "Disable the Resource Owner endpoint",
         "categories": [
           "access control"
@@ -51,6 +57,7 @@
         "code": "function (user, context, callback) {\n  if (context.protocol === 'oauth2-resource-owner') {\n    return callback(\n      new UnauthorizedError('The resource owner endpoint cannot be used.'));\n  }\n  callback(null, user, context);\n}"
       },
       {
+        "id": "disable-social-signup",
         "title": "Disable social signups",
         "categories": [
           "access control"
@@ -59,6 +66,7 @@
         "code": "function (user, context, callback) {\n\n  var CLIENTS_ENABLED = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_ENABLED.indexOf(context.clientID) === -1) {\n    return callback(null, user, context);\n  }\n\n  // initialize app_metadata\n  user.app_metadata = user.app_metadata || {};\n\n  // if it is the first login (hence the `signup`) and it is a social login\n  if (context.stats.loginsCount === 1 && user.identities[0].isSocial) {\n\n    // turn on the flag\n    user.app_metadata.is_signup = true; \n\n    // store the app_metadata\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        // throw error\n        return callback('Signup disabled');\n      })\n      .catch(function(err){\n        callback(err);\n      });\n\n    return;\n  } \n\n  // if flag is enabled, throw error\n  if (user.app_metadata.is_signup) {\n    return callback('Signup disabled');\n  }\n\n  // else it is a non social login or it is not a signup\n  callback(null, user, context);\n}"
       },
       {
+        "id": "dropbox-whitelist",
         "title": "Whitelist on the cloud",
         "categories": [
           "access control"
@@ -67,6 +75,7 @@
         "code": "function (user, context, callback) {\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/21665105/users.txt'\n  }, function (err, response, body) {\n    var whitelist = body.split('\\r\\n');\n\n    var userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}"
       },
       {
+        "id": "email-verified",
         "title": "Force email verification",
         "categories": [
           "access control"
@@ -75,6 +84,7 @@
         "code": "function (user, context, callback) {\n  if (!user.email_verified) {\n    return callback(new UnauthorizedError('Please verify your email before logging in.'));\n  } else {\n    return callback(null, user, context);\n  }\n}"
       },
       {
+        "id": "ip-address-whitelist",
         "title": "IP Address whitelist",
         "categories": [
           "access control"
@@ -83,6 +93,7 @@
         "code": "function (user, context, callback) {\n    var whitelist = ['1.2.3.4', '2.3.4.5']; //authorized IPs\n    var userHasAccess = whitelist.some(\n      function (ip) {\n        return context.request.ip === ip;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied from this IP address.'));\n    }\n\n    return callback(null, user, context);\n}"
       },
       {
+        "id": "link-users-by-email-with-metadata",
         "title": "Link Accounts with Same Email Address while Merging Metadata",
         "categories": [
           "access control"
@@ -91,6 +102,7 @@
         "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  var async = require('async@2.1.2');\n\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n  var userApiUrl = auth0.baseUrl + '/users';\n\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email.raw:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n\n          targetUser.app_metadata = targetUser.app_metadata || {};\n          targetUser.user_metadata = targetUser.user_metadata || {};\n          auth0.users.updateAppMetadata(user.user_id, targetUser.app_metadata)\n          .then(auth0.users.updateUserMetadata(user.user_id, targetUser.user_metadata))\n          .then(function(){\n            request.post({\n              url: userApiUrl + '/' + user.user_id + '/identities',\n              headers: {\n                Authorization: 'Bearer ' + auth0.accessToken\n              },\n              json: { provider: provider, user_id: targetUserId }\n            }, function(err, response, body) {\n                if (response.statusCode >= 400) {\n                  cb(new Error('Error linking account: ' + response.statusMessage));  \n                }\n                cb(err);\n            });\n          })\n          .catch(function(err){\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
       },
       {
+        "id": "link-users-by-email",
         "title": "Link Accounts with Same Email Address",
         "categories": [
           "access control"
@@ -99,6 +111,7 @@
         "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email_verified) {\n    return callback(null, user, context);\n  }\n  var userApiUrl = auth0.baseUrl + '/users';\n\n  request({\n   url: userApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     search_engine: 'v2',\n     q: 'email:\"' + user.email + '\" -user_id:\"' + user.user_id + '\"',\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    if (data.length > 0) {\n      async.each(data, function(targetUser, cb) {\n        if (targetUser.email_verified) {\n          var aryTmp = targetUser.user_id.split('|');\n          var provider = aryTmp[0];\n          var targetUserId = aryTmp[1];\n          request.post({\n            url: userApiUrl + '/' + user.user_id + '/identities',\n            headers: {\n              Authorization: 'Bearer ' + auth0.accessToken\n            },\n            json: { provider: provider, user_id: targetUserId }\n          }, function(err, response, body) {\n              if (response.statusCode >= 400) {\n               cb(new Error('Error linking account: ' + response.statusMessage));  \n              }\n            cb(err);\n          });\n        } else {\n          cb();\n        }\n      }, function(err) {\n        callback(err, user, context);\n      });\n    } else {\n      callback(null, user, context);\n    }\n  });\n}"
       },
       {
+        "id": "roles-creation",
         "title": "Set roles to a user",
         "categories": [
           "access control"
@@ -107,6 +120,7 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email.indexOf('@example.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
       },
       {
+        "id": "simple-domain-whitelist",
         "title": "Email domain whitelist",
         "categories": [
           "access control"
@@ -115,6 +129,7 @@
         "code": "function (user, context, callback) {\n    var whitelist = ['example.com', 'example.org']; //authorized domains\n    var userHasAccess = whitelist.some(\n      function (domain) {\n        var emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    return callback(null, user, context);\n}"
       },
       {
+        "id": "simple-user-whitelist-for-app",
         "title": "Whitelist for a Specific App",
         "categories": [
           "access control"
@@ -123,6 +138,7 @@
         "code": "function (user, context, callback) {\n    //we just care about NameOfTheAppWithWhiteList\n    //bypass this rule for every other app\n    if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n      return callback(null, user, context);\n    }\n\n    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
+        "id": "simple-user-whitelist",
         "title": "Whitelist",
         "categories": [
           "access control"
@@ -131,6 +147,7 @@
         "code": "function (user, context, callback) {\n    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
       },
       {
+        "id": "simple-whitelist-on-a-connection",
         "title": "Whitelist on Specific Connection",
         "categories": [
           "access control"
@@ -139,6 +156,7 @@
         "code": "function (user, context, callback) {\n\n    // We check users only authenticated with 'fitbit'\n    if(context.connection === 'fitbit'){\n\n      var whitelist = [ 'user1', 'user2' ]; //authorized users\n      var userHasAccess = whitelist.some(\n        function (name) {\n          return name === user.name;\n        });\n\n      if (!userHasAccess) {\n        return callback(new UnauthorizedError('Access denied.'));\n      }\n    }\n\n    callback(null, user, context);\n}"
       },
       {
+        "id": "thisdata-deny-anomalies",
         "title": "Login Anomaly Detection via ThisData",
         "categories": [
           "access control"
@@ -152,6 +170,7 @@
     "name": "enrich profile",
     "templates": [
       {
+        "id": "add-attributes",
         "title": "Add attributes to a user for specific connection",
         "categories": [
           "enrich profile"
@@ -160,6 +179,7 @@
         "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    user.vip = true;\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "add-country",
         "title": "Add country to the user profile",
         "categories": [
           "enrich profile"
@@ -168,6 +188,7 @@
         "code": "function (user, context, callback) {\n  if (context.request.geoip) {\n    user.country = context.request.geoip.country_name;\n  }\n\n   // Example geoip object:\n   // \"geoip\": {\n   //    \"country_code\": \"AR\",\n   //    \"country_code3\": \"ARG\",\n   //    \"country_name\": \"Argentina\",\n   //    \"region\": \"05\",\n   //    \"city\": \"Cordoba\",\n   //    \"latitude\": -31.41349983215332,\n   //    \"longitude\": -64.18109893798828,\n   //    \"continent_code\": \"SA\",\n   //    \"time_zone\": \"America/Argentina/Cordoba\"\n   //  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "add-income",
         "title": "Add zipcode median household income to the user profile",
         "categories": [
           "enrich profile"
@@ -176,6 +197,7 @@
         "code": "function (user, context, callback) {\n\n    user.user_metadata = user.user_metadata || {};\n    var geoip = user.user_metadata.geoip || context.request.geoip;\n\n    if (!geoip || geoip.country_code !== 'US') return callback(null, user, context);\n\n    if(global.incomeData === undefined) {\n        retrieveIncomeData(user, geoip, context, callback);\n    } else {\n        setIncomeData(global.incomeData, user, geoip, context, callback);\n    }\n\n    function retrieveIncomeData(user, geoip, context, callback) {\n        request({\n            url: 'http://cdn.auth0.com/zip-income/householdincome.json'\n        }, function (e,r,b) {\n            if(e) return callback(e);\n            if(r.statusCode===200){\n                var incomeData = JSON.parse(b);\n                global.incomeData = incomeData;\n                setIncomeData(incomeData,user,context, callback);\n            }\n            callback(null, user, context);\n        });\n    }\n\n    function setIncomeData(incomeData, user, geoip, context, callback) {\n        if (incomeData[geoip.postal_code]) {\n            user.user_metadata.zipcode_income = incomeData[geoip.postal_code];\n            auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n                .then(function(){\n                    callback(null, user, context);\n                })\n                .catch(function(err){\n                    callback(err);\n                });\n        }\n    }\n}"
       },
       {
+        "id": "add-persistent-attributes",
         "title": "Add persistent attributes to the user",
         "categories": [
           "enrich profile"
@@ -184,6 +206,7 @@
         "code": "function (user, context, callback) {\n  user.user_metadata = user.user_metadata || {};\n  user.user_metadata.color = user.user_metadata.color || 'blue';\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n        callback(null, user, context);\n    })\n    .catch(function(err){\n        callback(err);\n    });\n}"
       },
       {
+        "id": "add-roles-from-sqlserver",
         "title": "Add user roles from a SQL Server database",
         "categories": [
           "enrich profile"
@@ -192,6 +215,7 @@
         "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n\n  // Queries a table by e-mail and returns associated 'Roles'\n  function getRoles(email, done) {\n    var connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', function (error) {\n      console.log(error.message);\n    });\n\n    var query = \"SELECT Email, Role \" +\n                \"FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', function (err) {\n      if (err) return done(new Error(err));\n\n      var request = new sqlserver.Request(query, function (err, rowCount, rows) {\n        if (err) return done(new Error(err));\n\n        var roles = rows.map(function (row) {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}"
       },
       {
+        "id": "decrypt-sensitive-data",
         "title": "Decrypt sensitive data from the user profile",
         "categories": [
           "enrich profile"
@@ -200,6 +224,7 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n\n  var private_data = decrypt(user.app_metadata.private_data);\n  if (private_data.license_key === '1234567') {\n    user.role = 'admin';\n  }\n\n  return callback(null, user, context);\n\n  function decrypt(data) {\n    if (!data) {\n      return { };\n    }\n    var iv = new Buffer(configuration.ENCRYPT_IV);\n    var encodeKey = crypto.createHash('sha256')\n    .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();\n    var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);\n    var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');\n    return JSON.parse(decrypted);\n  }\n}"
       },
       {
+        "id": "default-picture-null-avatars",
         "title": "Default picture for null avatars",
         "categories": [
           "enrich profile"
@@ -208,6 +233,7 @@
         "code": "function (user, context, callback) {\n  if (user.picture.indexOf('cdn.auth0.com') > -1) {\n    var url = require('url');\n    var u = url.parse(user.picture, true);\n    u.query.d = '<URL TO YOUR DEFAULT PICTURE HERE>';\n    delete u.search;\n    user.picture = url.format(u);\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "encrypt-sensitive-data",
         "title": "Encrypt sensitive data in the user profile",
         "categories": [
           "enrich profile"
@@ -216,6 +242,7 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n  user.app_metadata.private_data = encrypt({\n    license_key: '1234567',\n    social_security_number: '56789'\n  });\n\n  callback(null, user, context);\n\n  function encrypt(data) {\n    var iv = new Buffer(configuration.ENCRYPT_IV);\n    var decodeKey = crypto.createHash('sha256')\n      .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();\n    var cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);\n    return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');\n  }\n}"
       },
       {
+        "id": "facebook-custum-picture",
         "title": "Use a custom sized profile picture for Facebook connections",
         "categories": [
           "enrich profile"
@@ -224,6 +251,7 @@
         "code": "function (user, context, callback) {\n  if (context.connection === 'facebook') {\n    var fbIdentity = _.find(user.identities, { connection: 'facebook' });\n    // See: https://developers.facebook.com/docs/graph-api/reference/user/picture/ for more \n    // sizes and types of images that can be returned\n    var pictureType = 'large';\n    user.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;\n  }\n  callback(null, user, context);\n}"
       },
       {
+        "id": "get-FullContact-profile",
         "title": "Enrich profile with FullContact",
         "categories": [
           "enrich profile"
@@ -232,6 +260,7 @@
         "code": "function (user, context, callback) {\n  var FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY';\n  var SLACK_HOOK = 'YOUR SLACK HOOK URL';\n\n  var slack = require('slack-notify')(SLACK_HOOK);\n\n  // skip if no email\n  if(!user.email) return callback(null, user, context);\n  // skip if fullcontact metadata is already there\n  if(user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);\n  request({\n    url: 'https://api.fullcontact.com/v2/person.json',\n    qs: {\n      email:  user.email,\n      apiKey: FULLCONTACT_KEY\n    }\n  }, function (error, response, body) {\n    if (error || (response && response.statusCode !== 200)) {\n\n      slack.alert({\n        channel: '#slack_channel',\n        text: 'Fullcontact API Error',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n\n      // swallow fullcontact api errors and just continue login\n      return callback(null, user, context);\n    }\n\n\n    // if we reach here, it means fullcontact returned info and we'll add it to the metadata\n    user.user_metadata = user.user_metadata || {};\n    user.user_metadata.fullcontact = JSON.parse(body);\n\n    auth0.users.updateUserMetadata(user.user_id, user.user_metadata);\n    return callback(null, user, context);\n  });\n}"
       },
       {
+        "id": "get-getIP",
         "title": "Enrich profile with the locations where the user logs in",
         "categories": [
           "enrich profile"
@@ -240,6 +269,7 @@
         "code": "function (user, context, callback) {\n\n  user.user_metadata = user.user_metadata || {};\n\n  user.user_metadata.geoip = context.request.geoip;\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n}"
       },
       {
+        "id": "get-rapLeaf-profile",
         "title": "Enrich profile with Rapleaf",
         "categories": [
           "enrich profile"
@@ -248,6 +278,7 @@
         "code": "function (user, context, callback) {\n\n  //Filter by app\n  //if(context.clientName !== 'AN APP') return callback(null, user, context);\n\n  var rapLeafAPIKey = 'YOUR RAPLEAF API KEY';\n\n  if(user.email){\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://personalize.rapleaf.com/v4/dr',\n    qs: {\n      email: user.email,\n      api_key: rapLeafAPIKey\n    }\n  }, function(err, response, body){\n    if(err) return callback(err);\n\n    if(response.statusCode===200){\n     user.rapLeafData = JSON.parse(body);\n    }\n\n    return callback(null, user, context);\n  });\n\n}"
       },
       {
+        "id": "get-twitter-email",
         "title": "Get email address from Twitter",
         "categories": [
           "enrich profile"
@@ -256,6 +287,7 @@
         "code": "user.app_metadata = user.app_metadata || {};\nvar email = user.email || user.app_metadata.social_email;"
       },
       {
+        "id": "google-refresh-token",
         "title": "Store Google Refresh Token",
         "categories": [
           "enrich profile"
@@ -264,6 +296,7 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // IMPORTANT: for greater security, we recommend encrypting this value and decrypt on your application.\n  // function encryptAesSha256 (password, textToEncrypt) {\n  //   var cipher = crypto.createCipher('aes-256-cbc', password);\n  //   var crypted = cipher.update(textToEncrypt, 'utf8', 'hex');\n  //   crypted += cipher.final('hex');\n  //   return crypted;\n  // }\n\n  // get the google identity\n  var googleIdentity = _.find(user.identities, {'provider': 'google-oauth2'});\n\n  // if the user that just logged in has a refresh_token, persist it\n  if (googleIdentity && googleIdentity.refresh_token) {\n    user.app_metadata.refresh_token = googleIdentity.refresh_token;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  } else {\n    callback(null, user, context);\n  }\n}"
       },
       {
+        "id": "google-service-account-token",
         "title": "Create a Google access_token using a Service Account",
         "categories": [
           "enrich profile"
@@ -272,6 +305,7 @@
         "code": "function (user, context, callback) {\n\n  // this is the private key you downloaded from your service account.\n  // make sure you remove the password from the key and convert it to PEM using the following\n  // openssl pkcs12 -in yourkey.p12 -out yourkey.pem -nocerts -nodes\n  // finally, you should put this as a configuration encrypted in Auth0\n  var KEY = '....RSA private key downloaded from service account...'; \n\n  // this is the email address of the service account created (NOT the Client ID)\n  var GOOGLE_CLIENT_ID_EMAIL = '.....@developer.gserviceaccount.com';\n\n  // the scope you want access to. Full list of scopes https://developers.google.com/admin-sdk/directory/v1/guides/authorizing\n  var SCOPE = 'https://www.googleapis.com/auth/admin.directory.user.readonly';\n\n  // a user of your Google Apps domain that this rule would impersonate\n  var ADMIN_EMAIL = 'foo@corp.com';\n\n  var token = jwt.sign({ scope: SCOPE, sub: ADMIN_EMAIL }, KEY, { audience: \"https://accounts.google.com/o/oauth2/token\", issuer: GOOGLE_CLIENT_ID_EMAIL, expiresInMinutes: 60, algorithm: 'RS256'});\n\n  request.post({ url: 'https://accounts.google.com/o/oauth2/token', form: { grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: token } }, function(err, resp, body) {\n    if (err) return callback(null, user, context);\n    var result = JSON.parse(body);\n    if (result.error) {\n      console.log(body);\n      // log and swallow\n      return callback(null, user, context);\n    }\n\n    user.admin_access_token = result.access_token;\n    callback(null, user, context);\n  });\n\n}"
       },
       {
+        "id": "linkedin-original-picture",
         "title": "Use the original sized profile picture for LinkedIn connections",
         "categories": [
           "enrich profile"
@@ -280,6 +314,7 @@
         "code": "function (user, context, callback) {\n  if (context.connection !== 'linkedin') {\n    callback(null, user, context);\n  }\n\n  var request = require('request');\n  var options = {\n    url: 'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',\n    headers: {\n      Authorization: 'Bearer ' + user.identities[0].access_token\n    }\n  };\n\n  request(options, function(error, response) {\n    if (!error && response.statusCode === 200) {\n      var json = JSON.parse(response.body);\n      if (json.values && json.values.length >= 1) {\n        user.picture = json.values[0];\n      }\n    }\n    callback(null, user, context);\n  });\n}"
       },
       {
+        "id": "remove-attributes",
         "title": "Remove attributes from a user",
         "categories": [
           "enrich profile"
@@ -288,6 +323,7 @@
         "code": "function (user, context, callback) {\n  delete user.some_attribute;\n\n  // another option would be to define a whitelist of attributes you want,\n  // instead of delete the ones you don't want\n  /*\n  var whitelist = ['email', 'name', 'identities'];\n  Object.keys(user).forEach(function(key) {\n    console.log(whitelist.indexOf(key));\n    if (whitelist.indexOf(key) === -1) delete user[key];\n  });\n  */\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "saml-attribute-mapping",
         "title": "SAML Attributes mapping",
         "categories": [
           "enrich profile"
@@ -296,6 +332,7 @@
         "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "soap-webservice",
         "title": "Roles from a SOAP Service",
         "categories": [
           "enrich profile"
@@ -304,6 +341,7 @@
         "code": "function (user, context, callback) {\n  function getRoles(callback) {\n    request.post({\n      url:  'https://somedomain.com/RoleService.svc',\n      body: '<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><GetRolesForCurrentUser xmlns=\"http://tempuri.org\"/></s:Body></s:Envelope>',\n      headers: { 'Content-Type': 'text/xml; charset=utf-8',\n              'SOAPAction': 'http://tempuri.org/RoleService/GetRolesForCurrentUser' }\n    }, function (err, response, body) {\n      if (err) return callback(err);\n\n      var parser = new xmldom.DOMParser();\n      var doc = parser.parseFromString(body);\n      var roles = xpath.select(\"//*[local-name(.)='string']\", doc).map(function(node) { return node.textContent; });\n      return callback(null, roles);\n    });\n  }\n\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    user.roles = roles;\n\n    callback(null, user, context);\n  });\n}"
       },
       {
+        "id": "socure_fraudscore",
         "title": "Detect Fraud Users",
         "categories": [
           "enrich profile"
@@ -317,6 +355,7 @@
     "name": "webhook",
     "templates": [
       {
+        "id": "aspnet-webapi",
         "title": "Custom webhook with ASPNET WebApi2",
         "categories": [
           "webhook"
@@ -325,6 +364,7 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.customId) {\n    console.log(\"Found ID!\");\n    return callback(null, user, context);\n  }\n\n  // You should make your requests over SSL to protect your app secrets.\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: \";ojhsajk;h;Kh:Jh\",\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    user.app_metadata.customId = body.customId;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}"
       },
       {
+        "id": "creates-lead-salesforce",
         "title": "Creates a new Lead in Salesforce on First Login",
         "categories": [
           "webhook"
@@ -333,6 +373,7 @@
         "code": "function (user, context, done) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.recordedAsLead) {\n    return done(null,user,context);\n  }\n\n  var MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  //Populate the variables below with appropriate values\n  var SFCOM_CLIENT_ID = configuration.SALESFORCE_CLIENT_ID;\n  var SFCOM_CLIENT_SECRET = configuration.SALESFORCE_CLIENT_SECRET;\n  var USERNAME = configuration.SALESFORCE_USERNAME;\n  var PASSWORD = configuration.SALESFORCE_PASSWORD;\n\n  getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,\n    function(r) {\n      if (!r.instance_url || !r.access_token) {\n        slack.alert({\n          channel: '#some_channel',\n          text: 'Error Getting SALESFORCE Access Token',\n          fields: {\n            error: r\n          }\n        });\n\n        return;\n      }\n\n      createLead(r.instance_url, r.access_token, function (e, result) {\n        if (e || !result || !result.id) {\n          slack.alert({\n            channel: '#some_channel',\n            text: 'Error Creating SALESFORCE Lead',\n            fields: {\n              error: e || result\n            }\n          });\n\n          return;\n        }\n\n        user.app_metadata.recordedAsLead = true;\n        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);\n      });\n    });\n\n  //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm\n  function createLead(url, access_token, callback){\n    //Can use many more fields\n    var data = {\n      LastName: user.name,\n      Company: 'Web channel signups'\n    };\n\n    request.post({\n      url: url + \"/services/data/v20.0/sobjects/Lead\",\n      headers: {\n        \"Authorization\": \"OAuth \" + access_token\n      },\n      json: data\n      }, function(e,r,b) {\n        return callback(e, b);\n      });\n  }\n\n  //Obtains a SFCOM access_token with user credentials\n  function getAccessToken(client_id, client_secret, username, password, callback) {\n    request.post({\n      url: 'https://login.salesforce.com/services/oauth2/token',\n      form: {\n        grant_type: 'password',\n        client_id: client_id,\n        client_secret: client_secret,\n        username: username,\n        password: password\n      }}, function(e,r,b) {\n        return callback(JSON.parse(b));\n      });\n  }\n\n  // don’t wait for the SF API call to finish, return right away (the request will continue on the sandbox)`\n  done(null, user, context);\n}"
       },
       {
+        "id": "mailgun",
         "title": "Send emails through Mailgun",
         "categories": [
           "webhook"
@@ -341,6 +382,7 @@
         "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',\n      auth:\n      {\n          user: 'api',\n          pass: '{YOUR MAILGUN KEY}'\n      },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
       },
       {
+        "id": "mandrill",
         "title": "Send email with Mandrill",
         "categories": [
           "webhook"
@@ -349,6 +391,7 @@
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // Only send an email when user signs up\n  if (!user.app_metadata.signedUp) {\n    // See https://mandrillapp.com/api/docs/messages.JSON.html#method=send\n    var body = {\n      key: configuration.MANDRILL_API_KEY,\n      message: {\n        subject: 'User ' + user.name + ' signed up to ' + context.clientName,\n        text: 'Sent from an Auth0 rule',\n        from_email: 'SENDER_EMAIL@example.com',\n        from_name: 'Auth0 Rule',\n        to: [\n          {\n            email: 'DESTINATION_EMAIL@example.com',\n            type: 'to'\n          }\n        ],\n      }\n    };\n    var mandrill_send_endpoint = 'https://mandrillapp.com/api/1.0/messages/send.json';\n\n    request.post({url: mandrill_send_endpoint, form: body}, function (err, resp, body) {\n      if (err) { return callback(err); }\n      user.app_metadata.signedUp = true;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    });\n  } else {\n    // User had already logged in before, do nothing\n    callback(null, user, context);\n  }\n}"
       },
       {
+        "id": "mixpanel-track-event",
         "title": "Tracks Logins in MixPanel",
         "categories": [
           "webhook"
@@ -357,6 +400,7 @@
         "code": "function (user, context, callback) {\n\n  var mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": \"{REPLACE_WITH_YOUR_MIXPANEL_TOKEN}\",\n        \"application\": context.clientName\n    }\n  };\n\n  var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/',\n    qs: {\n      data: base64Event\n    }\n  }, function (e, r, b){\n      // don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`\n      callback(null, user, context);\n  });\n}"
       },
       {
+        "id": "pusher",
         "title": "Obtains a Pusher token for subscribing/publishing to private channels",
         "categories": [
           "webhook"
@@ -365,6 +409,7 @@
         "code": "function (user, context, callback) {\n\n  var pusherKey='YOUR PUSHER KEY';\n  var pusherSecret = '{YOUR PUSHER SECRET}';\n\n  if( context.request.query.channel && context.request.query.socket_id)\n  {\n    user.pusherAuth = pusherKey + \":\" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);\n  }\n\n  callback(null, user, context);\n\n  function sign(secret, channel, socket_id)\n  {\n    var string_to_sign = socket_id+\":\"+channel;\n    var sha = crypto.createHmac('sha256',secret);\n    return sha.update(string_to_sign).digest('hex');\n  }\n}"
       },
       {
+        "id": "send-events-keenio",
         "title": "Send events to Keen",
         "categories": [
           "webhook"
@@ -373,6 +418,7 @@
         "code": "function(user, context, callback) {\n  if (context.stats.loginsCount > 1) {\n    return callback(null, user, context);\n  }\n\n  var MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  var writeKey = 'YOUR KEEN IO WRITE KEY';\n  var projectId = 'YOUR KEEN IO PROJECT ID';\n  var eventCollection = 'signups';\n\n  var keenEvent = {\n    userId: user.user_id,\n    name: user.name,\n    ip: context.request.ip //Potentially any other properties in the user profile/context\n  };\n\n  request.post({\n    method: 'POST',\n    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,\n    headers: {\n      'Content-type': 'application/json',\n    },\n    body: JSON.stringify(keenEvent),\n  },\n  function (error, response, body) {\n\n    if( error || (response && response.statusCode !== 200) ) {\n      slack.alert({\n        channel: '#some_channel',\n        text: 'KEEN API ERROR',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n    }\n  });\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "sendgrid",
         "title": "Send emails through SendGrid",
         "categories": [
           "webhook"
@@ -381,6 +427,7 @@
         "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (!user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ...'\n    },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
       },
       {
+        "id": "slack",
         "title": "Slack Notification on User Signup",
         "categories": [
           "webhook"
@@ -389,6 +436,7 @@
         "code": "function(user, context, callback) {\n  // short-circuit if the user signed up already\n  if (context.stats.loginsCount > 1) return callback(null, user, context);\n\n  // get your slack's hook url from: https://slack.com/services/10525858050\n  var SLACK_HOOK = 'YOUR SLACK HOOK URL';\n\n  var slack = require('slack-notify')(SLACK_HOOK);\n  var message = 'New User: ' + (user.name || user.email) + ' (' + user.email + ')';\n  var channel = '#some_channel';\n\n  slack.success({\n   text: message,\n   channel: channel\n  });\n\n  // don’t wait for the Slack API call to finish, return right away (the request will continue on the sandbox)`\n  callback(null, user, context);\n}"
       },
       {
+        "id": "splunk-HEC-track-event",
         "title": "Tracks Logins/SignUps with Splunk HEC",
         "categories": [
           "webhook"
@@ -397,6 +445,7 @@
         "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  var host = 'YOUR SPLUNK HEC ENDPOINT, like https://localhost:8088';\n  var token = 'YOUR SPLUNK HEC TOKEN';\n\n  //Add any interesting info to the event\n  var hec_event = {\n    event: {\n      message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n      application: context.clientName,\n      clientIP: context.request.ip,\n      protocol: context.protocol,\n      userName: user.name,\n      userId: user.user_id\n    },\n    source: \"auth0\",\n    sourcetype: \"auth0_activity\"\n  };\n\n  request.post( {\n    url: host + '/services/collector',\n    headers: {\n        'Authorization': 'Splunk ' + token\n      },\n    strictSSL: true // set to false if using a self-signed cert\n    json: hec_event\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true; \n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n\n}"
       },
       {
+        "id": "splunk-track-event",
         "title": "Tracks Logins/SignUps with Splunk",
         "categories": [
           "webhook"
@@ -405,6 +454,7 @@
         "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  var splunkBaseUrl = 'YOUR SPLUNK SERVER, like: https://your server:8089';\n\n  //Add any interesting info to the event\n  var event = {\n    message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n    application: context.clientName,\n    clientIP: context.request.ip,\n    protocol: context.protocol,\n    userName: user.name,\n    userId: user.user_id\n  };\n\n  request.post( {\n    url: splunkBaseUrl + '/services/receivers/simple',\n    auth: {\n        'user': 'YOUR SPLUNK USER',\n        'pass': 'YOUR SPLUNK PASSWORD',\n      },\n    json: event,\n    qs: {\n      'source': 'auth0',\n      'sourcetype': 'auth0_activity'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n\n}"
       },
       {
+        "id": "thisdata-alert-anomalies",
         "title": "Send login anomaly emails",
         "categories": [
           "webhook"
@@ -413,6 +463,7 @@
         "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/events?api_key=' + apiKey,\n    json: {\n      verb: 'log-in',\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options);\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "update-firebase-user",
         "title": "Update user profile identity in Firebase",
         "categories": [
           "webhook"
@@ -421,6 +472,7 @@
         "code": "function (user, context, callback) {\n\n  var baseURL = configuration.FIREBASE_URL;\n  var secret = configuration.FIREBASE_SECRET;\n  var fb_id = new Buffer(user.user_id).toString('base64');\n\n  var fbIdentity = {\n    \"identity\": {\n      \"user_id\": user.user_id,\n      \"email\": user.email,\n      \"name\": user.name,\n      \"nickname\": user.nickname,\n      \"picture\": user.picture\n    }\n  };\n\n  var putURL = baseURL + \"/users/\" + fb_id + \".json?auth=\" + secret;\n  request.put({\n    \"url\": putURL,\n    \"json\": fbIdentity\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    return callback(null, user, context);\n  });\n}"
       },
       {
+        "id": "zapier-new-login",
         "title": "Trigger a Zap on Every User Login",
         "categories": [
           "webhook"
@@ -429,6 +481,7 @@
         "code": "function (user, context, callback) {\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n  var payload_to_zap = extend({}, user, small_context);\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    // swallow error\n    callback(null, user, context);\n  });\n\n  function extend(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i],\n          keys = Object.keys(source);\n\n      for (var j = 0; j < keys.length; j++) {\n          var name = keys[j];\n          target[name] = source[name];\n      }\n    }\n    return target;\n  }\n}"
       },
       {
+        "id": "zapier-new-user",
         "title": "Trigger a Zap on New Users",
         "categories": [
           "webhook"
@@ -442,6 +495,7 @@
     "name": "multifactor",
     "templates": [
       {
+        "id": "duo-multifactor",
         "title": "Multifactor with Duo Security",
         "categories": [
           "multifactor"
@@ -450,6 +504,7 @@
         "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['{REPLACE_WITH_YOUR_CLIENT_ID}'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        //required\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        // optional, defaults to true. Set to false to force DuoSecurity every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false,\n\n        // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n        // username: user.nickname,\n\n        // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.\n        // admin: {\n        //  ikey: 'DIAN...NV6UM',\n        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n        // },\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "google-multifactor",
         "title": "Multifactor with Google Authenticator",
         "categories": [
           "multifactor"
@@ -458,6 +513,7 @@
         "code": "function (user, context, callback) {\n  // Uncomment the following to skip MFA when impersonating a user\n  // if (user.impersonated) { return callback(null, user, context); }\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true\n    // if (user.app_metadata && user.app_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        // optional\n        // issuer: 'Label on Google Authenticator App', \n\n        // optional, the key to use for TOTP. By default one is generated for you\n        // key: '{YOUR_KEY_HERE}', \n\n        // optional, defaults to true. Set to false to force Google Authenticator every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false \n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "guardian-multifactor-authorization-extension",
         "title": "Multifactor with Auth0 Guardian + Authorization Extension",
         "categories": [
           "multifactor",
@@ -467,6 +523,7 @@
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "guardian-multifactor-changed-location",
         "title": "Multifactor when country changes",
         "categories": [
           "multifactor",
@@ -476,6 +533,7 @@
         "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
       },
       {
+        "id": "guardian-multifactor-ip-range",
         "title": "Multifactor when request comes from outside an IP range",
         "categories": [
           "multifactor",
@@ -485,6 +543,7 @@
         "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "guardian-multifactor",
         "title": "Multifactor with Auth0 Guardian",
         "categories": [
           "multifactor",
@@ -499,6 +558,7 @@
     "name": "guardian",
     "templates": [
       {
+        "id": "guardian-multifactor-authorization-extension",
         "title": "Multifactor with Auth0 Guardian + Authorization Extension",
         "categories": [
           "multifactor",
@@ -508,6 +568,7 @@
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "guardian-multifactor-changed-location",
         "title": "Multifactor when country changes",
         "categories": [
           "multifactor",
@@ -517,6 +578,7 @@
         "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
       },
       {
+        "id": "guardian-multifactor-ip-range",
         "title": "Multifactor when request comes from outside an IP range",
         "categories": [
           "multifactor",
@@ -526,6 +588,7 @@
         "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "guardian-multifactor",
         "title": "Multifactor with Auth0 Guardian",
         "categories": [
           "multifactor",
@@ -540,6 +603,7 @@
     "name": "debugging",
     "templates": [
       {
+        "id": "requestbin",
         "title": "Dump rule variables to RequestBin",
         "categories": [
           "debugging"
@@ -553,6 +617,7 @@
     "name": "saml",
     "templates": [
       {
+        "id": "saml-configuration",
         "title": "Change your SAML configuration",
         "categories": [
           "saml"
