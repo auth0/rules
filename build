@@ -3,6 +3,7 @@
 var marked = require('marked');
 var yaml = require('js-yaml');
 var async = require('async');
+var path = require('path');
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -55,6 +56,7 @@ async.map(files, function (file, callback) {
     })[0].text;
 
     var result = {
+      id:          path.basename(file).replace('.md', ''),
       title:       title || meta.title,
       categories:  meta.categories || ['default'],
       description: description,
