@@ -3,14 +3,15 @@ gallery: true
 categories:
 - access control
 ---
-## Login Anomaly Detection via ThisData
+## Account Takeover Prevention via ThisData
 
-This rule is designed to detect phished or compromised user accounts.
-Even if the primary user authentication is approved it will deny
-access to a user if the login appears to be highly suspicious.
+This rule is designed to detect phished or compromised user accounts and block
+attackers from logging in to hacked accounts. Even if the primary user
+authentication is approved (e.g. correct username and password) it will deny
+access if the login appears to be highly suspicious.
 
-It relies on the [ThisData](https://thisdata.com) anomaly detection
-algorithms which take into account many behavioural factors including:
+It uses [ThisData's](https://thisdata.com) anomaly detection
+algorithms which take into account many behavioral factors including:
 
 * Location & Velocity
 * Devices
@@ -19,13 +20,32 @@ algorithms which take into account many behavioural factors including:
 * Risky IP addresses
 * And more...
 
-###What happens if an anomaly is detected?
-It uses to get a risk score for the login and then blocks the
-login by raising an `UnauthorizedError`error if the risk is very high.
+What happens if an anomaly is detected?
+---------------------------------------
 
-###Prerequisites
+This rule uses ThisData's API to get a risk score for the login, and then blocks
+the login by raising an `UnauthorizedError` error if the risk is very high.
+
+Prerequisites
+-------------
+
 You will need a ThisData API Key. Sign up for a free ThisData
 account at https://thisdata.com/sign-up
+
+**Important** This rule should be used with the "Account Takeover Detection via ThisData"
+Auth0 rule, which allows you to teach our algorithms about your users. Using
+both rules allows you to achieve results of higher accuracy.
+
+Learn More
+----------
+
+Read our guide "How to add login anomaly detection to Auth0"
+  https://thisdata.com/blog/how-to-add-login-anomaly-detection-to-auth0/
+
+Contact ThisData: support@thisdata.com
+
+Auth0 Rule
+----------
 
 ```js
 function (user, context, callback) {
