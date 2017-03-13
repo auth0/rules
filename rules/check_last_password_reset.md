@@ -8,8 +8,6 @@ categories:
 
 This rule will check the last time that a user changed his or her account password.
 
-> NOTE: This rule leverages the `last_password_reset` user profile field. It's important to understand that this field doesn't get set at the time of password _change_ but only when the user performs the _next login_ with the new password. This works since rules always run after authentication occurs anyway.
-
 ```js
 function (user, context, callback) {
   
