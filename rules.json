@@ -35,7 +35,7 @@
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will check the last time that a user changed his or her account password.</p>\n<blockquote>\n<p>NOTE: This rule leverages the <code>last_password_reset</code> user profile field. It&#39;s important to understand that this field doesn&#39;t get set at the time of password <em>change</em> but only when the user performs the <em>next login</em> with the new password. This works since rules always run after authentication occurs anyway.</p>\n</blockquote>\n",
+        "description": "<p>This rule will check the last time that a user changed his or her account password.</p>\n",
         "code": "function (user, context, callback) {\n\n  function daydiff (first, second) {\n    return (second-first)/(1000*60*60*24);\n  }\n\n  var last_password_change = user.last_password_reset || user.created_at;\n\n  if (daydiff(new Date(last_password_change), new Date()) > 30) {\n    return callback(new UnauthorizedError('please change your password'));\n  }\n\n  callback(null, user, context);\n}"
       },
       {
