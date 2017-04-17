@@ -50,7 +50,7 @@ This is the rules editor inside Auth0:
 
 ---
 
-###Highlighted Rules
+### Highlighted Rules
 
 * [Send events to MixPanel](https://github.com/auth0/rules/blob/master/rules/mixpanel-track-event.md)
 * [Query User Profile in FullContact](https://github.com/auth0/rules/blob/master/rules/get-FullContact-profile.md)
