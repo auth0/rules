@@ -42,7 +42,7 @@ function (user, context, callback) {
           var provider = aryTmp[0];
           var targetUserId = aryTmp[1];
           request.post({
-            url: userApiUrl + '/' + user.user_id + '/identities',
+            url: auth0.baseUrl + '/users/' + user.user_id + '/identities',
             headers: {
               Authorization: 'Bearer ' + auth0.accessToken
             },
