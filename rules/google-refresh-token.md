@@ -8,7 +8,7 @@ categories:
 
 In some scenarios, you might want to access Google APIs from your application. You do that by using the `access_token` stored on the `identities` array (`user.identities[0].access_token`). However `access_token`s have an expiration and in order to get a new one, you have to ask the user to login again. That's why Google allows asking for a `refresh_token` that can be used forever (until the user revokes it) to obtain new `access_tokens` without requiring the user to relogin.
 
-The way you ask for a `refresh_token` using Lock is by sending the `access_type=offline` as an extra parameter as [explained here](https://github.com/auth0/lock/wiki/Sending-authentication-parameters).
+The way you ask for a `refresh_token` using Lock is by sending the `access_type=offline` as an extra parameter as [explained here](https://auth0.com/docs/libraries/lock/v10/customization#auth-object-) using the `auth.params` object in Lock's `options`.
 
 The only caveat is that Google will send you the `refresh_token` only once, and if you haven't stored it, you will have to ask for it again and add `approval_prompt=force` so the user explicitly consent again. Since this would be annoying from a user experience perspective, you should store the refresh token on Auth0 as a persistent property of the user, only if it there is a new one available.
 
