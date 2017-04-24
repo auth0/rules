@@ -19,7 +19,7 @@ function (user, context, callback) {
     return callback(null, user, context);
   }
   var userApiUrl = auth0.baseUrl + '/users';
-  
+
   request({
    url: userApiUrl,
    headers: {
@@ -48,8 +48,8 @@ function (user, context, callback) {
             },
             json: { provider: provider, user_id: targetUserId }
           }, function(err, response, body) {
-              if (response.statusCode >= 400) {
-               cb(new Error('Error linking account: ' + response.statusMessage));  
+              if (response && response.statusCode >= 400) {
+               return cb(new Error('Error linking account: ' + response.statusMessage));
               }
             cb(err);
           });
