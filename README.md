@@ -36,7 +36,7 @@ This is the rules editor inside Auth0:
 2. Update the version by executing:
 
  ```bash
- npm version [patch|minor|mayor]
+ npm version [patch|minor|major]
  ```
 
  > There is a `preversion` script in the `package.json` file that executes the following command:  `./build && git add rules.json && git commit -m 'update rules.json`
