@@ -8,7 +8,7 @@ categories:
 
 This rule gets the user locations based on the IP and is added to the app_metadata in the `geoip` attribute.
 
-```
+```js
 function (user, context, callback) {
   
   user.user_metadata = user.user_metadata || {};

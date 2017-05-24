@@ -15,6 +15,7 @@ function (user, context, callback) {
     license_key: '1234567',
     social_security_number: '56789'
   });
+  user.idToken['https://example.com/private_data'] = user.app_metadata.private_data;
 
   callback(null, user, context);
 
@@ -30,7 +31,7 @@ function (user, context, callback) {
 
 The `user` will look like this after the encryption:
 
-```
+```json
 {
   "name": "jdoe",
   "email": "jdoe@foobar.com",

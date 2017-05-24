@@ -11,7 +11,8 @@ This rule will add a `country` attribute to the user based on their ip address.
 ```js
 function (user, context, callback) {
   if (context.request.geoip) {
-    user.country = context.request.geoip.country_name;
+    context.idToken['https://example.com/country'] = context.request.geoip.country_name;
+    context.idToken['https://example.com/timezone'] = context.request.geoip.time_zone;
   }
   
    // Example geoip object:

@@ -12,6 +12,7 @@ This rule count set the default color (an example preference) to a user (using u
 function (user, context, callback) {
   user.user_metadata = user.user_metadata || {};
   user.user_metadata.color = user.user_metadata.color || 'blue';
+  context.idToken['https://example.com/favorite_color'] = user.user_metadata.color;
 
   auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
     .then(function(){

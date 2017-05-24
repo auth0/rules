@@ -8,7 +8,7 @@ categories:
 
 This rule gets user information from __rapleaf__ using the e-mail (if available). If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `rapLeafInfo` to the user profile and returns. Any other conditions are ignored. See [RapLeaf docs](http://www.rapleaf.com/developers/personalization-api/) for full details.
 
-```
+```js
 function (user, context, callback) {
 
   //Filter by app
