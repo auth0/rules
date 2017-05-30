@@ -26,7 +26,7 @@ function (user, context, callback) {
     if (!error && response.statusCode === 200) {
       var json = JSON.parse(response.body);
       if (json.values && json.values.length >= 1) {
-        user.picture = json.values[0];
+        context.idToken.picture = json.values[0];
       }
     }
     callback(null, user, context);

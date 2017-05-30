@@ -46,6 +46,7 @@ function (user, context, callback) {
     user.user_metadata.fullcontact = JSON.parse(body);
 
     auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
+    context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;
     return callback(null, user, context);
   });
 }

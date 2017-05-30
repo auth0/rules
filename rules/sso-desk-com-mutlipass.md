@@ -7,7 +7,7 @@ This rule will generate a Multipass URL that can be used for SSO with <desk.com>
 
 ![](https://puu.sh/7rstz)
 
-After successful login on your application, Auth0 will add the property `desk_login_url` to the __user profile__ object. You can display this URL on your app. When a user follows the link, they will get access to desk.com automatically.
+After successful login on your application, Auth0 will add the claim `https://example.com/desk_login_url` to the `id_token`. You can display this URL on your app. When a user follows the link, they will get access to desk.com automatically.
 
 > Note: adjust the expiration of the Multipass so it is aligned with your app.
 
@@ -28,7 +28,7 @@ function (user, context, callback) {
   var mp = multipass(deskToken, deskAPIKey, deskSubDomain);
   var signature = sign(deskAPIKey, mp);
 
-  user.desk_login_url = 'https://' + deskSubDomain + '.desk.com/customer/authentication/multipass/callback?multipass=' + encodeURIComponent(mp) + '&signature=' + encodeURIComponent(signature);
+  context.idToken['https://example.com/desk_login_url'] = 'https://' + deskSubDomain + '.desk.com/customer/authentication/multipass/callback?multipass=' + encodeURIComponent(mp) + '&signature=' + encodeURIComponent(signature);
 
   function sign(key, multipass)
   {

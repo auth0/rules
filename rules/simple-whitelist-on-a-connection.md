@@ -8,7 +8,7 @@ categories:
 
 This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).
 
-```
+```js
 function (user, context, callback) {
 
     // We check users only authenticated with 'fitbit'

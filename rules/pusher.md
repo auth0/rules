@@ -9,7 +9,7 @@ categories:
 This rule will generate a [pusher.com] token that can be used to send and receive messages from private channels. See [a complete example here](https://github.com/auth0/auth0-pusher).
 
 
-```
+```js
 function (user, context, callback) {
 
   var pusherKey='YOUR PUSHER KEY';
@@ -17,7 +17,7 @@ function (user, context, callback) {
  
   if( context.request.query.channel && context.request.query.socket_id)
   {
-    user.pusherAuth = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
+    user['https://example.com/pusherAuth'] = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
   }
 
   callback(null, user, context);

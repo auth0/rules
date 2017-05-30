@@ -39,7 +39,7 @@ function rule(user, context, callback) {
 
     // user was found, add sessionToken to user profile
     if (response.statusCode === 200) {
-      user.parse_session_token = JSON.parse(body).sessionToken;
+      context.idToken['https://example.com/parse_session_token'] = JSON.parse(body).sessionToken;
       return callback(null, user, context);
     }
 
@@ -62,7 +62,7 @@ function rule(user, context, callback) {
 
         // user created, add sessionToken to user profile
         if (response.statusCode === 201) {
-          user.parse_session_token = body.sessionToken;
+          context.idToken['https://example.com/parse_session_token'] = body.sessionToken;
           return callback(null, user, context);
         }
         return callback(new Error('The user provisioning returned an unkonwn error. Body: ' + JSON.stringify(body)));

@@ -30,7 +30,7 @@ function (user, context, callback) {
     if(err) return callback(err);
 
     if(response.statusCode===200){
-     user.rapLeafData = JSON.parse(body);
+     context.idToken['https://example.com/rapLeafData'] = JSON.parse(body);
     }
 
     return callback(null, user, context);

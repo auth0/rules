@@ -19,7 +19,7 @@ The `context.request.query` object is parsed using the `querystring` module <htt
 ```js
 function (user, context, callback) {
   if (context.request.query.some_querystring === 'whatever') {
-     user.new_attribute = 'foo';
+     context.idToken['https://example.com/new_attribute'] = 'foo';
   }
 
   callback(null, user, context);
