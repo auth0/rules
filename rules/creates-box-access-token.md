@@ -52,7 +52,7 @@ function(user, context, callback) {
         if(e) {
           return callback(e,user,context);
         }
-        user.idToken['https://example.com/box_access_token'] = token;
+        context.idToken['https://example.com/box_access_token'] = token;
         return callback(null,user,context); //We are done!
      });
     });
