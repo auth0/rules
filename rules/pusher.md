@@ -17,7 +17,7 @@ function (user, context, callback) {
  
   if( context.request.query.channel && context.request.query.socket_id)
   {
-    user['https://example.com/pusherAuth'] = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
+    context.idToken['https://example.com/pusherAuth'] = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
   }
 
   callback(null, user, context);

@@ -42,7 +42,7 @@ function (user, context, callback) {
   };
 
   var zendesk_token = jwt.sign(payload, configuration.ZENDESK_JWT_SECRET);
-  user['https://example.com/zendesk_jwt_url'] = 'https://' + ZENDESK_SUBDOMAIN + '.zendesk.com/access/jwt?jwt=' + zendesk_token;
+  context.idToken['https://example.com/zendesk_jwt_url'] = 'https://' + ZENDESK_SUBDOMAIN + '.zendesk.com/access/jwt?jwt=' + zendesk_token;
 
   callback(null, user, context);
 }
