@@ -15,7 +15,7 @@ function (user, context, callback) {
       if (err) return callback(err);
       if (!mongoUser) return callback(null, user, context);
   
-      user.foo = mongoUser.foo;
+      context.idToken['https://example.com/foo'] = mongoUser.foo;
       callback(null, user, context);
     });  
   });

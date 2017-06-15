@@ -11,7 +11,7 @@ This rule will add an attribute to the user only for the login transaction (i.e.
 ```js
 function (user, context, callback) {
   if (context.connection === 'company.com') {
-    user.vip = true;
+    context.idToken['https://example.com/vip'] = true;
   }
 
   callback(null, user, context);

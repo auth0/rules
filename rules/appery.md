@@ -36,8 +36,8 @@ function (user, context, callback) {
 
     // user was found, add sessionToken to user profile
     if (response.statusCode === 200) {
-      user.apperyio_session_token = JSON.parse(body).sessionToken;
-      user.apperyio_userId = JSON.parse(body)._id;
+      context.idToken['https://example.com/apperyio_session_token'] = body.sessionToken;
+      context.idToken['https://example.com/apperyio_user_id'] = body._id;
       return callback(null, user, context);
     }
 
@@ -59,8 +59,8 @@ function (user, context, callback) {
 
         // user created, add sessionToken to user profile
         if (response.statusCode === 200) {
-          user.apperyio_session_token = body.sessionToken;
-          user.apperyio_userId = body._id;
+          context.idToken['https://example.com/apperyio_session_token'] = body.sessionToken;
+          context.idToken['https://example.com/apperyio_user_id'] = body._id;
           return callback(null, user, context);
         }
 

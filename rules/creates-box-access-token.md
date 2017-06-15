@@ -12,7 +12,7 @@ For more information on the Box APIs used in this rule see: https://developers.b
 
 > Note: these Box APIs are still in beta.
 
-```
+```js
 function(user, context, callback) {
 
   var boxClientId = configuration.clientId;
@@ -25,11 +25,13 @@ function(user, context, callback) {
                    '-----END RSA PRIVATE KEY-----';
 
   //Check if the user has already been provisioned in Box
-  if(user.box_id){
-    getBoxAccessToken(boxClientId, boxClientSecret, 
-                     user.box_id, "user", privateKey, function(e,token){
-      if(e) return callback(e,user,context);
-      user.box_access_token = token;
+  if(user.app_metadata.box_id){
+    getBoxAccessToken(boxClientId, boxClientSecret, user.app_metadata.box_id, "user", privateKey, function(e,token){
+      if(e) { 
+        return callback(e,user,context);
+      }
+
+      context.idToken['https://example.com/box_access_token'] = token;
       return callback(null,user,context);
    });  
   }
@@ -40,15 +42,17 @@ function(user, context, callback) {
   // 3. Save the ID in the box_id property for next time
   // 4. Get a Box User access_token
   
-  getBoxAccessToken(boxClientId, boxClientSecret, 
-                    boxEnterpriseId, "enterprise", privateKey, function(e,token){
+  getBoxAccessToken(boxClientId, boxClientSecret, boxEnterpriseId, "enterprise", privateKey, function(e,token){
     createUser(user, token.access_token, function(e,u){
-      if(e) return callback(e,user,context);
-      user.persistent.box_id = u.id; //Save property in users' metadata
-      getBoxAccessToken(boxClientId, boxClientSecret, 
-                        u.id, "user", privateKey, function(e,token){
-        if(e) return callback(e,user,context);
-        user.box_access_token = token;
+      if(e) {
+        return callback(e,user,context);
+      }
+      user.app_metadata.box_id = u.id; //Save property in users' metadata
+      getBoxAccessToken(boxClientId, boxClientSecret, u.id, "user", privateKey, function(e,token){
+        if(e) {
+          return callback(e,user,context);
+        }
+        context.idToken['https://example.com/box_access_token'] = token;
         return callback(null,user,context); //We are done!
      });
     });
@@ -71,8 +75,7 @@ function(user, context, callback) {
       });
   }
 
-  function getBoxAccessToken(boxClientId, boxClientSecret, 
-                             boxUserEnterpriseId, boxSubType, privateKey, done){
+  function getBoxAccessToken(boxClientId, boxClientSecret, boxUserEnterpriseId, boxSubType, privateKey, done){
     var jwtOptions = {
       algorithm: 'RS256',
       expiresInMinutes: 1,

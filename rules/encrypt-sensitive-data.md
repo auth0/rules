@@ -10,8 +10,7 @@ This rule will set a sensitive value in the app_metadata and encrypt it (see the
 
 ```js
 function (user, context, callback) {
-  user.app_metadata = user.app_metadata || { };
-  user.app_metadata.private_data = encrypt({
+  context.idToken['https://example.com/private_data'] = encrypt({
     license_key: '1234567',
     social_security_number: '56789'
   });
@@ -30,15 +29,13 @@ function (user, context, callback) {
 
 The `user` will look like this after the encryption:
 
-```
+```json
 {
   "name": "jdoe",
   "email": "jdoe@foobar.com",
   "nickname": "jdoe",
   "picture": "http://foobar.com/pictures/jdoe.png",
-  "app_metadata": {
-    "private_data": "46d2581f53ad45a9423182de2de1ca306659dd94101808cb20338b6a6a2f6e32899747197cfe8ade5a1d8b1ed5b9552357a4264b2cc766ea784e1ca688ce84ed"
-  },
+  "https://example.com/private_data": "46d2581f53ad45a9423182de2de1ca306659dd94101808cb20338b6a6a2f6e32899747197cfe8ade5a1d8b1ed5b9552357a4264b2cc766ea784e1ca688ce84ed",
   "user_id": "foobar.com|0123456789"
 }
 ```

@@ -6,7 +6,7 @@ categories:
 ---
 ## Create a Google access_token using a Service Account
 
-In some scenarios, you might want to access Google Admin APIs from your applications. Accesing those APIs require either a consent of the Google Apps administrator or creating a Service Account and obtain a token programatically without interactive consent. This rule create such token based on a service account and put it under `user.admin_access_token`. 
+In some scenarios, you might want to access Google Admin APIs from your applications. Accessing those APIs require either a consent of the Google Apps administrator or creating a Service Account and obtain a token programmatically without interactive consent. This rule create such token based on a service account and put it under `user.admin_access_token`. 
 
 #### 1. Create a Service Account
 
@@ -69,7 +69,7 @@ function (user, context, callback) {
       return callback(null, user, context);
     }
     
-    user.admin_access_token = result.access_token;
+    context.idToken['https://example.com/admin_access_token'] = result.access_token;
     callback(null, user, context);
   });
   

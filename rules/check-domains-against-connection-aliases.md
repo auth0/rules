@@ -8,7 +8,7 @@ categories:
 
 This rule will check that the email the user has used to login matches any of the domains configured in a connection. If there are no domains configured, it will allow access.
 
-> Note: this rule uses Auth0 API v2. You need to get a token from the [API explorer](https://auth0.com/docs/apiv2). The required scope is `read:connections`.
+> Note: this rule uses the Auth0 Management API v2. You need to get a token from the [API explorer](https://auth0.com/docs/api/management/v2). The required scope is `read:connections`.
 
 ```js
 function (user, context, callback) {
@@ -26,7 +26,9 @@ function (user, context, callback) {
     })];
     
     //No domains -> access allowed
-    if( !connection.options.tenant_domain ) return callback(null, user, context);
+    if( !connection.options.tenant_domain ) {
+      return callback(null, user, context);
+    }
     
     //Access allowed if domains is found.
     if( _.findIndex(connection.options.domain_aliases,function(d){

@@ -15,7 +15,7 @@ function (user, context, callback) {
   getRoles(user.email, function(err, roles) {
     if (err) return callback(err);
 
-    user.roles = roles;
+    context.idToken['https://example.com/roles'] = roles;
 
     callback(null, user, context);
   });

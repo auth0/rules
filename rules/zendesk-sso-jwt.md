@@ -11,7 +11,7 @@ The specific details for how this works can be read here: https://support.zendes
 
 This rule assumes you've set a configuration variable named `ZENDESK_JWT_SECRET`.
 
-When the user authenticates, redirect to the URL returned in `user.zendesk_jwt_url`, optionally adding the `return_to` query string parameter.
+When the user authenticates, redirect to the URL returned in the `https://example.com/zendesk_jwt_url` claim, optionally adding the `return_to` query string parameter.
 
 ```js
 function (user, context, callback) {
@@ -42,7 +42,7 @@ function (user, context, callback) {
   };
 
   var zendesk_token = jwt.sign(payload, configuration.ZENDESK_JWT_SECRET);
-  user.zendesk_jwt_url = 'https://' + ZENDESK_SUBDOMAIN + '.zendesk.com/access/jwt?jwt=' + zendesk_token;
+  context.idToken['https://example.com/zendesk_jwt_url'] = 'https://' + ZENDESK_SUBDOMAIN + '.zendesk.com/access/jwt?jwt=' + zendesk_token;
 
   callback(null, user, context);
 }

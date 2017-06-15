@@ -38,7 +38,10 @@ function (user, context, callback) {
 
     function setIncomeData(incomeData, user, geoip, context, callback) {
         if (incomeData[geoip.postal_code]) {
+
             user.user_metadata.zipcode_income = incomeData[geoip.postal_code];
+            context.idToken['https://example.com/zipcode_income'] = incomeData[geoip.postal_code];
+
             auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
                 .then(function(){
                     callback(null, user, context);

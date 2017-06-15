@@ -8,7 +8,7 @@ categories:
 
 This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullContactInfo` to the user_metadata and returns. Any other conditions are ignored. See [FullContact docs](http://www.fullcontact.com/developer/docs/) for full details.
 
-```
+```js
 function (user, context, callback) {
   var FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY';
   var SLACK_HOOK = 'YOUR SLACK HOOK URL';
@@ -46,6 +46,7 @@ function (user, context, callback) {
     user.user_metadata.fullcontact = JSON.parse(body);
 
     auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
+    context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;
     return callback(null, user, context);
   });
 }

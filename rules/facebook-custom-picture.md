@@ -15,7 +15,7 @@ function (user, context, callback) {
     // See: https://developers.facebook.com/docs/graph-api/reference/user/picture/ for more 
     // sizes and types of images that can be returned
     var pictureType = 'large';
-    user.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;
+    context.idToken.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;
   }
   callback(null, user, context);
 }
