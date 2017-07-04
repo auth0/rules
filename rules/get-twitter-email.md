@@ -25,8 +25,10 @@ function (user, context, callback) {
     var url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
     var consumerKey = 'UPDATE-WITH-YOUR-CONSUMER-KEY';
     var consumerSecretKey = 'UPDATE-WITH-YOUR-CONSUMER-SECRET-KEY';
-    var oauthToken = user.identities[0].access_token;
-    var oauthTokenSecret = user.identities[0].access_token_secret;
+
+    var twitterIdentity = _.find(user.identities, { connection: 'twitter' });
+    var oauthToken = twitterIdentity.access_token;
+    var oauthTokenSecret = twitterIdentity.access_token_secret;
 
     var timestamp = Date.now() / 1000;
     var nonce = uuid.v4().replace(/-/g, '');
