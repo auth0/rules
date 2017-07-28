@@ -27,7 +27,7 @@ function (user, context, callback) {
    },
    qs: {
      search_engine: 'v2',
-     q: 'email:"' + user.email + '" -user_id:"' + user.user_id + '"',
+     q: 'email.raw:"' + user.email + '" -user_id:"' + user.user_id + '"',
    }
   },
   function(err, response, body) {
