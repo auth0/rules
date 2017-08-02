@@ -27,7 +27,7 @@ function (user, context, callback) {
    },
    qs: {
      search_engine: 'v2',
-     q: 'email.raw:"' + user.email + '" -user_id:"' + user.user_id + '"',
+     q: 'email:"' + user.email + '" -user_id:"' + user.user_id + '"',
    }
   },
   function(err, response, body) {
@@ -37,7 +37,7 @@ function (user, context, callback) {
     var data = JSON.parse(body);
     if (data.length > 0) {
       async.each(data, function(targetUser, cb) {
-        if (targetUser.email_verified) {
+        if (targetUser.email_verified && targetUser.email.toLowerCase() === user.email.toLowerCase()) {
           var aryTmp = targetUser.user_id.split('|');
           var provider = aryTmp[0];
           var targetUserId = aryTmp[1];
