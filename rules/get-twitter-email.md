@@ -6,7 +6,7 @@ categories:
 ---
 ## Get email address from Twitter
 
-NOTE: Further configuration is need on your Twitter App, take a look at [Twitter's doc](https://dev.twitter.com/rest/reference/get/account/verify_credentials).
+NOTE: Further configuration is needed to enable fetching user emails through your Twitter App. Take a look at [Twitter's doc](https://dev.twitter.com/rest/reference/get/account/verify_credentials) for specifics.
 
 The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to update
 `consumerKey` and `oauthTokenSecret` properly.
