@@ -44,9 +44,10 @@ function (user, context, callback) {
     }
 
     var originalUser = data[0];
-    var aryTmp = user.user_id.split('|');
-    var provider = aryTmp[0];
-    var newUserId = aryTmp[1];
+    var pipePos = user_id.indexOf('|');
+    var provider = user_id.slice(0, pipePos);
+    var newUserId = user_id.slice(pipePos + 1);
+    
     request.post({
       url: userApiUrl + '/' + originalUser.user_id + '/identities',
       headers: {
