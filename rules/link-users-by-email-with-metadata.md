@@ -27,7 +27,7 @@ function (user, context, callback) {
    },
    qs: {
      search_engine: 'v2',
-     q: 'email:"' + user.email + '" -user_id:"' + user.user_id + '"',
+     q: 'email.raw:"' + user.email + '" AND email_verified: "true" -user_id:"' + user.user_id + '"',
    }
   },
   function(err, response, body) {
@@ -35,43 +35,42 @@ function (user, context, callback) {
     if (response.statusCode !== 200) return callback(new Error(body));
 
     var data = JSON.parse(body);
-    if (data.length > 0) {
-      async.each(data, function(targetUser, cb) {
-        if (targetUser.email_verified && targetUser.email.toLowerCase() === user.email.toLowerCase()) {
-          var aryTmp = targetUser.user_id.split('|');
-          var provider = aryTmp[0];
-          var targetUserId = aryTmp[1];
-
-          targetUser.app_metadata = targetUser.app_metadata || {};
-          targetUser.user_metadata = targetUser.user_metadata || {};
-          auth0.users.updateAppMetadata(user.user_id, targetUser.app_metadata)
-          .then(auth0.users.updateUserMetadata(user.user_id, targetUser.user_metadata))
-          .then(function(){
-            request.post({
-              url: userApiUrl + '/' + user.user_id + '/identities',
-              headers: {
-                Authorization: 'Bearer ' + auth0.accessToken
-              },
-              json: { provider: provider, user_id: targetUserId }
-            }, function(err, response, body) {
-                if (response && response.statusCode >= 400) {
-                  return cb(new Error('Error linking account: ' + response.statusMessage));
-                }
-                cb(err);
-            });
-          })
-          .catch(function(err){
-            cb(err);
-          });
-        } else {
-          cb();
-        }
-      }, function(err) {
-        callback(err, user, context);
-      });
-    } else {
-      callback(null, user, context);
+    if (data.length > 1) {
+      return callback(new Error('[!] Rule: Multiple user profiles already exist - cannot select base profile to link with'));
     }
+    if (data.length === 0) {
+      console.log('[-] Skipping link rule');
+      return callback(null, user, context);
+    }
+    
+    var originalUser = data[0];
+    var user_id = user.user_id;
+    var pipePos = user_id.indexOf('|');
+    var provider = user_id.slice(0, pipePos);
+    var newUserId = user_id.slice(pipePos + 1);
+
+    user.app_metadata = user.app_metadata || {};
+    user.user_metadata = user.user_metadata || {};
+    auth0.users.updateAppMetadata(originalUser.user_id, user.app_metadata)
+    .then(auth0.users.updateUserMetadata(originalUser.user_id, user.user_metadata))
+    .then(function(){
+      request.post({
+        url: userApiUrl + '/' + originalUser.user_id + '/identities',
+        headers: {
+          Authorization: 'Bearer ' + auth0.accessToken
+        },
+        json: { provider: provider, user_id: newUserId }
+      }, function(err, response, body) {
+          if (response && response.statusCode >= 400) {
+            return cb(new Error('Error linking account: ' + response.statusMessage));
+          }
+          context.primaryUser = originalUser.user_id;
+          callback(null, user, context);
+      });
+    })
+    .catch(function(err){
+      cb(err);
+    });
   });
 }
 ```
