@@ -44,17 +44,18 @@ function (user, context, callback) {
     }
     
     var originalUser = data[0];
-    var aryTmp = user.user_id.split('|');
-    var provider = aryTmp[0];
-    var newUserId = aryTmp[1];
+    var user_id = user.user_id;
+    var pipePos = user_id.indexOf('|');
+    var provider = user_id.slice(0, pipePos);
+    var newUserId = user_id.slice(pipePos + 1);
 
     user.app_metadata = user.app_metadata || {};
     user.user_metadata = user.user_metadata || {};
-    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-    .then(auth0.users.updateUserMetadata(user.user_id, user.user_metadata))
+    auth0.users.updateAppMetadata(originalUser.user_id, user.app_metadata)
+    .then(auth0.users.updateUserMetadata(originalUser.user_id, user.user_metadata))
     .then(function(){
       request.post({
-        url: userApiUrl + '/' + user.user_id + '/identities',
+        url: userApiUrl + '/' + originalUser.user_id + '/identities',
         headers: {
           Authorization: 'Bearer ' + auth0.accessToken
         },
