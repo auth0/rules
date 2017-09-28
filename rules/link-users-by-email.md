@@ -44,6 +44,7 @@ function (user, context, callback) {
     }
 
     var originalUser = data[0];
+    var user_id = user.user_id;
     var pipePos = user_id.indexOf('|');
     var provider = user_id.slice(0, pipePos);
     var newUserId = user_id.slice(pipePos + 1);
