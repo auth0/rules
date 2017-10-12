@@ -44,10 +44,8 @@ function (user, context, callback) {
     }
 
     var originalUser = data[0];
-    var user_id = user.user_id;
-    var pipePos = user_id.indexOf('|');
-    var provider = user_id.slice(0, pipePos);
-    var newUserId = user_id.slice(pipePos + 1);
+    var provider = user.identities[0].provider;
+    var providerUserId = user.identities[0].user_id;
     
     request.post({
       url: userApiUrl + '/' + originalUser.user_id + '/identities',
@@ -56,7 +54,7 @@ function (user, context, callback) {
       },
       json: {
         provider: provider,
-        user_id: newUserId
+        user_id: providerUserId
       }
     }, function(err, response, body) {
       if (response.statusCode >= 400) {

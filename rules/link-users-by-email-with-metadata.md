@@ -44,10 +44,8 @@ function (user, context, callback) {
     }
     
     var originalUser = data[0];
-    var user_id = user.user_id;
-    var pipePos = user_id.indexOf('|');
-    var provider = user_id.slice(0, pipePos);
-    var newUserId = user_id.slice(pipePos + 1);
+    var provider = user.identities[0].provider;
+    var providerUserId = user.identities[0].user_id;
 
     user.app_metadata = user.app_metadata || {};
     user.user_metadata = user.user_metadata || {};
@@ -59,7 +57,7 @@ function (user, context, callback) {
         headers: {
           Authorization: 'Bearer ' + auth0.accessToken
         },
-        json: { provider: provider, user_id: newUserId }
+        json: { provider: provider, user_id: providerUserId }
       }, function(err, response, body) {
           if (response && response.statusCode >= 400) {
             return cb(new Error('Error linking account: ' + response.statusMessage));
