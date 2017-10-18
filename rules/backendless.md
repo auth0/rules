@@ -57,7 +57,9 @@ function (user, context, callback) {
   function ensureUserExists(callback) {
     request.get({
       url: appUrl + '/data/Users',
-      where: "email='"+ user.email +"'",
+      qs: {
+        where: "email='"+ user.email +"'",
+      },
       json: true
     }, function(error, response, body) {
       if (error || response.statusCode !== 200) {
