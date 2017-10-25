@@ -11,7 +11,6 @@ This rule will link any accounts that have the same email address while merging 
 ```js
 function (user, context, callback) {
   var request = require('request@2.56.0');
-  var async = require('async@2.1.2');
 
   // Check if email is verified, we shouldn't automatically
   // merge accounts if this is not the case.
@@ -65,14 +64,14 @@ function (user, context, callback) {
         json: { provider: provider, user_id: providerUserId }
       }, function(err, response, body) {
           if (response && response.statusCode >= 400) {
-            return cb(new Error('Error linking account: ' + response.statusMessage));
+            return callback(new Error('Error linking account: ' + response.statusMessage));
           }
           context.primaryUser = originalUser.user_id;
           callback(null, user, context);
       });
     })
     .catch(function(err){
-      cb(err);
+      callback(err);
     });
   });
 }
