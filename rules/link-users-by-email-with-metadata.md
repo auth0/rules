@@ -11,7 +11,6 @@ This rule will link any accounts that have the same email address while merging 
 ```js
 function (user, context, callback) {
   var request = require('request@2.56.0');
-  var async = require('async@2.1.2');
 
   // Check if email is verified, we shouldn't automatically
   // merge accounts if this is not the case.
@@ -19,15 +18,15 @@ function (user, context, callback) {
     return callback(null, user, context);
   }
   var userApiUrl = auth0.baseUrl + '/users';
+  var userSearchApiUrl = auth0.baseUrl + '/users-by-email';
 
   request({
-   url: userApiUrl,
+   url: userSearchApiUrl,
    headers: {
      Authorization: 'Bearer ' + auth0.accessToken
    },
    qs: {
-     search_engine: 'v2',
-     q: 'email.raw:"' + user.email + '" AND email_verified: "true" -user_id:"' + user.user_id + '"',
+     email: user.email
    }
   },
   function(err, response, body) {
@@ -35,6 +34,11 @@ function (user, context, callback) {
     if (response.statusCode !== 200) return callback(new Error(body));
 
     var data = JSON.parse(body);
+    // Ignore non-verified users and current user, if present
+    data = data.filter(function(u) {
+      return u.email_verified && (u.user_id !== user.user_id);
+    });
+
     if (data.length > 1) {
       return callback(new Error('[!] Rule: Multiple user profiles already exist - cannot select base profile to link with'));
     }
@@ -60,14 +64,14 @@ function (user, context, callback) {
         json: { provider: provider, user_id: providerUserId }
       }, function(err, response, body) {
           if (response && response.statusCode >= 400) {
-            return cb(new Error('Error linking account: ' + response.statusMessage));
+            return callback(new Error('Error linking account: ' + response.statusMessage));
           }
           context.primaryUser = originalUser.user_id;
           callback(null, user, context);
       });
     })
     .catch(function(err){
-      cb(err);
+      callback(err);
     });
   });
 }
