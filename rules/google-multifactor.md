@@ -29,9 +29,6 @@ function (user, context, callback) {
         // optional
         // issuer: 'Label on Google Authenticator App', 
 
-        // optional, the key to use for TOTP. By default one is generated for you
-        // key: '{YOUR_KEY_HERE}', 
-
         // optional, defaults to true. Set to false to force Google Authenticator every time. 
         // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
         allowRememberBrowser: false 
