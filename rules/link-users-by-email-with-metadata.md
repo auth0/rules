@@ -14,7 +14,7 @@ function (user, context, callback) {
 
   // Check if email is verified, we shouldn't automatically
   // merge accounts if this is not the case.
-  if (!user.email_verified) {
+  if (!user.email || !user.email_verified) {
     return callback(null, user, context);
   }
   var userApiUrl = auth0.baseUrl + '/users';
