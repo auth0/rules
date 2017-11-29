@@ -55,7 +55,6 @@ This is the rules editor inside Auth0:
 * [Send events to MixPanel](https://github.com/auth0/rules/blob/master/rules/mixpanel-track-event.md)
 * [Query User Profile in FullContact](https://github.com/auth0/rules/blob/master/rules/get-FullContact-profile.md)
 * [Add a Lead in Salesforce](https://github.com/auth0/rules/blob/master/rules/creates-lead-salesforce.md)
-* [Get a Firebase Session Token](https://github.com/auth0/rules/blob/master/rules/generate-firebase-token.md)
 * [Get an Appery Session Token](https://github.com/auth0/rules/blob/master/rules/appery.md)
 
 [More information about them here](https://docs.auth0.com/rules).
