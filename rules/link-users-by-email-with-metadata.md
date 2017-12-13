@@ -61,7 +61,7 @@ function (user, context, callback) {
         headers: {
           Authorization: 'Bearer ' + auth0.accessToken
         },
-        json: { provider: provider, user_id: providerUserId }
+        json: { provider: provider, user_id: String(providerUserId) }
       }, function(err, response, body) {
           if (response && response.statusCode >= 400) {
             return callback(new Error('Error linking account: ' + response.statusMessage));
