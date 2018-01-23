@@ -4,7 +4,7 @@ short_description: Verify user email with password reset
 ---
 ## Verify user email with password reset
 
-This rule will set the user's email as verified in the next login sequence after the password is reseted successfully.
+This rule will set the user's email as verified in the next login sequence after the password is reset successfully.
 
 ```js
 function (user, context, callback) {
@@ -25,15 +25,15 @@ function (user, context, callback) {
       },
       json: { "email_verified": true },
       timeout: 5000
-      }, function(err, response, body) {
+    }, 
+    function(err, response, body) {
+      // Setting email verified isn't propaged to id_token in this 
+      // authentication cycle so explicitly set it to true 
+      context.idToken.email_verified = true;
 
-        // Setting email verified isn't propaged to id_token in this 
-        // authentication cycle so explicitly set it to true 
-        context.idToken.email_verified = true;
-
-        // Always return with success, ignore any management api errors 
-        return callback(null, user, context);
-      });
+      // Always return with success, ignore any management api errors 
+      return callback(null, user, context);
+    });
   } else {
     return callback(null, user, context);
   }
