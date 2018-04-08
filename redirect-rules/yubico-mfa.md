@@ -39,19 +39,20 @@ return function (context, req, res) {
             return callback(err);
           }
 
-          if(resp.status==='OK'){
-          //Return result to Auth0 (includes OTP and Status. Only when OK)
-            var token = jwt.sign({
+          if (resp.status === 'OK') {
+            // Return result to Auth0 (includes OTP and Status. Only when OK)
+            var payload = {
               status: resp.status,
               otp: resp.otp
-            },
-                new Buffer(context.data.yubikey_secret, 'base64'),
-              {
-                subject: context.data.user,
-                expiresIn: 60,
-                audience: context.data.yubikey_clientid,
-                issuer: 'urn:auth0:yubikey:mfa'
-              });
+            };
+            var key = Buffer.from(context.data.yubikey_secret, 'base64');
+            var options = {
+              subject: context.data.user,
+              expiresIn: 60,
+              audience: context.data.yubikey_clientid,
+              issuer: 'urn:auth0:yubikey:mfa'
+            };
+            var token = jwt.sign(payload, key, options]);
             res.writeHead(301, {Location: context.data.returnUrl + "?id_token=" + token + "&state=" + context.data.state});
             res.end();
             callback();

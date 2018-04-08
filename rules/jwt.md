@@ -25,8 +25,8 @@ function (user, context, callback) {
   	issuer: 'https://{your auth0 account}.auth0.com'
   };
 
-  context.idToken['https://example.com/id_token'] = jwt.sign(api_user, 
-  						   new Buffer(CLIENT_SECRET, 'base64'),
+  context.idToken['https://example.com/id_token'] = jwt.sign(api_user,
+  						   Buffer.from(CLIENT_SECRET, 'base64'),
   						   options);
   callback(null, user, context);
 }

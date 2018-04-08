@@ -61,43 +61,38 @@ We can leverage this information from within a rule to block logins with high fr
 
 ```js
 function (user, context, callback) {
-  var _ = require('underscore');
+  var querystring = require('querystring');
   var request = require('request');
   var crypto = require('crypto');
-  
+
   var MINFRAUD_API = 'https://minfraud.maxmind.com/app/ccv2r';
 
   var data = {
     i: context.request.ip,
     user_agent: context.request.userAgent,
     license_key: 'YOUR_LICENSE_KEY',
-    emailMD5: user.email && 
+    emailMD5: user.email &&
         crypto.createHash('md5').update(user.email).digest("hex") || null,
-    usernameMD5: user.username && 
+    usernameMD5: user.username &&
         crypto.createHash('md5').update(user.username).digest("hex") || null
   };
-  
+
   request.post(MINFRAUD_API, { form: data, timeout: 3000 }, function (err, res, body) {
-    if (!err && res.statusCode === 200 && body && body.indexOf(';') >= 0) {
-      var result = _.reduce(_.map(body.split(';'), function(val) {
-        return { key: val.split('=')[0], value: val.split('=')[1] };
-      }), function(result, currentItem) {
-        result[currentItem.key] = currentItem.value;
-        return result;
-      });
+    if (!err && res.statusCode === 200) {
+      var result = querystring.parse(body, ';');
 
       console.log('Fraud response: ' + JSON.stringify(result, null, 2));
-      
-      if (result && result.riskScore && (result.riskScore * 100) > 20) {
+
+      if (result.riskScore && (result.riskScore * 100) > 20) {
         return callback(new UnauthorizedError('Fraud prevention!'));
       }
     }
-    
+
     if (err) {
-      console.log('Error while attempting fraud check: ' + err.message); 
+      console.log('Error while attempting fraud check: ' + err.message);
     }
     if (res.statusCode !== 200) {
-      console.log('Unexpected error while attempting fraud check: ' + err.message); 
+      console.log('Unexpected error while attempting fraud check: ' + err.message);
     }
 
     // If the service is down, the request failed, or the result is OK just continue.

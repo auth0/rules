@@ -6,7 +6,7 @@ The Auth0 AD/LDAP Connector allows users to authenticate to any type of applicat
 
 In a traditional environment where customers are working on a domain joined machine within the corporate network these policies are easy to enforce: the next time users try to sign-in to their machine they'll be prompted to renew their password.
 
-But in modern environments where users are working remote or not even using a Windows machine or even a desktop machine it becomes harder to enforce these policies. 
+But in modern environments where users are working remote or not even using a Windows machine or even a desktop machine it becomes harder to enforce these policies.
 
 This is where redirect rules can be of great value. These rules can be used to enforce policies after the user has logged in and before they get to access any of your applications. You can use this for custom MFA but also to enforce password policies for example.
 
@@ -52,7 +52,7 @@ function (user, context, callback) {
   var MAX_PASSWORD_AGE = 30;
 
   if (context.protocol !== 'redirect-callback') {
-    
+
     // Require a password change every X days.
     var last_change_date = getLastPasswordChange(user);
     console.log('Last password change: ' + user.last_pwd_change);
@@ -60,7 +60,7 @@ function (user, context, callback) {
     if (dayDiff(last_change_date, new Date()) <= MAX_PASSWORD_AGE) {
       return callback(null, user, context);
     }
-    
+
     // Create token for the external site.
     var token = createToken(CLIENT_ID, CLIENT_SECRET, ISSUER, {
       sub: user.user_id,
@@ -73,27 +73,27 @@ function (user, context, callback) {
     context.redirect = {
       url: REDIRECT_TO + token
     };
-    
+
     console.log('Redirecting to: ' +context.redirect.url);
     return callback(null, user, context);
   }
-  else 
+  else
   {
-    console.log('User redirected back after password change. Token: ' +  
+    console.log('User redirected back after password change. Token: ' +
       context.request.query.token);
-    
+
     // Verify the incoming token.
-    verifyToken(CLIENT_ID, CLIENT_SECRET, ISSUER, context.request.query.token, 
+    verifyToken(CLIENT_ID, CLIENT_SECRET, ISSUER, context.request.query.token,
       function(err, decoded) {
         if (err) {
           console.log('Token error: ' + JSON.stringify(err));
-          return callback(new UnauthorizedError('Password change failed.'));  
+          return callback(new UnauthorizedError('Password change failed.'));
         } else if (decoded.sub !== user.user_id) {
           return callback(
-            new UnauthorizedError('Token does not match the current user.')); 
+            new UnauthorizedError('Token does not match the current user.'));
         } else if (!decoded.pwd_change) {
           return callback(
-            new UnauthorizedError('Invalid token.')); 
+            new UnauthorizedError('Invalid token.'));
         }
         else {
           console.log('Decoded token: ' + JSON.stringify(decoded));
@@ -101,18 +101,18 @@ function (user, context, callback) {
         }
       });
   }
-  
+
   // Get the last password change from AD.
   function getLastPasswordChange(user) {
     var last_change = user.last_pwd_change || 0;
     return new Date((last_change/10000) - 11644473600000);
   }
-  
+
   // Calculate the days between 2 days.
   function dayDiff(first, second) {
     return (second-first)/(1000*60*60*24);
   }
-  
+
   // Generate a JWT.
   function createToken(client_id, client_secret, issuer, user) {
     var options = {
@@ -121,16 +121,15 @@ function (user, context, callback) {
       issuer: issuer
     };
 
-    var token = jwt.sign(user, 
-      new Buffer(client_secret, 'base64'), options);
+    var token = jwt.sign(user, Buffer.from(client_secret, 'base64'), options);
     return token;
   }
-  
+
   // Verify a JWT.
   function verifyToken(client_id, client_secret, issuer, token, cb) {
-    var secret = new Buffer(client_secret, 'base64').toString('binary');
+    var secret = Buffer.from(client_secret, 'base64').toString('binary');
     var token_description = { audience: client_id, issuer: issuer };
-    
+
     jwt.verify(token, secret, token_description, cb);
   }
 }
@@ -164,16 +163,16 @@ public ActionResult Index(string token)
 
         var handler = new JwtSecurityTokenHandler();
         SecurityToken securityToken;
-        ClaimsPrincipal principal = 
-            handler.ValidateToken(token, validationParameters, 
+        ClaimsPrincipal principal =
+            handler.ValidateToken(token, validationParameters,
                 out securityToken);
         ClaimsIdentity identity = principal.Identity as ClaimsIdentity;
         identity.AddClaim(
             new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider", "Auth0"));
-        identity.AddClaim(new Claim(ClaimTypes.Name, 
+        identity.AddClaim(new Claim(ClaimTypes.Name,
             identity.FindFirst(ClaimTypes.Email).Value));
 
-        var sessionToken = new SessionSecurityToken(principal, 
+        var sessionToken = new SessionSecurityToken(principal,
             TimeSpan.FromMinutes(15));
         FederatedAuthentication.SessionAuthenticationModule.WriteSessionTokenToCookie(sessionToken);
 
@@ -226,14 +225,14 @@ public ActionResult ChangeSubmit(PasswordChangeModel model)
     try
     {
         // Update password.
-        using (var context = new PrincipalContext(ContextType.Domain, 
-            ConfigurationManager.AppSettings["AdDomain"], 
-            ConfigurationManager.AppSettings["AdBase"], 
-            ClaimsPrincipal.Current.FindFirst("SAMAccountName").Value, 
+        using (var context = new PrincipalContext(ContextType.Domain,
+            ConfigurationManager.AppSettings["AdDomain"],
+            ConfigurationManager.AppSettings["AdBase"],
+            ClaimsPrincipal.Current.FindFirst("SAMAccountName").Value,
             model.OldPassword))
         {
-            using (var user = UserPrincipal.FindByIdentity(context,    
-                IdentityType.SamAccountName, 
+            using (var user = UserPrincipal.FindByIdentity(context,
+                IdentityType.SamAccountName,
                 ClaimsPrincipal.Current.FindFirst("SAMAccountName").Value))
             {
                 user.ChangePassword(model.OldPassword, model.NewPassword);
@@ -244,11 +243,11 @@ public ActionResult ChangeSubmit(PasswordChangeModel model)
         var now = DateTime.UtcNow;
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] { 
-                new Claim("sub", 
+            Subject = new ClaimsIdentity(new[] {
+                new Claim("sub",
                     ClaimsPrincipal.Current
                         .FindFirst(ClaimTypes.NameIdentifier).Value),
-                new Claim("aud", 
+                new Claim("aud",
                     ConfigurationManager.AppSettings["auth0:ClientId"]),
                 new Claim("pwd_change", "true")
             }),
@@ -265,7 +264,7 @@ public ActionResult ChangeSubmit(PasswordChangeModel model)
         // Redirect back to Auth0.
         var handler = new JwtSecurityTokenHandler();
         var securityToken = handler.CreateToken(tokenDescriptor);
-        return Redirect(ConfigurationManager.AppSettings["auth0:Domain"] 
+        return Redirect(ConfigurationManager.AppSettings["auth0:Domain"]
             + "continue?token=" + handler.WriteToken(securityToken));
     }
     catch (Exception ex)
