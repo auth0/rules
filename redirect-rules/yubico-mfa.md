@@ -52,7 +52,7 @@ return function (context, req, res) {
               audience: context.data.yubikey_clientid,
               issuer: 'urn:auth0:yubikey:mfa'
             };
-            var token = jwt.sign(payload, key, options]);
+            var token = jwt.sign(payload, key, options);
             res.writeHead(301, {Location: context.data.returnUrl + "?id_token=" + token + "&state=" + context.data.state});
             res.end();
             callback();

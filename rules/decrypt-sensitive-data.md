@@ -23,9 +23,9 @@ function (user, context, callback) {
     if (!data) {
       return {};
     }
-    var iv = Buffer.from(configuration.ENCRYPT_IV, 'base64');
+    var iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');
     var encodeKey = crypto.createHash('sha256')
-    .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();
+    .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();
     var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);
     var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');
     return JSON.parse(decrypted);
