@@ -59,7 +59,7 @@ function (user, context, callback) {
       },
       json: {
         provider: provider,
-        user_id: providerUserId
+        user_id: String(providerUserId)
       }
     }, function(err, response, body) {
       if (response.statusCode >= 400) {
