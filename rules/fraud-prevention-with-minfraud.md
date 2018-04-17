@@ -77,7 +77,7 @@ function (user, context, callback) {
         crypto.createHash('md5').update(user.username).digest("hex") || null
   };
 
-  request.post(MINFRAUD_API, { form: data, timeout: 3000 }, function (err, res, body) {
+  request.post(MINFRAUD_API, { form: data, timeout: 3000 }, (err, res, body) => {
     if (!err && res.statusCode === 200) {
       const result = querystring.parse(body, ';');
 

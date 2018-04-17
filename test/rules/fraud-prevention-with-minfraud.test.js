@@ -49,7 +49,7 @@ describe('fraud-prevention-with-minfraud', () => {
   });
 
   it('should allow login if riskScore is <= 20', (done) => {
-    request.post.callsArgWith(2, 'some error', { statusCode: 200 }, 'riskScore=0.20;someOtherValue=123');
+    request.post.callsArgWith(2, null, { statusCode: 200 }, 'riskScore=0.20;someOtherValue=123');
 
     rule(user, context, (err, u, c) => {
       expect(err).to.be.null;
