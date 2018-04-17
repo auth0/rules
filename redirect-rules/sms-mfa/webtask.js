@@ -18,7 +18,7 @@ app.get('/', function (req, res) {
   var token = req.query.token;
   var state = req.query.state;
 
-  jwt.verify(token, new Buffer(req.webtaskContext.secrets.token_secret, 'base64'), function(err, decoded) {
+  jwt.verify(token, Buffer.from(req.webtaskContext.secrets.token_secret, 'base64'), function(err, decoded) {
     if (err) {
       res.end('error');
       return;
@@ -38,7 +38,7 @@ app.post('/', function (req, res) {
   var token = req.body.token;
   var state = req.body.state;
 
-  jwt.verify(token, new Buffer(req.webtaskContext.secrets.token_secret, 'base64'), function(err, decoded) {
+  jwt.verify(token, Buffer.from(req.webtaskContext.secrets.token_secret, 'base64'), function(err, decoded) {
     if (err) {
       res.end('error on callback token verification');
       return;
@@ -65,7 +65,7 @@ function redirectBack(res, webtaskContext, decoded, success, state) {
   var token = jwt.sign({
       status: success ? 'ok' : 'fail'
     },
-    new Buffer(webtaskContext.secrets.token_secret, 'base64'),
+    Buffer.from(webtaskContext.secrets.token_secret, 'base64'),
     {
       subject: decoded.sub,
       expiresInMinutes: 1,

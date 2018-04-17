@@ -37,12 +37,12 @@ function (user, context, callback) {
   }
 
   function multipass(jsonData, apiKey, site) {
-    var data = new Buffer(JSON.stringify(jsonData), 'utf8');
+    var data = Buffer.from(JSON.stringify(jsonData), 'utf8');
     var key = crypto.createHash('sha1').update(apiKey + site).digest('binary').substring(0, 16);
-    var iv = new Buffer('OpenSSL for Ruby', 'utf8');
+    var iv = Buffer.from('OpenSSL for Ruby', 'utf8');
 
-    var pad = 16 - (data.length % 16),
-        paddedData = new Buffer(data.length + pad);
+    var pad = 16 - (data.length % 16);
+    var paddedData = Buffer.from(data.length + pad, 'utf8');
     data.copy(paddedData);
     for (var i = data.length, len = paddedData.length; i < len; ++i) {
       paddedData[i] = pad;

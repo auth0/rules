@@ -21,7 +21,7 @@ function (user, context, callback) {
     }
   };
 
-  var base64Event = new Buffer(JSON.stringify(mpEvent)).toString('base64');
+  var base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');
 
   request.get({
     url: 'http://api.mixpanel.com/track/',

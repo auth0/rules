@@ -21,7 +21,7 @@ function (user, context, callback) {
 
   var baseURL = configuration.FIREBASE_URL;
   var secret = configuration.FIREBASE_SECRET;
-  var fb_id = new Buffer(user.user_id).toString('base64');
+  var fb_id = Buffer.from(user.user_id).toString('base64');
 
   var fbIdentity = {
     "identity": {

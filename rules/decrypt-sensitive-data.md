@@ -21,11 +21,11 @@ function (user, context, callback) {
 
   function decrypt(data) {
     if (!data) {
-      return { };
+      return {};
     }
-    var iv = new Buffer(configuration.ENCRYPT_IV);
+    var iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');
     var encodeKey = crypto.createHash('sha256')
-    .update(configuration.ENCRYPT_PASSWORD, 'utf-8').digest();
+    .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();
     var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);
     var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');
     return JSON.parse(decrypted);
@@ -47,11 +47,11 @@ public static string Decrypt(string encryptedText, string keyString, string ivSt
 	{
 		var key = crypt.ComputeHash(Encoding.UTF8.GetBytes(keyString));
 		var iv  = Encoding.UTF8.GetBytes(ivString);
-		
+
 		using (var rijndaelManaged = new RijndaelManaged {Key = key, IV = iv, Mode = CipherMode.CBC}){
-			
+
 			rijndaelManaged.Padding = PaddingMode.Zeros;
-			
+
 			using (var memoryStream = new MemoryStream(Convert.FromBase64String(encryptedText)))
 				using (var cryptoStream = new CryptoStream(memoryStream,
 					rijndaelManaged.CreateDecryptor(key, iv), CryptoStreamMode.Read))

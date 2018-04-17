@@ -14,7 +14,7 @@ function (user, context, callback) {
 
   var pusherKey='YOUR PUSHER KEY';
   var pusherSecret = '{YOUR PUSHER SECRET}';
- 
+
   if( context.request.query.channel && context.request.query.socket_id)
   {
     context.idToken['https://example.com/pusherAuth'] = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
@@ -24,8 +24,8 @@ function (user, context, callback) {
 
   function sign(secret, channel, socket_id)
   {
-    var string_to_sign = socket_id+":"+channel;
-    var sha = crypto.createHmac('sha256',secret);
+    var string_to_sign = socket_id + ":" + channel;
+    var sha = crypto.createHmac('sha256', secret);
     return sha.update(string_to_sign).digest('hex');
   }
 }
