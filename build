@@ -1,9 +1,21 @@
 #!/usr/bin/env node
 
-var marked = require('marked');
-var yaml = require('js-yaml');
-var async = require('async');
-var path = require('path');
+const marked = require('marked');
+const yaml = require('js-yaml');
+const async = require('async');
+const path = require('path');
+const yargs = require('yargs');
+
+const argv = yargs
+  .option('allRules', {
+    alias: 'a',
+    default: false
+  })
+  .option('outputPath', {
+    alias: 'o',
+    default: __dirname + '/rules.json'
+  })
+  .argv;
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -18,7 +30,6 @@ marked.setOptions({
 
 
 var fs = require('fs');
-var path = require('path');
 var files = fs.readdirSync(__dirname + '/rules').map(function (file) {
   return path.join(__dirname, '/rules', file);
 });
@@ -35,7 +46,7 @@ async.map(files, function (file, callback) {
       content = split.slice(2).join('---');
     }
 
-    if (!meta.gallery) {
+    if (!argv.allRules && !meta.gallery) {
       return callback();
     }
 
@@ -52,7 +63,7 @@ async.map(files, function (file, callback) {
     var description = marked.parser(descriptionMD);
 
     var code = lex.filter(function (t) {
-      return t.type === 'code';
+      return t.type === 'code' && t.lang === 'js';
     })[0].text;
 
     var result = {
@@ -93,6 +104,6 @@ async.map(files, function (file, callback) {
   });
 
   console.log('all good!');
-  fs.writeFileSync(__dirname + '/rules.json', JSON.stringify(categories, null, 2));
+  fs.writeFileSync(argv.outputPath, JSON.stringify(categories, null, 2));
   process.exit(0);
 });

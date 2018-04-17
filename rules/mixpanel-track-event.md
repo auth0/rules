@@ -12,7 +12,7 @@ This rule will send a `Sign In` event to MixPanel, and will include the applicat
 ```js
 function (user, context, callback) {
 
-  var mpEvent = {
+  const mpEvent = {
     "event": "Sign In",
     "properties": {
         "distinct_id": user.user_id,
@@ -21,14 +21,14 @@ function (user, context, callback) {
     }
   };
 
-  var base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');
+  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');
 
   request.get({
     url: 'http://api.mixpanel.com/track/',
     qs: {
       data: base64Event
     }
-  }, function (e, r, b){
+  }, (err, res, body) => {
       // don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`
       callback(null, user, context);
   });
