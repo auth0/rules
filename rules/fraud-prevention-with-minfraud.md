@@ -61,13 +61,13 @@ We can leverage this information from within a rule to block logins with high fr
 
 ```js
 function (user, context, callback) {
-  var querystring = require('querystring');
-  var request = require('request');
-  var crypto = require('crypto');
+  const querystring = require('querystring');
+  const request = require('request');
+  const crypto = require('crypto');
 
-  var MINFRAUD_API = 'https://minfraud.maxmind.com/app/ccv2r';
+  const MINFRAUD_API = 'https://minfraud.maxmind.com/app/ccv2r';
 
-  var data = {
+  const data = {
     i: context.request.ip,
     user_agent: context.request.userAgent,
     license_key: 'YOUR_LICENSE_KEY',
@@ -79,9 +79,9 @@ function (user, context, callback) {
 
   request.post(MINFRAUD_API, { form: data, timeout: 3000 }, function (err, res, body) {
     if (!err && res.statusCode === 200) {
-      var result = querystring.parse(body, ';');
+      const result = querystring.parse(body, ';');
 
-      console.log('Fraud response: ' + JSON.stringify(result, null, 2));
+      console.log(`Fraud response: ${JSON.stringify(result, null, 2)}`);
 
       if (result.riskScore && (result.riskScore * 100) > 20) {
         return callback(new UnauthorizedError('Fraud prevention!'));
@@ -89,10 +89,11 @@ function (user, context, callback) {
     }
 
     if (err) {
-      console.log('Error while attempting fraud check: ' + err.message);
+      console.log(`Error while attempting fraud check: ${err.message}`);
     }
     if (res.statusCode !== 200) {
-      console.log('Unexpected error while attempting fraud check: ' + err.message);
+      const message = err && err.message;
+      console.log(`Unexpected error while attempting fraud check: ${message}`);
     }
 
     // If the service is down, the request failed, or the result is OK just continue.

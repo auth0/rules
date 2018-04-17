@@ -11,7 +11,7 @@ NOTE: Further configuration is needed to enable fetching user emails through you
 The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to update
 `consumerKey` and `oauthTokenSecret` properly.
 
-```javascript
+```js
 function (user, context, callback) {
     // additional request below is specific to Twitter
     if (context.connectionStrategy !== 'twitter') {
@@ -66,7 +66,7 @@ function (user, context, callback) {
 
 This rule will not persist the returned email to the Auth0 user profile, but will return it to your application. If you want to persist the email, it will need to be [done with app_metadata as described here](https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata). For example, you can save it under app_metadata.social_email. Then, to access it, you can do the following from a rule or the equivalent in your application:
 
-```javascript
+```js
 user.app_metadata = user.app_metadata || {};
 var email = user.email || user.app_metadata.social_email;
 ```

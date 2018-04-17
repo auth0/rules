@@ -5,7 +5,7 @@
   "main": "./rules",
   "scripts": {
     "preversion": "./build && git add rules.json && git commit -m 'update rules.json'",
-    "test": "./build && mocha test/**/*.test.js"
+    "test": "./build -a -o rules.all.json && mocha test/**/*.test.js; rm rules.all.json"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "js-yaml": "^3.0.2",
     "marked": "^0.3.2",
     "mocha": "^5.1.0",
-    "sinon": "^4.5.0"
+    "sinon": "^4.5.0",
+    "yargs": "^11.0.0"
   }
 }

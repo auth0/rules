@@ -1,6 +1,6 @@
 'use strict';
 
-const rules = require('../../../rules.json');
+const rules = require('../../../rules.all.json');
 
 /**
  * Loads a rule from a string, optionally with stubs
