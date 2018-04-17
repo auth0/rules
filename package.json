@@ -4,7 +4,8 @@
   "description": "Auth0 Rules Repository =====",
   "main": "./rules",
   "scripts": {
-    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'"
+    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'",
+    "test": "./build && mocha test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -17,8 +18,11 @@
   },
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
-    "marked": "^0.3.2",
+    "async": "^0.7.0",
+    "chai": "^4.1.2",
     "js-yaml": "^3.0.2",
-    "async": "^0.7.0"
+    "marked": "^0.3.2",
+    "mocha": "^5.1.0",
+    "sinon": "^4.5.0"
   }
 }

@@ -12,7 +12,7 @@ This rule will get a sensitive value in the app_metadata and decrypt it (see the
 function (user, context, callback) {
   user.app_metadata = user.app_metadata || { };
 
-  var private_data = decrypt(user.app_metadata.private_data);
+  const private_data = decrypt(user.app_metadata.private_data);
   if (private_data.license_key === '1234567') {
     user.role = 'admin';
   }
@@ -23,11 +23,11 @@ function (user, context, callback) {
     if (!data) {
       return {};
     }
-    var iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');
-    var encodeKey = crypto.createHash('sha256')
+    const iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');
+    const encodeKey = crypto.createHash('sha256')
     .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();
-    var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);
-    var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');
+    const cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);
+    const decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');
     return JSON.parse(decrypted);
   }
 }

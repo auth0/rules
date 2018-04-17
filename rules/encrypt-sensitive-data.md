@@ -18,10 +18,10 @@ function (user, context, callback) {
   callback(null, user, context);
 
   function encrypt(data) {
-    var iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');
-    var decodeKey = crypto.createHash('sha256')
+    const iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');
+    const decodeKey = crypto.createHash('sha256')
       .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();
-    var cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);
+    const cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);
     return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');
   }
 }
