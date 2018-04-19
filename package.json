@@ -5,6 +5,7 @@
   "main": "./rules",
   "scripts": {
     "preversion": "./build-old && git add rules.json && git commit -m 'update rules.json'",
+    "build-old": "./build-old",
     "build": "./build -a -o rules.all.json",
     "test": "jest"
   },
