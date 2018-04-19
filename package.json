@@ -5,8 +5,7 @@
   "main": "./rules",
   "scripts": {
     "preversion": "./build-old && git add rules.json && git commit -m 'update rules.json'",
-    "test-old": "./build-old -a -o rules.all.json && mocha test/**/*.test.js; rm rules.all.json",
-    "build": "./build -a -o rules.all.json",
+    "build": "./build -a -o rules.json",
     "test": "jest"
   },
   "repository": {
@@ -21,7 +20,6 @@
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
     "async": "^0.7.0",
-    "chai": "^4.1.2",
     "jest": "22.4.3",
     "parse-comments": "0.4.3",
     "sinon": "^4.5.0",
