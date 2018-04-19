@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build_and_test:
+    working_directory: ~/auth0-rules
+    docker:
+      - image: circleci/node:4.9.1
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: Run Jest tests
+          command: npm run test
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build_and_test
+      
