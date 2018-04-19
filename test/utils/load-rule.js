@@ -38,14 +38,3 @@ function compile(code, globals, stubs) {
   return Function.apply(null, params.concat(`return ${code}`)).apply(null, paramValues);
 }
 
-function findRule(ruleId) {
-  for (const category of rules) {
-    for (const rule of category.templates) {
-      if (rule.id === ruleId) {
-        return rule;
-      }
-    }
-  }
-
-  return null;
-}
