@@ -22,7 +22,6 @@
     "async": "^0.7.0",
     "jest": "22.4.3",
     "parse-comments": "0.4.3",
-    "sinon": "^4.5.0",
     "strip-comments": "1.0.1",
     "yargs": "^11.0.0"
   }
