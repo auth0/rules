@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/auth0-rules
+    docker:
+      - image: circleci/node:4.9.1
+    steps:
+      - checkout
+      - run:
+          name: Update npm
+          command: 'sudo npm install -g npm@latest'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: Run Jest test
+          command: npm run test
