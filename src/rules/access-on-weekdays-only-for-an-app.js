@@ -5,7 +5,7 @@
  * @description This rule is used to prevent access during weekends for a specific app.
  */
 
-module.exports = function (user, context, callback) {
+function (user, context, callback) {
 
   if (context.clientName === 'TheAppToCheckAccessTo') {
     const d = Date.getDay();

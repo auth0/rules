@@ -1,15 +1,17 @@
-const rule = require('./access-on-weekdays-only-for-an-app')
+const loadRule = require('../utils/load-rule')
 
 describe('access-on-weekdays-only-for-an-app', () => {
   let user;
   let context;
-  let globals;
+  let rule;
 
   beforeEach(() => {
     context = {
       clientName: 'TheAppToCheckAccessTo'
     };
     global.UnauthorizedError = function() {}
+
+    rule = loadRule('access-on-weekdays-only-for-an-app.js')
   });
 
   describe('when day is weekend', () => {
