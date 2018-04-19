@@ -4,7 +4,8 @@ const async = require('async');
 const path = require('path');
 const yargs = require('yargs');
 const comments = require('parse-comments');
-const strip = require('strip-comments')
+const decomment = require('decomment');
+const fs = require('fs');
 
 const argv = yargs
   .option('allRules', {
@@ -17,7 +18,6 @@ const argv = yargs
   })
   .argv;
 
-var fs = require('fs');
 var files = fs.readdirSync(__dirname + '/src/rules').map(function (file) {
   return path.join(__dirname, '/src/rules', file);
 });
@@ -40,9 +40,9 @@ async.map(files, function (file, callback) {
       title: comment.overview,
       categories: categories,
       description: comment.description,
-      code: strip(content, { preserveNewlines: true })
+      code: decomment(content).trim()
     }
-
+    
     if (!argv.allRules && !comment.gallery) {
       return callback();
     }

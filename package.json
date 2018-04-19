@@ -5,7 +5,7 @@
   "main": "./rules",
   "scripts": {
     "preversion": "./build-old && git add rules.json && git commit -m 'update rules.json'",
-    "build": "./build -a -o rules.json",
+    "build": "./build -a -o rules.all.json",
     "test": "jest"
   },
   "repository": {
@@ -20,11 +20,11 @@
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
     "async": "^0.7.0",
+    "decomment": "0.9.1",
     "jest": "22.4.3",
     "js-yaml": "3.11.0",
     "marked": "0.3.19",
     "parse-comments": "0.4.3",
-    "strip-comments": "1.0.1",
     "yargs": "^11.0.0"
   }
 }
