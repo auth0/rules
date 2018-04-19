@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+
+const async = require('async');
+const path = require('path');
+const yargs = require('yargs');
+const comments = require('parse-comments');
+const decomment = require('decomment');
+const fs = require('fs');
+
+const argv = yargs
+  .option('allRules', {
+    alias: 'a',
+    default: false
+  })
+  .option('outputPath', {
+    alias: 'o',
+    default: __dirname + '/rules.json'
+  })
+  .argv;
+
+var files = fs.readdirSync(__dirname + '/src/rules').map(function (file) {
+  return path.join(__dirname, '/src/rules', file);
+});
+
+async.map(files, function (file, callback) {
+
+  fs.readFile(file, 'utf8', function (err, content) {
+    if (err) return callback(err);
+    var meta = {};
+
+    const comment = comments(content)[0]
+
+    const categories = 
+      Array.isArray(comment.category) ? comment.category :
+      comment.category ? [comment.category] :
+      ['default'];
+
+    const result = {
+      id: path.basename(file).replace('.js', ''),
+      title: comment.overview,
+      categories: categories,
+      description: comment.description,
+      code: decomment(content).trim()
+    }
+    
+    if (!argv.allRules && !comment.gallery) {
+      return callback();
+    }
+
+    callback(null, result);
+  });
+}, function (err, results) {
+  if (err) {
+    console.log(err.stack);
+    process.exit(1);
+  }
+
+  //group by category
+  var rules = results;
+
+  var categories = rules.filter(function (rt) {
+    return !!rt;
+  }).map(function (rule) {
+    return rule.categories;
+  }).reduce(function (prev, curr) {
+    var new_cats = curr.filter(function (cat) {
+      return !~prev.indexOf(cat);
+    });
+    return prev.concat(new_cats);
+  }, []).map(function (cat) {
+    return {
+      name:      cat,
+      templates: rules.filter(function (t) {
+        return t && ~t.categories.indexOf(cat);
+      })
+    };
+  });
+
+  console.log('all good!');
+  fs.writeFileSync(argv.outputPath, JSON.stringify(categories, null, 2));
+  process.exit(0);
+});

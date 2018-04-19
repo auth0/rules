@@ -1,25 +1,26 @@
 #!/usr/bin/env node
 
-const async = require('async');
-const path = require('path');
-const yargs = require('yargs');
-const comments = require('parse-comments');
-const decomment = require('decomment');
-const fs = require('fs');
+var marked = require('marked');
+var yaml = require('js-yaml');
+var async = require('async');
+var path = require('path');
 
-const argv = yargs
-  .option('allRules', {
-    alias: 'a',
-    default: false
-  })
-  .option('outputPath', {
-    alias: 'o',
-    default: __dirname + '/rules.json'
-  })
-  .argv;
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false
+});
 
-var files = fs.readdirSync(__dirname + '/src/rules').map(function (file) {
-  return path.join(__dirname, '/src/rules', file);
+
+var fs = require('fs');
+var path = require('path');
+var files = fs.readdirSync(__dirname + '/rules').map(function (file) {
+  return path.join(__dirname, '/rules', file);
 });
 
 async.map(files, function (file, callback) {
@@ -28,24 +29,39 @@ async.map(files, function (file, callback) {
     if (err) return callback(err);
     var meta = {};
 
-    const comment = comments(content)[0]
-
-    const categories = 
-      Array.isArray(comment.category) ? comment.category :
-      comment.category ? [comment.category] :
-      ['default'];
-
-    const result = {
-      id: path.basename(file).replace('.js', ''),
-      title: comment.overview,
-      categories: categories,
-      description: comment.description,
-      code: decomment(content).trim()
+    if (content.split('\n')[0] === '---') {
+      var split = content.split('---');
+      meta = yaml.safeLoad(split[1]);
+      content = split.slice(2).join('---');
     }
-    
-    if (!argv.allRules && !comment.gallery) {
+
+    if (!meta.gallery) {
       return callback();
     }
+
+    var lex = marked.lexer(content);
+
+    var title = lex.filter(function (t) {
+      return t.type === 'heading';
+    })[0].text;
+
+    var descriptionMD = lex.filter(function (t) {
+      return !~['heading', 'code'].indexOf(t.type);
+    });
+    descriptionMD.links = {};
+    var description = marked.parser(descriptionMD);
+
+    var code = lex.filter(function (t) {
+      return t.type === 'code';
+    })[0].text;
+
+    var result = {
+      id:          path.basename(file).replace('.md', ''),
+      title:       title || meta.title,
+      categories:  meta.categories || ['default'],
+      description: description,
+      code:        code,
+    };
 
     callback(null, result);
   });
@@ -77,6 +93,6 @@ async.map(files, function (file, callback) {
   });
 
   console.log('all good!');
-  fs.writeFileSync(argv.outputPath, JSON.stringify(categories, null, 2));
+  fs.writeFileSync(__dirname + '/rules.json', JSON.stringify(categories, null, 2));
   process.exit(0);
 });
