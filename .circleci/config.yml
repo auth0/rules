@@ -3,7 +3,7 @@ jobs:
   build_and_test:
     working_directory: ~/auth0-rules
     docker:
-      - image: circleci/node:4.9.1
+      - image: circleci/node:latest
     steps:
       - checkout
       - restore_cache:
