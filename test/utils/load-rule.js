@@ -24,11 +24,7 @@ module.exports = function (ruleFileName, globals, stubs) {
 
 function compile(code, globals, stubs) {
   function fakeRequire (moduleName) {
-    if (stubs[moduleName]) {
-      return stubs[moduleName];
-    }
-
-    return require(moduleName);
+    return stubs[moduleName] || require(moduleName);
   }
 
   const globalObj = Object.assign({}, { require: fakeRequire }, globals);
