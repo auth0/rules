@@ -1,17 +1,20 @@
 const loadRule = require('../utils/load-rule');
 
 describe('access-on-weekdays-only-for-an-app', () => {
+  let globals;
   let user;
   let context;
   let rule;
 
   beforeEach(() => {
+    globals = {
+      UnauthorizedError: function() {}
+    };
     context = {
       clientName: 'TheAppToCheckAccessTo'
     };
-    global.UnauthorizedError = function() {};
 
-    rule = loadRule('access-on-weekdays-only-for-an-app.js');
+    rule = loadRule('access-on-weekdays-only-for-an-app.js', globals);
   });
 
   describe('when day is weekend', () => {
@@ -20,7 +23,7 @@ describe('access-on-weekdays-only-for-an-app', () => {
     })
     it('should return UnauthorizedError', (done) => {
       rule(user, context, (err, user, context) => {
-        expect(err).toBeInstanceOf(global.UnauthorizedError);
+        expect(err).toBeInstanceOf(globals.UnauthorizedError);
         done();
       });
     });
