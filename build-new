@@ -18,7 +18,7 @@ const argv = yargs
   })
   .argv;
 
-var files = fs.readdirSync(__dirname + '/src/rules').map(function (file) {
+const files = fs.readdirSync(__dirname + '/src/rules').map(function (file) {
   return path.join(__dirname, '/src/rules', file);
 });
 
@@ -26,7 +26,6 @@ async.map(files, function (file, callback) {
 
   fs.readFile(file, 'utf8', function (err, content) {
     if (err) return callback(err);
-    var meta = {};
 
     const comment = comments(content)[0]
 
@@ -56,14 +55,14 @@ async.map(files, function (file, callback) {
   }
 
   //group by category
-  var rules = results;
+  const rules = results;
 
-  var categories = rules.filter(function (rt) {
+  const categories = rules.filter(function (rt) {
     return !!rt;
   }).map(function (rule) {
     return rule.categories;
   }).reduce(function (prev, curr) {
-    var new_cats = curr.filter(function (cat) {
+    const new_cats = curr.filter(function (cat) {
       return !~prev.indexOf(cat);
     });
     return prev.concat(new_cats);
