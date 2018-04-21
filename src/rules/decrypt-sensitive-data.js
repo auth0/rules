@@ -5,7 +5,7 @@
  * @description Decrypt a sensitive value from the app_metadata
  * 
  * <p>This rule will get a sensitive value in the app_metadata and decrypt it 
- * (see the <a href="https://auth0.com/rules/encrypt-sensitive-data">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>
+ * (see the <a href="https://auth0.com/rules/src/rules/encrypt-sensitive-data.js">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>
  * 
  * <p>Note, for this to work you'll need to set 2 configuration settings:</p>
  * ENCRYPT_PASSWORD, eg: **S0me,Password!è§**
