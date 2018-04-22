@@ -1,5 +1,5 @@
 const loadRule = require('../utils/load-rule');
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 describe('encrypt-sensitive-data', () => {
   let globals;
