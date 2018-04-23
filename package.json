@@ -4,7 +4,9 @@
   "description": "Auth0 Rules Repository =====",
   "main": "./rules",
   "scripts": {
-    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'"
+    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'",
+    "build": "./build-new -a -o rules.all.json",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -17,8 +19,12 @@
   },
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
-    "marked": "^0.3.2",
-    "js-yaml": "^3.0.2",
-    "async": "^0.7.0"
+    "async": "^0.7.0",
+    "decomment": "0.9.1",
+    "jest": "22.4.3",
+    "js-yaml": "3.11.0",
+    "marked": "0.3.19",
+    "parse-comments": "0.4.3",
+    "yargs": "^11.0.0"
   }
 }
