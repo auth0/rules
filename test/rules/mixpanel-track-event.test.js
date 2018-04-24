@@ -1,7 +1,4 @@
 'use strict';
-
-const expect = require('chai').expect;
-const sinon = require('sinon');
 const loadRule = require('../utils/load-rule');
 
 const ruleName = 'mixpanel-track-event';
@@ -12,7 +9,9 @@ describe(ruleName, () => {
 
   beforeEach(() => {
     request = {
-      get: sinon.stub()
+      get: jest.fn((uri, cb) => {
+        getCallback = cb;
+      })
     };
 
     const globals = {
@@ -31,15 +30,12 @@ describe(ruleName, () => {
       clientName: 'asdf'
     };
 
-    request.get.callsArg(1);
-
     rule(user, context, (err, user, context) => {
-      const call = request.get.getCall(0);
-      const options = call.args[0];
-      const data = JSON.parse(Buffer.from(options.qs.data, 'base64').toString('utf8'));
+      const callOption = request.get.mock.calls[0][0];
+      const data = JSON.parse(Buffer.from(callOption.qs.data, 'base64').toString('utf8'));
 
-      expect(options).to.have.property('url', 'http://api.mixpanel.com/track/');
-      expect(data).to.deep.equal({
+      expect(callOption).toHaveProperty('url', 'http://api.mixpanel.com/track/');
+      expect(data).toEqual({
         event: 'Sign In',
         properties: {
           distinct_id: '1234',
@@ -50,6 +46,9 @@ describe(ruleName, () => {
 
       done();
     });
+
+    getCallback(null, {}, {});
+
   });
 });
 

@@ -1,6 +1,5 @@
 'use strict';
 
-const expect = require('chai').expect;
 const loadRule = require('../utils/load-rule');
 const crypto = require('crypto');
 
@@ -34,8 +33,8 @@ describe(ruleName, () => {
       const plainText = cipher.update(cipherText, 'base64', 'utf8') + cipher.final('utf8');
       const result = JSON.parse(plainText);
 
-      expect(result).to.have.property('license_key', '1234567');
-      expect(result).to.have.property('social_security_number', '56789');
+      expect(result).toHaveProperty('license_key', '1234567');
+      expect(result).toHaveProperty('social_security_number', '56789');
 
       done();
     });
