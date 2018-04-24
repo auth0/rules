@@ -13,7 +13,7 @@ module.exports = function (ruleFileName, globals, stubs) {
   globals = globals || {};
   stubs = stubs || {};
   
-  const fileName = path.join(__dirname, '../../src/rules', ruleFileName);
+  const fileName = path.join(__dirname, '../../src/rules', ruleFileName + '.js');
 
   const file = fs.readFileSync(fileName, 'utf8');
 

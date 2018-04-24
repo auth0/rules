@@ -1,6 +1,8 @@
 const loadRule = require('../utils/load-rule');
 
-describe('fraud-prevention-with-minfraud', () => {
+const ruleName = 'fraud-prevention-with-minfraud';
+
+describe(ruleName, () => {
   let rule;
   let request;
   let context;
@@ -33,7 +35,7 @@ describe('fraud-prevention-with-minfraud', () => {
       }
     };
 
-    rule = loadRule('fraud-prevention-with-minfraud.js', globals, stubs);
+    rule = loadRule(ruleName, globals, stubs);
   });
 
   it('should return UnauthorizedError if riskScore is > 20', (done) => {

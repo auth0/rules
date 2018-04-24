@@ -1,6 +1,7 @@
 const loadRule = require('../utils/load-rule');
 
-describe('mixpanel-track-event', () => {
+const ruleName = 'mixpanel-track-event';
+describe(ruleName, () => {
   let request;
   let rule;
   let getCallback;
@@ -16,7 +17,7 @@ describe('mixpanel-track-event', () => {
       request
     };
 
-    rule = loadRule('mixpanel-track-event.js', globals);
+    rule = loadRule(ruleName, globals);
   });
 
   it('should send mixpanel request', (done) => {
