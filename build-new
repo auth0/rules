@@ -29,10 +29,10 @@ async.map(files, function (file, callback) {
 
     const comment = comments(content)[0]
 
-    const categories = 
-      Array.isArray(comment.category) ? comment.category :
-      comment.category ? [comment.category] :
-      ['default'];
+    let categories = ['default'];
+    if(comment.category) {
+      categories = Array.isArray(comment.category) ? comment.category : [comment.category]
+    }
 
     const result = {
       id: path.basename(file).replace('.js', ''),
