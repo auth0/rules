@@ -19,12 +19,12 @@
   },
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
-    "async": "^0.7.0",
+    "async": "2.6.0",
     "decomment": "0.9.1",
     "jest": "22.4.3",
     "js-yaml": "3.11.0",
     "marked": "0.3.19",
     "parse-comments": "0.4.3",
-    "yargs": "^11.0.0"
+    "yargs": "11.1.0"
   }
 }
