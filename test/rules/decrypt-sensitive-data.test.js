@@ -1,3 +1,4 @@
+const expect = require('chai').expect;
 const loadRule = require('../utils/load-rule');
 
 const ruleName = 'decrypt-sensitive-data';
@@ -28,7 +29,7 @@ describe(ruleName, () => {
 
   it('should add admin role if license_key matches', (done) => {
     rule(user, {}, (err, user, context) => {
-      expect(user.role).toBe('admin');
+      expect(user.role).to.equal('admin');
 
       done();
     });
@@ -38,7 +39,7 @@ describe(ruleName, () => {
     user.app_metadata.private_data = 'B7N0Y8um1mPwHI0PM9JzX2tPmSgxH0HnsmMe8Qou/T0=';
 
     rule(user, {}, (err, user, context) => {
-      expect(user.role).toBeUndefined;
+      expect(user.role).to.be.undefined;
 
       done();
     });
@@ -48,7 +49,7 @@ describe(ruleName, () => {
     delete user.app_metadata;
 
     rule(user, {}, (err, user, context) => {
-      expect(user.role).toBeUndefined;
+      expect(user.role).to.be.undefined;
 
       done();
     });
@@ -58,7 +59,7 @@ describe(ruleName, () => {
     delete user.app_metadata.private_data;
 
     rule(user, {}, (err, user, context) => {
-      expect(user.role).toBeUndefined;
+      expect(user.role).to.be.undefined;
 
       done();
     });
@@ -69,6 +70,6 @@ describe(ruleName, () => {
 
     return expect(() => rule(user, {}, (err, user, context) => {
       throw new Error('should not reach here');
-    })).toThrow('bad decrypt');
+    })).to.throw('bad decrypt');
   });
 });
