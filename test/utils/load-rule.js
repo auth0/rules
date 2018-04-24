@@ -17,7 +17,7 @@ module.exports = function (ruleFileName, globals, stubs) {
 
   const file = fs.readFileSync(fileName, 'utf8');
 
-  const code =  decomment(file).trim();
+  const code =  decomment(file, {trim: true});
 
   return compile(code, globals, stubs);
 }
