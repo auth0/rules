@@ -1,7 +1,11 @@
+'use strict';
+
 const loadRule = require('../utils/load-rule');
 const crypto = require('crypto');
 
-describe('encrypt-sensitive-data', () => {
+const ruleName = 'encrypt-sensitive-data';
+
+describe(ruleName, () => {
   let globals;
   let rule;
   let user;
@@ -15,7 +19,7 @@ describe('encrypt-sensitive-data', () => {
       crypto
     };
 
-    rule = loadRule('encrypt-sensitive-data.js', globals);
+    rule = loadRule(ruleName, globals);
   });
 
   it('should add encrypted metadata to context', (done) => {

@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const decomment = require('decomment');
@@ -13,11 +15,11 @@ module.exports = function (ruleFileName, globals, stubs) {
   globals = globals || {};
   stubs = stubs || {};
   
-  const fileName = path.join(__dirname, '../../src/rules', ruleFileName);
+  const fileName = path.join(__dirname, '../../src/rules', ruleFileName + '.js');
 
   const file = fs.readFileSync(fileName, 'utf8');
 
-  const code =  decomment(file).trim();
+  const code =  decomment(file, {trim: true});
 
   return compile(code, globals, stubs);
 }

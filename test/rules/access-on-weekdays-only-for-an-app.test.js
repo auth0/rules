@@ -1,6 +1,10 @@
+'use strict';
+
 const loadRule = require('../utils/load-rule');
 
-describe('access-on-weekdays-only-for-an-app', () => {
+const ruleName = 'access-on-weekdays-only-for-an-app';
+
+describe(ruleName, () => {
   let globals;
   let user;
   let context;
@@ -14,7 +18,7 @@ describe('access-on-weekdays-only-for-an-app', () => {
       clientName: 'TheAppToCheckAccessTo'
     };
 
-    rule = loadRule('access-on-weekdays-only-for-an-app.js', globals);
+    rule = loadRule(ruleName, globals);
   });
 
   describe('when day is weekend', () => {

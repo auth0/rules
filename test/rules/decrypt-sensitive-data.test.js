@@ -1,6 +1,10 @@
+'use strict';
+
 const loadRule = require('../utils/load-rule');
 
-describe('decrypt-sensitive-data', () => {
+const ruleName = 'decrypt-sensitive-data';
+
+describe(ruleName, () => {
   let globals;
   let rule;
   let user;
@@ -21,7 +25,7 @@ describe('decrypt-sensitive-data', () => {
       }
     };
 
-    rule = loadRule('decrypt-sensitive-data.js', globals);
+    rule = loadRule(ruleName, globals);
   });
 
   it('should add admin role if license_key matches', (done) => {
