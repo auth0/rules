@@ -2,7 +2,8 @@
  * @overview .NET example of decrypting sensitive data from the user profile
  * @gallery true
  * @category enrich profile
- * @description Decrypt a sensitive value from the app_metadata
+ * 
+ * Decrypt a sensitive value from the app_metadata
  * 
  * This rule will get a sensitive value in the app_metadata and decrypt it (see the https://auth0.com/rules/encrypt-sensitive-data rule for information on how to encrypt the data).
  * 
