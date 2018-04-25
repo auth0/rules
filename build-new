@@ -7,6 +7,7 @@ const comments = require('parse-comments');
 const decomment = require('decomment');
 const fs = require('fs');
 const glob = require('glob');
+const _ = require('lodash');
 
 const argv = yargs
   .option('allRules', {
@@ -22,7 +23,7 @@ const argv = yargs
 const files = glob.sync(__dirname + '/src/rules/*.js');
 
 async.map(files, function (file, callback) {
-  
+
   fs.readFile(file, 'utf8', function (err, content) {
     if (err) return callback(err);
 
@@ -47,34 +48,30 @@ async.map(files, function (file, callback) {
 
     callback(null, result);
   });
-}, function (err, results) {
+}, function (err, rules) {
   if (err) {
     console.log(err.stack);
     process.exit(1);
   }
 
-  //group by category
-  const rules = results;
-
-  const categories = rules.filter(function (rt) {
-    return !!rt;
-  }).map(function (rule) {
-    return rule.categories;
-  }).reduce(function (prev, curr) {
-    const new_cats = curr.filter(function (cat) {
-      return !~prev.indexOf(cat);
-    });
-    return prev.concat(new_cats);
-  }, []).map(function (cat) {
-    return {
-      name:      cat,
-      templates: rules.filter(function (t) {
-        return t && ~t.categories.indexOf(cat);
-      })
-    };
-  });
+  const expandedRules = _.chain(rules)
+    .flatMap(rule =>
+      _.map(rule.categories, category => ({
+        category: category,
+        id: rule.id,
+        title: rule.title,
+        description: rule.description,
+        code: rule.code
+      }))
+    )
+    .groupBy(r => r.category)
+    .map((value, key) => ({
+      name: key,
+      templates: value
+    }))
+    .value();
 
   console.log('all good!');
-  fs.writeFileSync(argv.outputPath, JSON.stringify(categories, null, 2));
+  fs.writeFileSync(argv.outputPath, JSON.stringify(expandedRules, null, 2));
   process.exit(0);
 });
