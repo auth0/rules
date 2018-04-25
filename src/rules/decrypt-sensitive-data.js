@@ -2,12 +2,13 @@
  * @overview Decrypt sensitive data from the user profile
  * @gallery true
  * @category enrich profile
- * @description Decrypt a sensitive value from the app_metadata
  * 
- * <p>This rule will get a sensitive value in the app_metadata and decrypt it 
- * (see the <a href="https://auth0.com/rules/src/rules/encrypt-sensitive-data.js">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>
+ * Decrypt a sensitive value from the app_metadata
  * 
- * <p>Note, for this to work you'll need to set 2 configuration settings:</p>
+ * This rule will get a sensitive value in the app_metadata and decrypt it 
+ * (see the <a href="https://auth0.com/rules/src/rules/encrypt-sensitive-data.js">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).
+ * 
+ * Note, for this to work you'll need to set 2 configuration settings:
  * ENCRYPT_PASSWORD, eg: **S0me,Password!è§**
  * ENCRYPT_IV, eg: **abcjfiekdpaifjfd**
  * 

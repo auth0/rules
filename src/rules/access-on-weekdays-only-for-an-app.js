@@ -2,7 +2,9 @@
  * @overview Allow Access during weekdays for a specific App 
  * @gallery true
  * @category access control
- * @description This rule is used to prevent access during weekends for a specific app.
+ * 
+ * This rule is used to prevent access during weekends for a specific app.
+ * 
  */
 
 function (user, context, callback) {

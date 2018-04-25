@@ -33,12 +33,12 @@ async.map(files, function (file, callback) {
     if(comment.category) {
       categories = Array.isArray(comment.category) ? comment.category : [comment.category]
     }
-
+    
     const result = {
       id: path.basename(file).replace('.js', ''),
       title: comment.overview,
       categories: categories,
-      description: comment.description,
+      description: comment.example,
       code: decomment(content)
     }
     
