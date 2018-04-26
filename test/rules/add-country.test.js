@@ -1,6 +1,8 @@
 'use strict';
 
 const loadRule = require('../utils/load-rule');
+const ContextBuilder = require('../utils/contextBuilder');
+const RequestBuilder = require('../utils/requestBuilder');
 
 const ruleName = 'add-country';
 
@@ -15,21 +17,15 @@ describe(ruleName, () => {
 
   describe('when request has geoip', () => {
     beforeEach(() => {
-      context = {
-        idToken: {},
-        request: {
-          geoip: {
-            country_name: 'narnia',
-            time_zone: 'UTC-5'
-          }
-        }
-      };
+      const request = new RequestBuilder().build();
+      context = new ContextBuilder()
+        .withRequest(request)
+        .build();
     })
     it('should set the idToken dictionaries with correct values', (done) => {
-      const outerContext = context;
-      rule(user, context, (err, user, context) => {
-        expect(context.idToken['https://example.com/country']).toBe(outerContext.request.geoip.country_name);
-        expect(context.idToken['https://example.com/timezone']).toBe(outerContext.request.geoip.time_zone);
+      rule(user, context, (err, u, c) => {
+        expect(c.idToken['https://example.com/country']).toBe(context.request.geoip.country_name);
+        expect(c.idToken['https://example.com/timezone']).toBe(context.request.geoip.time_zone);
 
         done();
       });
