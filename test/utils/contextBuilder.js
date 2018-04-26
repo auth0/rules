@@ -1,6 +1,7 @@
 'use strict';
 const RequestBuilder = require('./requestBuilder');
 
+// See https://auth0.com/docs/rules/current/context
 class ContextBuilder {
   constructor() {
     this.context = {
