@@ -1,6 +1,8 @@
 Auth0 Rules Repository
 =====
 
+[![CircleCI](https://circleci.com/gh/auth0/rules.svg?style=svg)](https://circleci.com/gh/auth0/rules)
+
 Rules are code snippets written in JavaScript that are executed as part of the authentication pipeline in [Auth0](https://www.auth0.com). This happens every time a user authenticates to an application. __Rules__ enable very powerful customizations and extensions to be easily added to Auth0.
 
 ![](https://docs.google.com/drawings/d/16W_hTS_u2CeDFXkD2PlfituFl7b74EQ6HE_XYn3TdD0/pub?w=891&h=283)
