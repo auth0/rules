@@ -26,7 +26,7 @@ function (user, context, callback) {
   function retrieveIncomeData(user, geoip, context, callback) {
     request.get('http://cdn.auth0.com/zip-income/householdincome.json', { json: true }, function (e,r,b) {
       if(e) return callback(e);
-      if(r.statusCode===200){
+      if(r.statusCode===200) {
         global.incomeData = b;
         setIncomeData(b, user, geoip, context, callback);
       }
