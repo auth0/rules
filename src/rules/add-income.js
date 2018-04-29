@@ -24,12 +24,11 @@ function (user, context, callback) {
   }
 
   function retrieveIncomeData(user, geoip, context, callback) {
-    request.get('http://cdn.auth0.com/zip-income/householdincome.json', function (e,r,b) {
+    request.get('http://cdn.auth0.com/zip-income/householdincome.json', { json: true }, function (e,r,b) {
       if(e) return callback(e);
       if(r.statusCode===200){
-        const incomeData = JSON.parse(b);
-        global.incomeData = incomeData;
-        setIncomeData(incomeData, user, geoip, context, callback);
+        global.incomeData = b;
+        setIncomeData(b, user, geoip, context, callback);
       }
       callback(null, user, context);
     });

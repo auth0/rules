@@ -2,7 +2,7 @@
 
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
-const UserBuilder = require('../utils/userBuilder')
+const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'active-directory-groups';
 describe(ruleName, () => {

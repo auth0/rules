@@ -1,5 +1,8 @@
 'use strict';
 const loadRule = require('../utils/load-rule');
+const ContextBuilder = require('../utils/contextBuilder');
+const RequestBuilder = require('../utils/requestBuilder');
+const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'add-income';
 describe(ruleName, () => {
@@ -13,7 +16,7 @@ describe(ruleName, () => {
     globals = {
       global: {},
       request: {
-        get: jest.fn((uri, cb) => {
+        get: jest.fn((uri, opts, cb) => {
           getCallback = cb;
         })
       },
@@ -24,20 +27,19 @@ describe(ruleName, () => {
       }
     };
 
-    user = {
-      user_id: 'id',
-      user_metadata: {}
-    }
+    user = new UserBuilder()
+      .build();
 
-    context = {
-      idToken: {},
-      request: {
-        geoip: {
-          country_code: 'US',
-          postal_code: 10001
-        }
-      }
-    }
+
+    const request = new RequestBuilder()
+      .withGeoIp({
+        country_code: 'US',
+        postal_code: 10001
+      })
+      .build();
+    context = new ContextBuilder()
+      .withRequest(request)
+      .build();
   });
 
   describe('when incomeData exists', () => {
@@ -83,7 +85,7 @@ describe(ruleName, () => {
         done();
       });
 
-      getCallback(null, { statusCode: 200 }, JSON.stringify(incomeDataSample));
+      getCallback(null, { statusCode: 200 }, incomeDataSample);
     });
 
   });
