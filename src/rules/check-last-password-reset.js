@@ -1,7 +1,7 @@
 /**
  * @overview Check the last time that a user changed his or her account password.
  * @gallery true
- * @category enrich profile
+ * @category access control
  * 
  * Check last password reset
  * 
