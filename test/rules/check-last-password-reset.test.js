@@ -1,16 +1,16 @@
 'use strict';
-
 const loadRule = require('../utils/load-rule');
 const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'check-last-password-reset';
 describe(ruleName, () => {
-  const ORIGINAL_DATE = Date;
-  const CURRENT_DATE_TO_USE = new Date(2018, 3, 1);  
   let rule;
   let context;
   let user;
   let globals;
+
+  const ORIGINAL_DATE = Date;
+  const CURRENT_DATE_TO_USE = new Date(2018, 3, 1);
 
   beforeEach(() => {
     globals = {
@@ -29,7 +29,7 @@ describe(ruleName, () => {
       beforeEach(() => {
         const LAST_PASSWORD_DATE = new Date(2018, 1, 1);
         
-        jest.fn((s) => {
+        global.Date = jest.fn((s) => {
           if(s) return LAST_PASSWORD_DATE;
           return CURRENT_DATE_TO_USE;
         });
@@ -72,7 +72,7 @@ describe(ruleName, () => {
       beforeEach(() => {
         const CREATED_DATE = new Date(2018, 1, 1);
         
-        jest.fn((s) => {
+        global.Date = jest.fn((s) => {
           if(s) return CREATED_DATE;
           return CURRENT_DATE_TO_USE;
         });
