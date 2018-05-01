@@ -39,6 +39,14 @@ class UserBuilder {
     this.user.groups = groups;
     return this;
   }
+  withCreatedAt(createdAt) {
+    this.user.created_at = createdAt;
+    return this;
+  }
+  withLastPasswordResetDate(lastPasswordReset) {
+    this.user.last_password_reset = lastPasswordReset;
+    return this;
+  }
   build() {
     return this.user;
   }
