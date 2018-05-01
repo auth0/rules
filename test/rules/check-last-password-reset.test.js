@@ -1,15 +1,16 @@
 'use strict';
+
 const loadRule = require('../utils/load-rule');
 const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'check-last-password-reset';
 describe(ruleName, () => {
   const ORIGINAL_DATE = Date;
+  const CURRENT_DATE_TO_USE = new Date(2018, 3, 1);  
   let rule;
   let context;
   let user;
   let globals;
-  const CURRENT_DATE_TO_USE = new Date(2018, 3, 1);  
 
   beforeEach(() => {
     globals = {
