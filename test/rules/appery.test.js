@@ -1,7 +1,7 @@
 'use strict';
+
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
-const RequestBuilder = require('../utils/requestBuilder');
 const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'appery';
@@ -70,8 +70,3 @@ describe(ruleName, () => {
     });
   });
 });
-
-const incomeDataSample = {
-  [10001]: 81671,
-  [10002]: 33218
-}
