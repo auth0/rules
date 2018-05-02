@@ -40,10 +40,6 @@ describe(ruleName, () => {
     rule = loadRule(ruleName, globals);
   });
 
-  afterEach(() => {
-
-  })
-
   describe('when database returns roles', () => {
     beforeEach(() => {      
       user = new UserBuilder()
