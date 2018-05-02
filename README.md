@@ -33,7 +33,7 @@ This is the rules editor inside Auth0:
 ---
 ### Available Modules
 
-* [Webtask modules](https://auth0.com/docs/appliance/modules)
+* [Webtask modules](https://tehsis.github.io/webtaskio-canirequire/)
 * [Additional modules](https://auth0.com/docs/appliance/modules)
 
 ---
