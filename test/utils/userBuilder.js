@@ -39,6 +39,10 @@ class UserBuilder {
     this.user.groups = groups;
     return this;
   }
+  withPicture(picture) {
+    this.user.picture = picture;
+    return this;
+  }
   build() {
     return this.user;
   }
