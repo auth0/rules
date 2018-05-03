@@ -26,12 +26,20 @@ class ContextBuilder {
     this.context.clientID = id;
     return this;
   }
+  withEmail(email) {
+    this.context.email = email;
+    return this;
+  }
   withRequest(request) {
     this.context.request = request;
     return this;
   }
   withIdToken(idToken) {
     this.context.idToken = idToken;
+    return this;
+  }
+  withConnection(connection) {
+    this.context.connection = connection;
     return this;
   }
   build() {

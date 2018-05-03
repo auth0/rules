@@ -31,6 +31,10 @@ class UserBuilder {
       ]
     }
   }
+  withEmail(email) {
+    this.user.email = email;
+    return this;
+  }
   withUserMetadata(metadata) {
     this.user.user_metadata = metadata;
     return this;

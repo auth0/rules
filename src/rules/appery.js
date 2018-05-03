@@ -28,7 +28,8 @@ function (user, context, callback) {
     },
     headers: {
       'X-Appery-Database-Id': APPERYIO_DATABASE_ID
-    }
+    },
+    json: true
   },
   (err, response, body) => {
     if (err) return callback(err);
