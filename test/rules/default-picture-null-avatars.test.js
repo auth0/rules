@@ -20,7 +20,7 @@ describe(ruleName, () => {
 
   it('should set the picture on the user', (done) => {
     rule(user, {}, (err, user, context) => {
-      expect(user.picture).toBe('https://cdn.auth0.com/test.png?d=QUERY_PARAM_PATH_TO_YOUR_DEFAULT_PICTURE_HERE.png');
+      expect(user.picture).toBe('https://cdn.auth0.com/test.png?d=URL_TO_YOUR_DEFAULT_PICTURE_HERE');
 
       done();
     });
