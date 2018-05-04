@@ -31,12 +31,24 @@ class UserBuilder {
       ]
     }
   }
+  withEmail(email) {
+    this.user.email = email;
+    return this;
+  }
   withUserMetadata(metadata) {
     this.user.user_metadata = metadata;
     return this;
   }
   withGroups(groups) {
     this.user.groups = groups;
+    return this;
+  }
+  withCreatedAt(createdAt) {
+    this.user.created_at = createdAt;
+    return this;
+  }
+  withLastPasswordResetDate(lastPasswordReset) {
+    this.user.last_password_reset = lastPasswordReset;
     return this;
   }
   withPicture(picture) {

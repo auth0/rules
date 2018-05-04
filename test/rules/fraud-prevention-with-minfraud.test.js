@@ -10,7 +10,6 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
-  let postCallback;
 
   beforeEach(() => {
     globals = {
@@ -18,9 +17,7 @@ describe(ruleName, () => {
     };
 
     request = {
-      post: jest.fn((uri, options, cb) => {
-        postCallback = cb;
-      })
+      post: jest.fn()
     };
 
     const stubs = {
@@ -46,7 +43,7 @@ describe(ruleName, () => {
 
       done();
     });
-    postCallback(null, { statusCode: 200 }, 'riskScore=0.25;someOtherValue=123');
+    request.post.mock.calls[0][2](null, { statusCode: 200 }, 'riskScore=0.25;someOtherValue=123');
   });
 
   it('should allow login if riskScore is <= 20', (done) => {
@@ -57,7 +54,7 @@ describe(ruleName, () => {
 
       done();
     });
-    postCallback(null, { statusCode: 200 }, 'riskScore=0.20;someOtherValue=123');
+    request.post.mock.calls[0][2](null, { statusCode: 200 }, 'riskScore=0.20;someOtherValue=123');
   });
 
   it('should allow login if riskScore is not set', (done) => {
@@ -68,7 +65,7 @@ describe(ruleName, () => {
 
       done();
     });
-    postCallback('some error', { statusCode: 200 }, 'someOtherValue=123');
+    request.post.mock.calls[0][2]('some error', { statusCode: 200 }, 'someOtherValue=123');
   });
 
   it('should allow login on request error', (done) => {
@@ -79,7 +76,7 @@ describe(ruleName, () => {
 
       done();
     });
-    postCallback('some error', { statusCode: 200 }, 'riskScore=0.25;someOtherValue=123');
+    request.post.mock.calls[0][2]('some error', { statusCode: 200 }, 'riskScore=0.25;someOtherValue=123');
   });
 
   it('should allow login on non-200 status code', (done) => {
@@ -90,7 +87,7 @@ describe(ruleName, () => {
 
       done();
     });
-    postCallback(null, { statusCode: 400 }, 'riskScore=0.25;someOtherValue=123');
+    request.post.mock.calls[0][2](null, { statusCode: 400 }, 'riskScore=0.25;someOtherValue=123');
   });
 
 });

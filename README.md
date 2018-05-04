@@ -30,6 +30,11 @@ This is the rules editor inside Auth0:
 
 ![](http://cdn.auth0.com/docs/img/rules-editor.png)
 
+---
+### Available Modules
+
+* [Webtask modules](https://tehsis.github.io/webtaskio-canirequire/)
+* [Additional modules](https://auth0.com/docs/appliance/modules)
 
 ---
 ### Release Notes

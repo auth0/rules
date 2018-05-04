@@ -26,6 +26,10 @@ class ContextBuilder {
     this.context.clientID = id;
     return this;
   }
+  withEmail(email) {
+    this.context.email = email;
+    return this;
+  }
   withRequest(request) {
     this.context.request = request;
     return this;
@@ -36,6 +40,10 @@ class ContextBuilder {
   }
   withJwtConfiguration(jwtConfiguration) {
     this.context.jwtConfiguration = jwtConfiguration;
+    return this;
+  }
+  withConnection(connection) {
+    this.context.connection = connection;
     return this;
   }
   build() {
