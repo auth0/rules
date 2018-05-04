@@ -41,32 +41,38 @@ describe(ruleName, () => {
   });
 
   it('should record user as lead and set app metadata', (done) => {
-    const expectedAccessToken = 'some_token';
-    const updateAppMetadataMock = globals.auth0.users.updateAppMetadata;
-    updateAppMetadataMock.mockReturnValue(Promise.resolve());
-    
+    const salesforceAccessToken = 'some_token';
+    const salesforceInstanceUrl = 'http://tenant.salesforce.com';
     
     rule(user, context, () => { });
 
     // First POST is to get the access token
+    const getAccessTokenPostOptions = globals.request.post.mock.calls[0][0];
+    expect(getAccessTokenPostOptions.url).toBe('https://login.salesforce.com/services/oauth2/token');
+    expect(getAccessTokenPostOptions.form.grant_type).toBe('password');
+    expect(getAccessTokenPostOptions.form.client_id).toBe(globals.configuration.SALESFORCE_CLIENT_ID);
+    expect(getAccessTokenPostOptions.form.client_secret).toBe(globals.configuration.SALESFORCE_CLIENT_SECRET);
+    expect(getAccessTokenPostOptions.form.username).toBe(globals.configuration.SALESFORCE_USERNAME);
+    expect(getAccessTokenPostOptions.form.password).toBe(globals.configuration.SALESFORCE_PASSWORD);
     globals.request.post.mock.calls[0][1](null, null,
       JSON.stringify({
-        instance_url: 'some_url',
-        access_token: expectedAccessToken
+        instance_url: salesforceInstanceUrl,
+        access_token: salesforceAccessToken
       })
     );
 
     // Second POST is to create the lead
     const createLeadPostOptions = globals.request.post.mock.calls[1][0];
+    expect(createLeadPostOptions.url).toBe(salesforceInstanceUrl + '/services/data/v20.0/sobjects/Lead');
     expect(createLeadPostOptions.json.LastName).toBe(user.name);
-    expect(createLeadPostOptions.headers.Authorization).toContain(expectedAccessToken);
+    expect(createLeadPostOptions.headers.Authorization).toContain(salesforceAccessToken);
 
     globals.request.post.mock.calls[1][1](null, null,
       {
-        id: 'dummy create lead response id'
+        id: 'fake create lead response id'
       }
     );
-    const updateAppMetadataCall = updateAppMetadataMock.mock.calls[0];
+    const updateAppMetadataCall = globals.auth0.users.updateAppMetadata.mock.calls[0];
     expect(updateAppMetadataCall[0]).toBe(user.user_id);
     expect(updateAppMetadataCall[1].recordedAsLead).toBe(true);
 
