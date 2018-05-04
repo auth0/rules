@@ -34,6 +34,10 @@ class ContextBuilder {
     this.context.idToken = idToken;
     return this;
   }
+  withJwtConfiguration(jwtConfiguration) {
+    this.context.jwtConfiguration = jwtConfiguration;
+    return this;
+  }
   build() {
     return this.context;
   }
