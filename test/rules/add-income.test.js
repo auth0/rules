@@ -9,16 +9,13 @@ describe(ruleName, () => {
   let rule;
   let context;
   let user;
-  let getCallback;
   let globals;
 
   beforeEach(() => {
     globals = {
       global: {},
       request: {
-        get: jest.fn((uri, opts, cb) => {
-          getCallback = cb;
-        })
+        get: jest.fn()
       },
       auth0: {
         users: {
@@ -85,7 +82,7 @@ describe(ruleName, () => {
         done();
       });
 
-      getCallback(null, { statusCode: 200 }, incomeDataSample);
+      globals.request.get.mock.calls[0][2](null, { statusCode: 200 }, incomeDataSample);
     });
 
   });
