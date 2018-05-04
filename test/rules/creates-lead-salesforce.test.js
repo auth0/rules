@@ -54,6 +54,7 @@ describe(ruleName, () => {
     expect(getAccessTokenPostOptions.form.client_secret).toBe(globals.configuration.SALESFORCE_CLIENT_SECRET);
     expect(getAccessTokenPostOptions.form.username).toBe(globals.configuration.SALESFORCE_USERNAME);
     expect(getAccessTokenPostOptions.form.password).toBe(globals.configuration.SALESFORCE_PASSWORD);
+    
     globals.request.post.mock.calls[0][1](null, null,
       JSON.stringify({
         instance_url: salesforceInstanceUrl,
@@ -72,6 +73,7 @@ describe(ruleName, () => {
         id: 'fake create lead response id'
       }
     );
+
     const updateAppMetadataCall = globals.auth0.users.updateAppMetadata.mock.calls[0];
     expect(updateAppMetadataCall[0]).toBe(user.user_id);
     expect(updateAppMetadataCall[1].recordedAsLead).toBe(true);
