@@ -69,5 +69,4 @@ function (user, context, callback) {
       });
     }
   });
-
 }

@@ -31,13 +31,13 @@ function (user, context, done) {
     SFCOM_CLIENT_SECRET,
     USERNAME,
     PASSWORD,
-    (r) => {
-      if (!r.instance_url || !r.access_token) {
+    (response) => {
+      if (!response.instance_url || !response.access_token) {
         slack.alert({
           channel: '#some_channel',
           text: 'Error Getting SALESFORCE Access Token',
           fields: {
-            error: r
+            error: response
           }
         });
 
@@ -45,15 +45,15 @@ function (user, context, done) {
       }
 
       createLead(
-        r.instance_url,
-        r.access_token,
-        (e, result) => {
-        if (e || !result || !result.id) {
+        response.instance_url,
+        response.access_token,
+        (err, result) => {
+        if (err || !result || !result.id) {
           slack.alert({
             channel: '#some_channel',
             text: 'Error Creating SALESFORCE Lead',
             fields: {
-              error: e || result
+              error: err || result
             }
           });
 
@@ -79,8 +79,8 @@ function (user, context, done) {
         "Authorization": "OAuth " + access_token
       },
       json: data
-      }, (e,r,b) => {
-        return callback(e, b);
+      }, (err, response, body) => {
+        return callback(err, body);
       });
   }
 
@@ -94,8 +94,8 @@ function (user, context, done) {
         client_secret: client_secret,
         username: username,
         password: password
-      }}, (e,r,b) => {
-        return callback(JSON.parse(b));
+      }}, (err, respose, body) => {
+        return callback(JSON.parse(body));
       });
   }
   

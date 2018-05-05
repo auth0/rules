@@ -31,11 +31,9 @@ describe(ruleName, () => {
     };
     stubs['slack-notify'] = jest.fn()
 
-    user = new UserBuilder()
-      .build();
+    user = new UserBuilder().build();
 
-    context = new ContextBuilder()
-      .build();
+    context = new ContextBuilder().build();
 
     rule = loadRule(ruleName, globals, stubs);
   });
