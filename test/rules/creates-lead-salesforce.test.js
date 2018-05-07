@@ -12,10 +12,23 @@ describe(ruleName, () => {
   let globals;
   let stubs = {};
 
+  const salesforceAccessToken = 'some_token';
+  const salesforceInstanceUrl = 'http://tenant.salesforce.com';
+
   beforeEach(() => {
     globals = {
       request: {
-        post: jest.fn()
+        post: jest
+          .fn()
+          .mockImplementationOnce((obj, cb) => {
+            cb(null, null, JSON.stringify({
+              instance_url: salesforceInstanceUrl,
+              access_token: salesforceAccessToken
+            }))
+          })          
+          .mockImplementationOnce((obj, cb) => {
+            cb(null, null, { id: 'fake create lead response id' })
+          })
       },
       auth0: {
         users: {
@@ -39,8 +52,6 @@ describe(ruleName, () => {
   });
 
   it('should record user as lead and set app metadata', (done) => {
-    const salesforceAccessToken = 'some_token';
-    const salesforceInstanceUrl = 'http://tenant.salesforce.com';
     
     rule(user, context, () => { });
 
@@ -53,24 +64,12 @@ describe(ruleName, () => {
     expect(getAccessTokenPostOptions.form.username).toBe(globals.configuration.SALESFORCE_USERNAME);
     expect(getAccessTokenPostOptions.form.password).toBe(globals.configuration.SALESFORCE_PASSWORD);
     
-    globals.request.post.mock.calls[0][1](null, null,
-      JSON.stringify({
-        instance_url: salesforceInstanceUrl,
-        access_token: salesforceAccessToken
-      })
-    );
 
     // Second POST is to create the lead
     const createLeadPostOptions = globals.request.post.mock.calls[1][0];
     expect(createLeadPostOptions.url).toBe(salesforceInstanceUrl + '/services/data/v20.0/sobjects/Lead');
     expect(createLeadPostOptions.json.LastName).toBe(user.name);
     expect(createLeadPostOptions.headers.Authorization).toContain(salesforceAccessToken);
-
-    globals.request.post.mock.calls[1][1](null, null,
-      {
-        id: 'fake create lead response id'
-      }
-    );
 
     const updateAppMetadataCall = globals.auth0.users.updateAppMetadata.mock.calls[0];
     expect(updateAppMetadataCall[0]).toBe(user.user_id);
