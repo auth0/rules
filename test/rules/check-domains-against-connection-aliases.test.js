@@ -30,6 +30,12 @@ describe(ruleName, () => {
 
   describe('when no tenant_domain', () => {
     beforeEach(() => {
+      globals.request.get = jest
+        .fn()
+        .mockImplementation((obj, cb) => {
+          cb(null, { statusCode: 200 }, connectionResponse)
+        });
+
       context = new ContextBuilder()
         .withConnection(connectionResponse[0].name)
         .build();
@@ -46,8 +52,6 @@ describe(ruleName, () => {
 
         done();
       });
-
-      globals.request.get.mock.calls[0][1](null, { statusCode: 200 }, connectionResponse);
     });
   });
 
@@ -55,6 +59,12 @@ describe(ruleName, () => {
     beforeEach(() => {
       connectionResponse[0].options.tenant_domain = 'test.com';
       connectionResponse[0].options.domain_aliases = ['test.com'];
+
+      globals.request.get = jest
+        .fn()
+        .mockImplementation((obj, cb) => {
+          cb(null, { statusCode: 200 }, connectionResponse)
+        });
 
       context = new ContextBuilder()
         .withConnection(connectionResponse[0].name)
@@ -72,8 +82,6 @@ describe(ruleName, () => {
 
         done();
       });
-
-      globals.request.get.mock.calls[0][1](null, { statusCode: 200 }, connectionResponse);
     });
   });
 
@@ -81,6 +89,12 @@ describe(ruleName, () => {
     beforeEach(() => {
       connectionResponse[0].options.tenant_domain = 'test.com';
       connectionResponse[0].options.domain_aliases = ['test.com'];
+
+      globals.request.get = jest
+        .fn()
+        .mockImplementation((obj, cb) => {
+          cb(null, { statusCode: 200 }, connectionResponse)
+        });
 
       context = new ContextBuilder()
         .withConnection(connectionResponse[0].name)
@@ -99,8 +113,6 @@ describe(ruleName, () => {
 
         done();
       });
-
-      globals.request.get.mock.calls[0][1](null, { statusCode: 200 }, connectionResponse);
     });
   });
 });
