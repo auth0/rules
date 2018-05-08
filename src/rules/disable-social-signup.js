@@ -37,8 +37,8 @@ function (user, context, callback) {
       });
     
     return;
-  } 
-  console.log(user)
+  }
+  
   // if flag is enabled, throw error
   if (user.app_metadata.is_signup) {
     return callback('Signup disabled');

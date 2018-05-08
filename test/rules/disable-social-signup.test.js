@@ -70,7 +70,6 @@ describe(ruleName, () => {
     });
 
     it('should disable signup', (done) => {
-      console.log(user)
       rule(user, context, (err, user, ctx) => {
         expect(err).toBe('Signup disabled');
         done();
