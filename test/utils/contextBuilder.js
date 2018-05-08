@@ -46,6 +46,10 @@ class ContextBuilder {
     this.context.protocol = protocol;
     return this;
   }
+  withStats(stats) {
+    this.context.stats = stats;
+    return this;
+  }
   build() {
     return this.context;
   }

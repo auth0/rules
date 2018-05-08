@@ -39,6 +39,10 @@ class UserBuilder {
     this.user.user_metadata = metadata;
     return this;
   }
+  withAppMetadata(metadata) {
+    this.user.app_metadata = metadata;
+    return this;
+  }
   withGroups(groups) {
     this.user.groups = groups;
     return this;
