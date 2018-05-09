@@ -59,6 +59,10 @@ class UserBuilder {
     this.user.last_password_reset = lastPasswordReset;
     return this;
   }
+  withPicture(picture) {
+    this.user.picture = picture;
+    return this;
+  }
   build() {
     return this.user;
   }

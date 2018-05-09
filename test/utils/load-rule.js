@@ -35,4 +35,3 @@ function compile(code, globals, stubs) {
 
   return Function.apply(null, params.concat(`return ${code}`)).apply(null, paramValues);
 }
-
