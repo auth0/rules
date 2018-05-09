@@ -15,7 +15,11 @@ describe(ruleName, () => {
     globals = {
       global: {},
       request: {
-        get: jest.fn()
+        get: jest
+          .fn()
+          .mockImplementationOnce((url, obj, cb) => {
+            cb(null, { statusCode: 200 }, incomeDataSample)
+          })   
       },
       auth0: {
         users: {
@@ -81,8 +85,6 @@ describe(ruleName, () => {
 
         done();
       });
-
-      globals.request.get.mock.calls[0][2](null, { statusCode: 200 }, incomeDataSample);
     });
 
   });
