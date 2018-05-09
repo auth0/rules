@@ -30,7 +30,7 @@ function (user, context, callback) {
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
       .then(function(){
         // throw error
-        return callback('Signup disabled');
+        return callback(new Error('Signup disabled'));
       })
       .catch(function(err){
         callback(err);
@@ -41,7 +41,7 @@ function (user, context, callback) {
   
   // if flag is enabled, throw error
   if (user.app_metadata.is_signup) {
-    return callback('Signup disabled');
+    return callback(new Error('Signup disabled'));
   }
   
   // else it is a non social login or it is not a signup

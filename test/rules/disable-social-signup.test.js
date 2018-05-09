@@ -51,7 +51,7 @@ describe(ruleName, () => {
 
     it('should disable signup', (done) => {
       rule(user, context, (err, user, ctx) => {
-        expect(err).toBe('Signup disabled');
+        expect(err).toBeInstanceOf(Error);
         expect(globals.auth0.users.updateAppMetadata.mock.calls[0][1].is_signup).toBe(true);
         done();
       });
@@ -71,7 +71,7 @@ describe(ruleName, () => {
 
     it('should disable signup', (done) => {
       rule(user, context, (err, user, ctx) => {
-        expect(err).toBe('Signup disabled');
+        expect(err).toBeInstanceOf(Error);
         done();
       });
     });
