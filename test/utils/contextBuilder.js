@@ -46,10 +46,17 @@ class ContextBuilder {
     this.context.connection = connection;
     return this;
   }
+  withProtocol(protocol) {
+    this.context.protocol = protocol;
+    return this;
+  }
+  withStats(stats) {
+    this.context.stats = stats;
+    return this;
+  }
   build() {
     return this.context;
   }
 }
-
 
 module.exports = ContextBuilder;

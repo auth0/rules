@@ -35,8 +35,16 @@ class UserBuilder {
     this.user.email = email;
     return this;
   }
+  withEmailVerified(verified) {
+    this.user.email_verified = verified;
+    return this;
+  }
   withUserMetadata(metadata) {
     this.user.user_metadata = metadata;
+    return this;
+  }
+  withAppMetadata(metadata) {
+    this.user.app_metadata = metadata;
     return this;
   }
   withGroups(groups) {
