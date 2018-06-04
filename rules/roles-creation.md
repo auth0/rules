@@ -14,7 +14,8 @@ function (user, context, callback) {
   // You can add a Role based on what you want
   // In this case I check domain
   var addRolesToUser = function(user, cb) {
-    if (user.email && user.email.indexOf('@example.com') > -1) {
+    var endsWith = '@example.com';
+    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {
       cb(null, ['admin']);
     } else {
       cb(null, ['user']);
