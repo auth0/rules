@@ -63,6 +63,10 @@ class UserBuilder {
     this.user.picture = picture;
     return this;
   }
+  withIdentities(identities) {
+    this.user.identities = identities;
+    return this;
+  }
   build() {
     return this.user;
   }
