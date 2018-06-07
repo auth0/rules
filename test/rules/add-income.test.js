@@ -31,7 +31,6 @@ describe(ruleName, () => {
     user = new UserBuilder()
       .build();
 
-
     const request = new RequestBuilder()
       .withGeoIp({
         country_code: 'US',
