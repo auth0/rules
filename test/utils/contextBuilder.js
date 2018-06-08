@@ -46,6 +46,10 @@ class ContextBuilder {
     this.context.connection = connection;
     return this;
   }
+  withConnectionStrategy(connectionStrategy) {
+    this.context.connectionStrategy = connectionStrategy;
+    return this;
+  }
   withProtocol(protocol) {
     this.context.protocol = protocol;
     return this;
