@@ -30,7 +30,7 @@ function (user, context, callback) {
       },
       json: true
     },
-    function(err, response, body) {
+    (err, response, body) => {
       if (err) return callback(err);
 
       if (response.statusCode === 200) {
