@@ -117,7 +117,7 @@
           "access control"
         ],
         "description": "<p>This rule adds a Roles field to the user based on some pattern</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    if (user.email && user.email.indexOf('@example.com') > -1) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    var endsWith = '@example.com';\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
       },
       {
         "id": "simple-domain-whitelist",
@@ -532,16 +532,6 @@
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
       },
       {
-        "id": "guardian-multifactor-changed-location",
-        "title": "Multifactor when country changes",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
-      },
-      {
         "id": "guardian-multifactor-ip-range",
         "title": "Multifactor when request comes from outside an IP range",
         "categories": [
@@ -575,16 +565,6 @@
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor-changed-location",
-        "title": "Multifactor when country changes",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the current country does not match the country of the previous session</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.app_metadata = user.app_metadata || {}; \n\n  if (user.app_metadata.last_location !== context.request.geoip.country_code) {\n    context.multifactor = { \n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time. \n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };  \n  }\n\n  //Set the location context for next time\n  user.app_metadata.last_location = context.request.geoip.country_code;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then( function() {\n      callback(null, user, context);\n    })\n    .catch( function(err) {\n      callback(err);\n    }); \n}"
       },
       {
         "id": "guardian-multifactor-ip-range",
