@@ -1,7 +1,6 @@
 'use strict';
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
-const RequestBuilder = require('../utils/requestBuilder');
 const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'google-multifactor';
