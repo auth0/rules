@@ -4,6 +4,8 @@
 var request = require('request');
 var qs = require('qs');
 var jwt = require('jsonwebtoken');
+var bodyParser = require('body-parser')
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 return function (context, req, res) {
 
@@ -23,18 +25,28 @@ return function (context, req, res) {
      * 1. GET: Render initial View with OTP.
      */
     function(callback) {
-      if (req.method === 'GET' && !context.query.otp) {
+      if (req.method === 'GET') {
         renderOtpView();
       }
       return callback();
     },
 
     /*
+     * 2. Parse the form body
+     */
+        function(callback) {
+            if (req.method === 'POST') {
+                return urlencodedParser(req, res, callback);
+            }
+            return callback();
+        },
+
+    /*
      * 2. Validate OTP
      */
     function(callback) {
-      if (req.method === 'GET' && context.query.otp) {
-        yubico_validate(context.secrets.yubikey_clientid, context.query.otp, function(err,resp) {
+      if (req.method === 'POST') {
+        yubico_validate(context.secrets.yubikey_clientid, req.body.otp, function(err,resp) {
           if (err) {
             return callback(err);
           }
@@ -123,7 +135,6 @@ return function (context, req, res) {
     });
     res.end(require('ejs').render(otpForm.toString().match(/[^]*\/\*([^]*)\*\/\s*\}$/)[1], {
       user: context.query.user,
-      state: context.query.state,
       errors: errors || []
     }));
   }
@@ -142,7 +153,7 @@ return function (context, req, res) {
         <div class="modal-wrapper">
           <div class="modal-centrix">
             <div class="modal">
-              <form onsubmit="showSpinner();" action="" method="GET">
+              <form onsubmit="showSpinner();" action="" method="POST" enctype="application/x-www-form-urlencoded">
                 <div class="head">
                   <svg class="logo" viewBox="0 0 426 426" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -161,7 +172,6 @@ return function (context, req, res) {
                   <span class="description domain">
                     <span class="input-wrapper icon-budicon-285">
                       <input type="text" autocomplete="off" name="otp" required autofocus id="otp" placeholder="Yubikey OTP">
-		      <input type="hidden" name="state" id="state" value="<%- state %>">
                     </span>
                   </span>
                 </div>
