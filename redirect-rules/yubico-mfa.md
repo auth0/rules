@@ -23,7 +23,7 @@ return function (context, req, res) {
      * 1. GET: Render initial View with OTP.
      */
     function(callback) {
-      if (req.method === 'GET') {
+      if (req.method === 'GET' && !context.query.otp) {
         renderOtpView();
       }
       return callback();
@@ -33,8 +33,8 @@ return function (context, req, res) {
      * 2. Validate OTP
      */
     function(callback) {
-      if (req.method === 'POST') {
-        yubico_validate(context.data.yubikey_clientid, context.data.otp, function(err,resp) {
+      if (req.method === 'GET' && context.query.otp) {
+        yubico_validate(context.secrets.yubikey_clientid, context.query.otp, function(err,resp) {
           if (err) {
             return callback(err);
           }
@@ -45,15 +45,15 @@ return function (context, req, res) {
               status: resp.status,
               otp: resp.otp
             };
-            var key = Buffer.from(context.data.yubikey_secret, 'base64');
+            var key = Buffer.from(context.secrets.yubikey_secret, 'base64');
             var options = {
-              subject: context.data.user,
+              subject: context.query.user,
               expiresIn: 60,
-              audience: context.data.yubikey_clientid,
+              audience: context.secrets.yubikey_clientid,
               issuer: 'urn:auth0:yubikey:mfa'
             };
             var token = jwt.sign(payload, key, options);
-            res.writeHead(301, {Location: context.data.returnUrl + "?id_token=" + token + "&state=" + context.data.state});
+            res.writeHead(301, {Location: context.secrets.returnUrl + "?id_token=" + token + "&state=" + context.query.state});
             res.end();
             callback();
           } else {
@@ -122,7 +122,8 @@ return function (context, req, res) {
       'Content-Type': 'text/html'
     });
     res.end(require('ejs').render(otpForm.toString().match(/[^]*\/\*([^]*)\*\/\s*\}$/)[1], {
-      user: context.data.user,
+      user: context.query.user,
+      state: context.query.state,
       errors: errors || []
     }));
   }
@@ -141,7 +142,7 @@ return function (context, req, res) {
         <div class="modal-wrapper">
           <div class="modal-centrix">
             <div class="modal">
-              <form onsubmit="showSpinner();" action="" method="POST" enctype="application/x-www-form-urlencoded">
+              <form onsubmit="showSpinner();" action="" method="GET">
                 <div class="head">
                   <svg class="logo" viewBox="0 0 426 426" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -160,6 +161,7 @@ return function (context, req, res) {
                   <span class="description domain">
                     <span class="input-wrapper icon-budicon-285">
                       <input type="text" autocomplete="off" name="otp" required autofocus id="otp" placeholder="Yubikey OTP">
+		      <input type="hidden" name="state" id="state" value="<%- state %>">
                     </span>
                   </span>
                 </div>
