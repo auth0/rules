@@ -10,8 +10,10 @@ This rule sends a message to a slack channel on every user signup.
 
 ```js
 function(user, context, callback) {
-  // short-circuit if the user signed up already
-  if (context.stats.loginsCount > 1) return callback(null, user, context);
+  // short-circuit if the user signed up already or is using a refresh token
+  if (context.stats.loginsCount > 1 || context.protocol === 'oauth2-refresh-token') {
+    return callback(null, user, context);
+  }
 
   // get your slack's hook url from: https://slack.com/services/10525858050
   var SLACK_HOOK = 'YOUR SLACK HOOK URL';
