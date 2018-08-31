@@ -10,34 +10,23 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
-  const connectionResponse = [{
-    name: 'test-connection',
-    options: {
-    }
-  }];
+  const connectionOptions = {
+    tenant_domain: 'contoso.com',
+    domain_aliases: ['contoso.com']
+  };
 
   beforeEach(() => {
     globals = {
       _: require('lodash'),
       request: {
         get: jest.fn()
-      },
-      configuration: {
-        AUTH0_API_TOKEN: 'some token'
       }
     };
   });
 
   describe('when no tenant_domain', () => {
     beforeEach(() => {
-      globals.request.get = jest
-        .fn()
-        .mockImplementation((obj, cb) => {
-          cb(null, { statusCode: 200 }, connectionResponse)
-        });
-
       context = new ContextBuilder()
-        .withConnection(connectionResponse[0].name)
         .build();
 
       user = new UserBuilder()
@@ -57,21 +46,12 @@ describe(ruleName, () => {
 
   describe('when email domain matches a domain alias', () => {
     beforeEach(() => {
-      connectionResponse[0].options.tenant_domain = 'test.com';
-      connectionResponse[0].options.domain_aliases = ['test.com'];
-
-      globals.request.get = jest
-        .fn()
-        .mockImplementation((obj, cb) => {
-          cb(null, { statusCode: 200 }, connectionResponse)
-        });
-
       context = new ContextBuilder()
-        .withConnection(connectionResponse[0].name)
+        .withConnectionOptions(connectionOptions)
         .build();
 
       user = new UserBuilder()
-        .withEmail('me@test.com')
+        .withEmail('me@contoso.com')
         .build();
 
       rule = loadRule(ruleName, globals);
@@ -87,17 +67,8 @@ describe(ruleName, () => {
 
   describe('when no tenant_domain or email matching domain alias exists', () => {
     beforeEach(() => {
-      connectionResponse[0].options.tenant_domain = 'test.com';
-      connectionResponse[0].options.domain_aliases = ['test.com'];
-
-      globals.request.get = jest
-        .fn()
-        .mockImplementation((obj, cb) => {
-          cb(null, { statusCode: 200 }, connectionResponse)
-        });
-
       context = new ContextBuilder()
-        .withConnection(connectionResponse[0].name)
+        .withConnectionOptions(connectionOptions)
         .build();
 
       user = new UserBuilder()
