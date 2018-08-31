@@ -9,8 +9,13 @@ class ContextBuilder {
       clientID: 'q2hn...pXmTUA',
       clientName: 'Default App',
       clientMetadata: {},
+      connectionID: 'con_123',
       connection: 'Username-Password-Authentication',
       connectionStrategy: 'auth0',
+      connectionOptions: {},
+      connectionMetadata: {
+        foo: 'bar'
+      },
       samlConfiguration: {},
       protocol: 'oidc-basic-profile',
       stats: { loginsCount: 111 },
@@ -44,6 +49,10 @@ class ContextBuilder {
   }
   withConnection(connection) {
     this.context.connection = connection;
+    return this;
+  }
+  withConnectionOptions(connectionOptions) {
+    this.context.connectionOptions = connectionOptions;
     return this;
   }
   withConnectionStrategy(connectionStrategy) {
