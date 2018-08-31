@@ -44,7 +44,7 @@ describe(ruleName, () => {
     });
   });
 
-  describe('when email domain matches a domain alias', () => {
+  describe('when email domain matches a domain alias exactly', () => {
     beforeEach(() => {
       context = new ContextBuilder()
         .withConnectionOptions(connectionOptions)
@@ -59,6 +59,27 @@ describe(ruleName, () => {
     it('should allow access', (done) => {      
       rule(user, context, (e, u, c) => {
         expect(e).toBeNull();
+
+        done();
+      });
+    });
+  });
+
+  describe('when email domain is not an exact match (partial match)', () => {
+    beforeEach(() => {
+      context = new ContextBuilder()
+        .withConnectionOptions(connectionOptions)
+        .build();
+
+      user = new UserBuilder()
+        .withEmail('me@notcontoso.com')
+        .build();
+
+      rule = loadRule(ruleName, globals);
+    });
+    it('should not allow access', (done) => {      
+      rule(user, context, (e, u, c) => {
+        expect(e).toBe('Access denied');
 
         done();
       });
