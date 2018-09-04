@@ -15,7 +15,7 @@ function (user, context, callback) {
   }, (err, response, body) => {
     const whitelist = body.split('\n');
     
-    const userHasAccess = whitelist.some((email) => {
+    const userHasAccess = user.email_verified && whitelist.some((email) => {
       return email === user.email;
     });
 

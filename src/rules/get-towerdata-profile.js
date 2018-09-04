@@ -19,24 +19,24 @@ function (user, context, callback) {
 
   const towerdataApiKey = 'YOUR towerdata API KEY';
 
-  if (!user.email) {
+  if(user.email && user.email_verified){
+    request.get('https://api.towerdata.com/v5/td', {
+        qs: {
+          email: user.email,
+          api_key: towerdataApiKey
+        },
+        json: true
+      },
+      (err, response, body) => {
+        if (err) return callback(err);
+
+        if (response.statusCode === 200) {
+          context.idToken['https://example.com/towerdata'] = body;
+        }
+
+        return callback(null, user, context);
+      });
+  }else{
     return callback(null, user, context);
   }
-
-  request.get('https://api.towerdata.com/v5/td', {
-      qs: {
-        email: user.email,
-        api_key: towerdataApiKey
-      },
-      json: true
-    },
-    (err, response, body) => {
-      if (err) return callback(err);
-
-      if (response.statusCode === 200) {
-        context.idToken['https://example.com/towerdata'] = body;
-      }
-
-      return callback(null, user, context);
-    });
 }

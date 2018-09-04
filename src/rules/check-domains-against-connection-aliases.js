@@ -21,7 +21,7 @@ function (user, context, callback) {
   
   // Access allowed if domain is found
   const userEmailDomain = user.email.split('@')[1].toLowerCase();
-  const domainFound = connectionOptions.domain_aliases.some(function (domain) {
+  const domainFound = user.email_verified && connectionOptions.domain_aliases.some(function (domain) {
     return userEmailDomain === domain;
   });
 

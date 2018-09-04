@@ -15,7 +15,7 @@ function (user, context, callback) {
   // In this case I check domain
   var addRolesToUser = function(user, cb) {
     var endsWith = '@example.com';
-    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {
+    if (user.email && user.email_verified && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {
       cb(null, ['admin']);
     } else {
       cb(null, ['user']);

@@ -12,13 +12,17 @@
  */
 
 function (user, context, callback) {
-  getRoles(user.email, (err, roles) => {
-    if (err) return callback(err);
+  if(user.email && user.email_verified){
+    getRoles(user.email, (err, roles) => {
+      if (err) return callback(err);
 
-    context.idToken['https://example.com/roles'] = roles;
+      context.idToken['https://example.com/roles'] = roles;
 
+      callback(null, user, context);
+    });
+  }else{
     callback(null, user, context);
-  });
+  }
 
   // Queries a table by e-mail and returns associated 'Roles'
   function getRoles(email, done) {
