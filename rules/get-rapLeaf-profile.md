@@ -16,25 +16,25 @@ function (user, context, callback) {
 
   var rapLeafAPIKey = 'YOUR RAPLEAF API KEY';
 
-  if(user.email){
+  if(user.email && user.email_verified){
+    request({
+      url: 'https://personalize.rapleaf.com/v4/dr',
+      qs: {
+        email: user.email,
+        api_key: rapLeafAPIKey
+      }
+    }, function(err, response, body){
+      if(err) return callback(err);
+
+      if(response.statusCode===200){
+      context.idToken['https://example.com/rapLeafData'] = JSON.parse(body);
+      }
+
+      return callback(null, user, context);
+    });
+  }else{
     return callback(null, user, context);
   }
-
-  request({
-    url: 'https://personalize.rapleaf.com/v4/dr',
-    qs: {
-      email: user.email,
-      api_key: rapLeafAPIKey
-    }
-  }, function(err, response, body){
-    if(err) return callback(err);
-
-    if(response.statusCode===200){
-     context.idToken['https://example.com/rapLeafData'] = JSON.parse(body);
-    }
-
-    return callback(null, user, context);
-  });
 
 }
 ```

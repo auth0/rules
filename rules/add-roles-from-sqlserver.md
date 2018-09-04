@@ -12,14 +12,17 @@ This rule will query a SQL server database on each login and add a `roles` array
 
 ```js
 function (user, context, callback) {
-  getRoles(user.email, function(err, roles) {
-    if (err) return callback(err);
+  if(user.email && user.email_verified){
+    getRoles(user.email, function(err, roles) {
+      if (err) return callback(err);
 
-    context.idToken['https://example.com/roles'] = roles;
+      context.idToken['https://example.com/roles'] = roles;
 
+      callback(null, user, context);
+    });
+  }else{
     callback(null, user, context);
-  });
-
+  }
   // Queries a table by e-mail and returns associated 'Roles'
   function getRoles(email, done) {
     var connection = sqlserver.connect({
