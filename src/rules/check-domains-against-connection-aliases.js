@@ -5,9 +5,9 @@
  * 
  * Check user email domain matches domains configured in connection
  * 
- * This rule checks if the user's login email matches any domains configured in a connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.
+ * This rule checks if the user's login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.
  * 
- * Use this rule to only allow logins from users belonging to managed email domains.
+ * Use this rule to only allow users from specific email domains to login.
  *
  * For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.
  */
