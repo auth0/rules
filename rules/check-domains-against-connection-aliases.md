@@ -6,27 +6,34 @@ categories:
 ---
 ## Check user email domain matches domains configured in connection
 
- This rule will check that the email the user has used to login matches any of the domains configured in a connection. If there are no domains configured, it will allow access.
+This rule checks if the user's login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.
+
+Use this rule to only allow users from specific email domains to login.
  
- For example, to setup SAML login, a Fabrikam customer must have a managed domain (claimed and verified by the customer). Fabrikam can then enforce a policy where only users belonging to managed email domains should be able to login via SAML. For example, if the customer Contoso has setup contoso.com as a managed domain, only users with email ending @contoso.com (not @contosocorp.com) should be able to login via SAML.
- Because Auth0 doesn't enforce this validation OOB - we have to store the valid email domain in connection object (lock already uses this) and then use a rule to validate incoming user's email domain with the one configured on the connection. If email domains doesn't match, the login is denied.
+For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.
 
 ```js
 function (user, context, callback) {
   const connectionOptions = context.connectionOptions;
-    
+  const domainAliases = connectionOptions.domain_aliases || [];
+  const tenantDomain = connectionOptions.tenant_domain;
+
   // No domains -> access allowed
-  if (!connectionOptions.tenant_domain) {
+  if (!tenantDomain && !domainAliases.length) {
     return callback(null, user, context);
   }
+
+  // Domain aliases exist but no tenant domain exists
+  if (domainAliases.length && !tenantDomain) return callback('Access denied');
+
+  let allowedDomains = new Set([tenantDomain]);
+  domainAliases.forEach(function (alias) {
+    if (alias) allowedDomains.add(alias.toLowerCase());
+  });
   
   // Access allowed if domain is found
   const userEmailDomain = user.email.split('@')[1].toLowerCase();
-  const domainFound = connectionOptions.domain_aliases.some(function (domain) {
-    return userEmailDomain === domain;
-  });
-
-  if (domainFound) return callback(null, user, context);
+  if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);
   
   return callback('Access denied');
 }
