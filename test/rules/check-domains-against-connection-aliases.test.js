@@ -24,7 +24,7 @@ describe(ruleName, () => {
     };
   });
 
-  describe('when no tenant_domain', () => {
+  describe('when no tenant_domain and no domain_aliases exist', () => {
     beforeEach(() => {
       context = new ContextBuilder()
         .build();
@@ -35,7 +35,7 @@ describe(ruleName, () => {
       rule = loadRule(ruleName, globals);
     });
 
-    it('should allow access', (done) => {      
+    it('should allow access', (done) => {  
       rule(user, context, (e, u, c) => {
         expect(e).toBeNull();
 
@@ -99,7 +99,53 @@ describe(ruleName, () => {
 
       rule = loadRule(ruleName, globals);
     });
-    it('should not allow access', (done) => {      
+    it('should not allow access', (done) => {
+      rule(user, context, (e, u, c) => {
+        expect(e).toBe('Access denied');
+
+        done();
+      });
+    });
+  });
+
+  describe('matching tenant_domain exists but no domain_aliases exist', () => {
+    beforeEach(() => {
+      context = new ContextBuilder()
+        .withConnectionOptions({
+          tenant_domain: 'contoso.com'
+        })
+        .build();
+
+      user = new UserBuilder()
+        .withEmail('me@contoso.com')
+        .build();
+
+      rule = loadRule(ruleName, globals);
+    });
+    it('should allow access', (done) => {      
+      rule(user, context, (e, u, c) => {
+        expect(e).toBeNull();
+
+        done();
+      });
+    });
+  });
+
+  describe('no tenant_domain exists but domain_aliases is not empty', () => {
+    beforeEach(() => {
+      context = new ContextBuilder()
+        .withConnectionOptions({
+          domain_aliases: ['contoso.com']
+        })
+        .build();
+
+      user = new UserBuilder()
+        .withEmail('me@contoso.com')
+        .build();
+
+      rule = loadRule(ruleName, globals);
+    });
+    it('should not allow access', (done) => {
       rule(user, context, (e, u, c) => {
         expect(e).toBe('Access denied');
 
