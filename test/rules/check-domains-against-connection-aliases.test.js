@@ -35,7 +35,7 @@ describe(ruleName, () => {
       rule = loadRule(ruleName, globals);
     });
 
-    it('should allow access', (done) => {      
+    it('should allow access', (done) => {  
       rule(user, context, (e, u, c) => {
         expect(e).toBeNull();
 
