@@ -31,7 +31,8 @@
   });
   
   // Access allowed if domain is found
-  const userEmailDomain = user.email.split('@')[1].toLowerCase();
+  const emailSplit = user.email.split('@');
+  const userEmailDomain = emailSplit[emailSplit.length - 1].toLowerCase();
   if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);
   
   return callback('Access denied');
