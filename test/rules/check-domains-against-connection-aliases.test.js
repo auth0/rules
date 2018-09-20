@@ -86,6 +86,27 @@ describe(ruleName, () => {
     });
   });
 
+  describe('when email domain is not an exact match', () => {
+    beforeEach(() => {
+      context = new ContextBuilder()
+        .withConnectionOptions(connectionOptions)
+        .build();
+
+      user = new UserBuilder()
+        .withEmail('rikaard.hosein”@contoso.com@whatever”@gmail.com')
+        .build();
+
+      rule = loadRule(ruleName, globals);
+    });
+    it('should split the domain correctly and not allow access', (done) => {      
+      rule(user, context, (e, u, c) => {
+        expect(e).toBe('Access denied');
+
+        done();
+      });
+    });
+  });
+
   describe('when no tenant_domain or email matching domain alias exists', () => {
     beforeEach(() => {
       context = new ContextBuilder()

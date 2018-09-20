@@ -26,13 +26,14 @@ function (user, context, callback) {
   // Domain aliases exist but no tenant domain exists
   if (domainAliases.length && !tenantDomain) return callback('Access denied');
 
-  let allowedDomains = new Set([tenantDomain]);
+  const allowedDomains = new Set([tenantDomain]);
   domainAliases.forEach(function (alias) {
     if (alias) allowedDomains.add(alias.toLowerCase());
   });
   
   // Access allowed if domain is found
-  const userEmailDomain = user.email.split('@')[1].toLowerCase();
+  const emailSplit = user.email.split('@');
+  const userEmailDomain = emailSplit[emailSplit.length - 1].toLowerCase();
   if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);
   
   return callback('Access denied');
