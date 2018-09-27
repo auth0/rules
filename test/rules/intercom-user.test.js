@@ -15,7 +15,7 @@ describe(ruleName, () => {
   const currentDate = new Date();
 
   beforeEach(() => {
-    rule = loadRule(ruleName, {}, { request: require('request') });
+    rule = loadRule(ruleName);
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

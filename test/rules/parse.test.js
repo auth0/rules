@@ -13,7 +13,7 @@ describe(ruleName, () => {
   let rule;
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { }, { request: require('request') });
+    rule = loadRule(ruleName);
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

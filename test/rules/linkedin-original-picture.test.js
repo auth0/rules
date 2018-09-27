@@ -23,7 +23,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, {}, { request: require('request') });
+    rule = loadRule(ruleName);
   });
 
   describe('should do nothing', () => {
