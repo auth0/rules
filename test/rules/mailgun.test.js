@@ -29,7 +29,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0, request: require('request') });
+    rule = loadRule(ruleName, { auth0 }, { request: require('request') });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

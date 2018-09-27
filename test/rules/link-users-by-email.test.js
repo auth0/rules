@@ -17,7 +17,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0, request: require('request') });
+    rule = loadRule(ruleName, { auth0 }, { request: require('request') });
   });
 
   describe('should do nothing', () => {
