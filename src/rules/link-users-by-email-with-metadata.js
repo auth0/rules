@@ -32,7 +32,7 @@ function (user, context, callback) {
     if (err) return callback(err);
     if (response.statusCode !== 200) return callback(new Error(body));
 
-    let data = JSON.parse(body);
+    var data = JSON.parse(body);
     // Ignore non-verified users and current user, if present
     data = data.filter(function(u) {
       return u.email_verified && (u.user_id !== user.user_id);
