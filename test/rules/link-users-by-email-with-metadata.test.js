@@ -29,7 +29,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0 });
+    rule = loadRule(ruleName, { auth0, request: require('request') });
   });
 
   describe('should do nothing', () => {
