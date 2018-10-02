@@ -1,15 +1,12 @@
----
-gallery: true
-short_description: Trigger multifactor authentication when a condition is met
-categories:
-- multifactor
----
+/**
+ * @overview Trigger multifactor authentication when a condition is met
+ * @gallery true
+ * @category multifactor
+ *
+ * Multifactor Authentication
+ * This rule is used to trigger multifactor authentication when a condition is met.
+ */
 
-## Multifactor Authentication
-
-This rule is used to trigger multifactor authentication when a condition is met.
-
-```js
 function (user, context, callback) {
   /*
   You can trigger MFA conditionally by checking:
@@ -31,4 +28,3 @@ function (user, context, callback) {
 
   callback(null, user, context);
 }
-```
