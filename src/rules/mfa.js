@@ -13,7 +13,7 @@ function (user, context, callback) {
   1. Client ID:
   context.clientID === 'REPLACE_WITH_YOUR_CLIENT_ID'
   2. User metadata:
-  user_metadata.use_mfa
+  user.user_metadata.use_mfa
   */
 
   // if (<condition>) {
