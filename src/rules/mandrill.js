@@ -20,7 +20,7 @@ function (user, context, callback) {
   if (!user.app_metadata.signedUp) {
     // See https://mandrillapp.com/api/docs/messages.JSON.html#method=send
     const body = {
-      key: 'MANDRILL_API_KEY',
+      key: configuration.MANDRILL_API_KEY,
       message: {
         subject: 'User ' + user.name + ' signed up to ' + context.clientName,
         text: 'Sent from an Auth0 rule',

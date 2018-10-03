@@ -9,7 +9,9 @@
  */
 
 function (user, context, callback) {
-  mongo('mongodb://user:password@server:port/db', function (db) {
+  const user = configuration.MONGO_USER;
+  const password = configuration.MONGO_PASSWORD;
+  mongo('mongodb://' + user + ':' + password + '@server:port/db', function (db) {
     const users = db.collection('users');
     users.findOne({email: user.email}, function (err, mongoUser) {
       if (err) return callback(err);
