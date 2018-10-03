@@ -66,7 +66,7 @@ If you'd like to play around with your own implementation of the consent form we
 
 1. In your account's [Rules](https://manage.auth0.com/#/rules) screen, delete the existing `CONSENT_FORM_URL` setting and recreate it with the value that is the URL that was output in the previous step.
 
-1. Try the rule along with your instance of the webtask by the following the steps in the [Run the Rule](#rule-the-rule) section.
+1. Try the rule along with your instance of the webtask by the following the steps in the [Run the Rule](#run-the-rule) section.
 
 1. If you want make changes to the webtask, you can upload a new version simply by running the same `wt create` command you did before.
 
