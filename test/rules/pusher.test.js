@@ -11,9 +11,16 @@ const ruleName = 'pusher';
 describe(ruleName, () => {
   let context;
   let rule;
+  let globals;
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { crypto });
+    rule = loadRule(ruleName, { crypto }),
+    globals = {
+      configuration: {
+        PUSHER_KEY: 'YOUR PUSHER KEY',
+        PUSHER_SECRET: '{YOUR PUSHER SECRET}'
+      }
+    };
   });
 
   describe('should do nothing', () => {
