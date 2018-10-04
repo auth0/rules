@@ -21,25 +21,23 @@ function (user, context, callback) {
   user.app_metadata.lastDeviceFingerPrint = currentFingerprint;
 
   auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-    .then(function(){
-      if( !user.phone ) return callback(null, user, context);
-      if( !previousFingerprint ||
-        previousFingerprint === currentFingerprint ) {
+    .then(function () {
+      if (!user.phone) return callback(null, user, context);
+      if (!previousFingerprint ||
+        previousFingerprint === currentFingerprint) {
         return callback(null, user, context);
       }
 
-      notifyUser(function(e){
-        return callback(e,user,context);
+      notifyUser(function (e) {
+        return callback(e, user, context);
       });
     })
-    .catch(function(err){
+    .catch(function (err) {
       callback(err);
     });
-  
 
   //Computes user device fingerprint with userAgent + IP address
-  function clientFingerprint()
-  {
+  function clientFingerprint() {
     const shasum = crypto.createHash('sha1');
     shasum.update(context.request.userAgent);
     shasum.update(context.request.ip);
@@ -47,7 +45,7 @@ function (user, context, callback) {
   }
 
   //Sends user SMS via Twilio
-  function notifyUser(done){
+  function notifyUser(done) {
     const twilioAccount = 'YOUR_TWILIO_ACCOUNT';
     const twilioAuthToken = 'YOUR_TWILIO_AUTH_TOKEN';
 
@@ -62,10 +60,10 @@ function (user, context, callback) {
         to: user.phone,
         from: '+18668888888'
       }
-    }, function(e,r,b) {
-      if (e) return done(e);
-      if (r.statusCode !== 201) return done(new Error(r.statusCode));
+    }, function (error, response, body) {
+      if (error) return done(error);
+      if (response.statusCode !== 201) return done(new Error(response.statusCode));
       return done(null);
     });
- }
+  }
 }

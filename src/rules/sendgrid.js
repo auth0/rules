@@ -21,7 +21,7 @@ function (user, context, callback) {
 
   const request = require('request');
 
-  request.post( {
+  request.post({
     url: 'https://api.sendgrid.com/api/mail.send.json',
     headers: {
       'Authorization': 'Bearer ...'
@@ -32,16 +32,16 @@ function (user, context, callback) {
       'from': 'admin@example.com',
       'text': 'We have got a new sign up from: ' + user.email + '.'
     }
-  }, function(e,r,b) {
-    if (e) return callback(e);
-    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));
+  }, function (error, response, body) {
+    if (error) return callback(error);
+    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
 
     user.app_metadata.signedUp = true;
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function(){
+      .then(function () {
         callback(null, user, context);
       })
-      .catch(function(err){
+      .catch(function (err) {
         callback(err);
       });
   });
