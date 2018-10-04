@@ -14,8 +14,12 @@ describe(ruleName, () => {
   let rule;
   const currentDate = new Date();
 
+  const configuration = {
+    INTERCOM_ACCESS_TOKEN: 'YOUR INTERCOM ACCESS TOKEN'
+  };
+
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    rule = loadRule(ruleName, {configuration});
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

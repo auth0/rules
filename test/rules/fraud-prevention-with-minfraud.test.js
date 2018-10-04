@@ -13,7 +13,10 @@ describe(ruleName, () => {
 
   beforeEach(() => {
     globals = {
-      UnauthorizedError: function() {}
+      UnauthorizedError: function() {},
+      configuration: {
+        MINFRAUD_LICENSE_KEY: 'YOUR_LICENSE_KEY'
+      }
     };
 
     request = {

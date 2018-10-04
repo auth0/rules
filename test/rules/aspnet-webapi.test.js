@@ -26,6 +26,9 @@ describe(ruleName, () => {
         users: {
           updateAppMetadata: jest.fn()
         }
+      },
+      configuration: {
+        YOURWEBSITE_SECRET_TOKEN: ';ojhsajk;h;Kh:Jh'
       }
     };
 

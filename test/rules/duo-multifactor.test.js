@@ -12,6 +12,14 @@ describe(ruleName, () => {
   let rule;
   let globals;
 
+  globals = {
+    configuration: {
+      DUO_IKEY: 'DIXBMN...LZO8IOS8',
+      DUO_SKEY: 'nZLxq8GK7....saKCOLPnh',
+      DUO_HOST: 'api-3....049.duosecurity.com'
+    }
+  };
+
   beforeEach(() => {
     rule = loadRule(ruleName, globals);
 

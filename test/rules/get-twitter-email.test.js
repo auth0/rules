@@ -19,7 +19,11 @@ describe(ruleName, () => {
           .fn()
           .mockImplementationOnce((url, obj, cb) => {
             cb(null, { statusCode: 200 }, twitterDataSample)
-          })   
+          })
+      },
+      configuration: {
+        TWITTER_CONSUMER_KEY: 'UPDATE-WITH-YOUR-CONSUMER-KEY',
+        TWITTER_CONSUMER_SECRET_KEY: 'UPDATE-WITH-YOUR-CONSUMER-SECRET-KEY'
       },
       _: require('lodash')
     };
