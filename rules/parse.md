@@ -1,7 +1,7 @@
 ---
 short_description: Generate a session token for accessing the Parse API
 ---
-## Generate an Parse Session Token
+## Generate a Parse Session Token
 
 This rule is used to generate a session token for accessing [Parse API](http://parse.com/). The rule
 adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls.
