@@ -17,12 +17,14 @@ describe(ruleName, () => {
     name: 'Terrified Duck'
   };
 
+  const uuid = () => 'random-uuid';
+
   const configuration = {
     ZENDESK_JWT_SECRET: 'secret'
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { configuration });
+    rule = loadRule(ruleName, { configuration }, { uuid });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()
@@ -37,7 +39,7 @@ describe(ruleName, () => {
       const token = c.idToken['https://example.com/zendesk_jwt_url'].split('jwt?jwt=')[1];
       const decoded = jwt.decode(token);
 
-      expect(typeof decoded.jti).toEqual('string');
+      expect(decoded.jti).toEqual('random-uuid');
       expect(decoded.email).toEqual(user.email);
       expect(decoded.name).toEqual(user.name);
       expect(decoded.external_id).toEqual(user.user_id);
