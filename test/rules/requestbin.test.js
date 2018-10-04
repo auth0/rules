@@ -30,7 +30,7 @@ describe(ruleName, () => {
 
     rule({}, context, (err) => {
       expect(err).toBeInstanceOf(Error);
-      expect(err.message).toEqual('Error: test error');
+      expect(err.message).toEqual('test error');
 
       done();
     });

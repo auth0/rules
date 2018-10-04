@@ -25,7 +25,7 @@ function (user, context, callback) {
     },
     timeout: 15000
   }, function(err, response, body){
-    if (err) return callback(new Error(err));
+    if (err) return callback(err);
     return callback(null, user, context);
   });
 }
