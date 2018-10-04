@@ -37,7 +37,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, {}, { mongo });
+    rule = loadRule(ruleName, { mongo });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

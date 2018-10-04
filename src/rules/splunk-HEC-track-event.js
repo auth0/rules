@@ -17,7 +17,7 @@
  * https://cdn.auth0.com/website/rules/splunk-hec-rule.png
  */
 
-function(user, context, callback) {
+function (user, context, callback) {
   const request = require('request');
 
   user.app_metadata = user.app_metadata || {};
@@ -34,26 +34,26 @@ function(user, context, callback) {
       userName: user.name,
       userId: user.user_id
     },
-    source: "auth0",
-    sourcetype: "auth0_activity"
+    source: 'auth0',
+    sourcetype: 'auth0_activity'
   };
 
-  request.post( {
+  request.post({
     url: endpoint,
     headers: {
-        'Authorization': 'Splunk ' + token
-      },
+      'Authorization': 'Splunk ' + token
+    },
     strictSSL: true, // set to false if using a self-signed cert
     json: hec_event
-  }, function(e,r,b) {
-    if (e) return callback(e);
-    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));
+  }, function(error, response, body) {
+    if (error) return callback(error);
+    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
     user.app_metadata.signedUp = true;
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function(){
+      .then(function () {
         callback(null, user, context);
       })
-      .catch(function(err){
+      .catch(function (err) {
         callback(err);
       });
   });

@@ -9,8 +9,6 @@
  */
 
 function (user, context, callback) {
-  const mongo = require('mongo');
-
   mongo('mongodb://user:password@server:port/db', function (db) {
     const users = db.collection('users');
     users.findOne({email: user.email}, function (err, mongoUser) {
