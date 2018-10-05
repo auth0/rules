@@ -16,6 +16,11 @@ describe(ruleName, () => {
     _id: 'someId'
   };
 
+  const configuration = {
+    APPERYIO_DATABASE_ID: '<APPERYIO_DATABASE_ID>',
+    APPERYIO_PASSWORD_SECRET: 'A REALLY LONG PASSWORD'
+  };
+
   beforeEach(() => {
     user = new UserBuilder()
       .build();
@@ -38,6 +43,7 @@ describe(ruleName, () => {
             })
         },
       };
+      globals.configuration = configuration;
 
       rule = loadRule(ruleName, globals);
     });
@@ -71,6 +77,7 @@ describe(ruleName, () => {
             })
         },
       };
+      globals.configuration = configuration;
 
       rule = loadRule(ruleName, globals);
     });
@@ -81,7 +88,7 @@ describe(ruleName, () => {
 
         const postArgs = globals.request.post.mock.calls[0][0];
         expect(postArgs.json.username).toBe(user.email);
-        
+
         done();
       });
     });

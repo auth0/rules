@@ -10,8 +10,12 @@ describe(ruleName, () => {
   let context;
   let rule;
 
+  const configuration = {
+    MONGO_CONNECTION_STRING: 'mongodb://user:password@server:port/db'
+  }
+
   const mongo = (connString, callback) => {
-    expect(connString).toEqual('mongodb://user:password@server:port/db');
+    expect(connString).toEqual(configuration.MONGO_CONNECTION_STRING);
 
     const users = {
       findOne: (options, cb) => {
@@ -37,7 +41,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { mongo });
+    rule = loadRule(ruleName, { configuration, mongo });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

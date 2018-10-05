@@ -28,8 +28,12 @@ describe(ruleName, () => {
     }
   };
 
+  const configuration = {
+    MAILGUN_API_KEY: '{YOUR MAILGUN KEY}'
+  };
+
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0 });
+    rule = loadRule(ruleName, { auth0, configuration });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

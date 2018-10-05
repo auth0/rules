@@ -16,7 +16,7 @@ describe(ruleName, () => {
     globals = {
       request: {
         get: jest
-          .fn()  
+          .fn()
           .mockImplementationOnce((url, obj, cb) => {
             cb(null, { statusCode: 200 }, fullContactData)
           })
@@ -25,6 +25,10 @@ describe(ruleName, () => {
         users: {
           updateUserMetadata: jest.fn()
         }
+      },
+      configuration: {
+        FULLCONTACT_KEY: 'YOUR FULLCONTACT API KEY',
+        SLACK_HOOK_URL: 'YOUR SLACK HOOK URL'
       }
     };
     stubs['slack-notify'] = jest.fn()
@@ -39,8 +43,8 @@ describe(ruleName, () => {
   it('should update user metadata and context idToken with full contact data', (done) => {
     const updateUserMetadataMock = globals.auth0.users.updateUserMetadata;
     updateUserMetadataMock.mockReturnValue(Promise.resolve());
-    
-    rule(user, context, (e, u, c) => { 
+
+    rule(user, context, (e, u, c) => {
       const call = updateUserMetadataMock.mock.calls[0];
       expect(call[0]).toBe(user.user_id);
       expect(call[1].fullcontact).toBe(fullContactData);

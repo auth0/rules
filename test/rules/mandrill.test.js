@@ -28,8 +28,12 @@ describe(ruleName, () => {
     }
   };
 
+  const configuration = {
+    MANDRILL_API_KEY: 'MANDRILL_API_KEY'
+  };
+
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0 });
+    rule = loadRule(ruleName, { auth0, configuration });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

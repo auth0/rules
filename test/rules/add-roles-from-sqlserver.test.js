@@ -34,6 +34,12 @@ describe(ruleName, () => {
         Types: {
           VarChar: 'VarChar'
         }
+      },
+      configuration: {
+        SQL_DATABASE_USERNAME: '<user_name>',
+        SQL_DATABASE_PASSWORD: '<password>',
+        SQL_DATABASE_HOSTNAME: '<db_server_name>',
+        SQL_DATABASE_NAME: '<db_name>'
       }
     };
 
@@ -41,7 +47,7 @@ describe(ruleName, () => {
   });
 
   describe('when database returns roles', () => {
-    beforeEach(() => {      
+    beforeEach(() => {
       user = new UserBuilder()
         .build();
 
@@ -50,7 +56,7 @@ describe(ruleName, () => {
     });
     it('should update the idToken on the context with the roles', (done) => {
       const expectedRules = ['admin', 'collaborator'];
-      
+
       rule(user, context, (e, u, c) => {
         const roles = c.idToken['https://example.com/roles'];
         expect(roles).toContain(expectedRules[0]);

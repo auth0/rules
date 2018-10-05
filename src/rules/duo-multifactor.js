@@ -2,15 +2,15 @@
  * @overview Trigger multifactor authentication with Duo Security when a condition is met.
  * @gallery true
  * @category multifactor
- * 
+ *
  * Multifactor with Duo Security
- * 
+ *
  * This rule is used to trigger multifactor authentication with [Duo Security](http://duosecurity.com) when a condition is met.
- * 
+ *
  * Upon first login, the user can enroll the device.
- * 
+ *
  * You need to create two __integrations__ in __Duo Security__: one of type __WebSDK__ and the other __Admin SDK__.
- * 
+ *
  */
 
 function (user, context, callback) {
@@ -23,11 +23,11 @@ function (user, context, callback) {
       context.multifactor = {
         //required
         provider: 'duo',
-        ikey: 'DIXBMN...LZO8IOS8',
-        skey: 'nZLxq8GK7....saKCOLPnh',
-        host: 'api-3....049.duosecurity.com',
+        ikey: configuration.DUO_IKEY,
+        skey: configuration.DUO_SKEY,
+        host: configuration.DUO_HOST, // e.g.: 'api-XXXXXXXX.duosecurity.com',
 
-        // optional, defaults to true. Set to false to force DuoSecurity every time. 
+        // optional, defaults to true. Set to false to force DuoSecurity every time.
         // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
         allowRememberBrowser: false,
 
@@ -36,8 +36,8 @@ function (user, context, callback) {
 
         // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.
         // admin: {
-        //  ikey: 'DIAN...NV6UM',
-        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'
+        //  ikey: configuration.DUO_ADMIN_IKEY,
+        //  skey: configuration.DUO_ADMIN_SKEY
         // },
       };
     // }

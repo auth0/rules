@@ -21,11 +21,11 @@ function (user, context, callback) {
 
   request.post( {
     url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',
-	  auth:
-	  {
-  		user: 'api',
-	  	pass: '{YOUR MAILGUN KEY}'
-	  },
+      auth:
+      {
+        user: 'api',
+        pass: configuration.MAILGUN_API_KEY
+      },
     form: {
       'to': 'admin@example.com',
       'subject': 'NEW SIGNUP',

@@ -12,8 +12,13 @@ describe(ruleName, () => {
   let context;
   let rule;
 
+  const configuration = {
+    TARGET_API_CLIENT_SECRET: 'TARGET_API_CLIENT_SECRET',
+    TARGET_API_CLIENT_ID: 'TARGET_API_CLIENT_ID'
+  };
+
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    rule = loadRule(ruleName, {configuration});
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

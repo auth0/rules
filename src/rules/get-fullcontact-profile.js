@@ -2,27 +2,28 @@
  * @overview Get the user profile from FullContact using the email then add a new property to user_metadata
  * @gallery true
  * @category enrich profile
- * 
+ *
  * Enrich profile with FullContact
- * 
- * This rule gets the user profile from FullContact using the e-mail (if available). 
- * If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullContactInfo` t
- * o the user_metadata and returns. Any other conditions are ignored. 
- * 
+ *
+ * This rule gets the user profile from FullContact using the e-mail (if available).
+ * If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullContactInfo`
+ * to the user_metadata and returns. Any other conditions are ignored.
+ *
  * See FullContact docs: http://www.fullcontact.com/developer/docs/ for full details.
- * 
+ *
  */
 
 function (user, context, callback) {
-  const FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY';
-  const SLACK_HOOK = 'YOUR SLACK HOOK URL';
+  const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;
+  const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
   const slack = require('slack-notify')(SLACK_HOOK);
-  
+
   // skip if no email
-  if(!user.email) return callback(null, user, context);
+  if (!user.email) return callback(null, user, context);
   // skip if fullcontact metadata is already there
-  if(user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
+  if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
+
   request.get('https://api.fullcontact.com/v2/person.json', {
     qs: {
       email:  user.email,
@@ -31,7 +32,7 @@ function (user, context, callback) {
     json: true
   }, (error, response, body) => {
     if (error || (response && response.statusCode !== 200)) {
-      
+
       slack.alert({
         channel: '#slack_channel',
         text: 'Fullcontact API Error',

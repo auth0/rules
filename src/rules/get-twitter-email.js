@@ -2,19 +2,19 @@
  * @overview Get user email address from Twitter
  * @gallery true
  * @category enrich profile
- * 
+ *
  * Get email address from Twitter
- * 
+ *
  * NOTE: Further configuration is needed to enable fetching user emails through your Twitter App.
  * Take a look at [Twitter's doc](https://dev.twitter.com/rest/reference/get/account/verify_credentials) for specifics.
- * 
- * The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to update
- * `consumerKey` and `oauthTokenSecret` properly.
- * 
- * This rule will not persist the returned email to the Auth0 user profile, but will return it to your application. 
+ *
+ * The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to configure
+ * `consumerKey` and `consumerSecretKey` properly.
+ *
+ * This rule will not persist the returned email to the Auth0 user profile, but will return it to your application.
  * If you want to persist the email, it will need to be done with app_metadata as described here: https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata.
  * For example, you can save it under app_metadata.social_email.
- * 
+ *
  */
 
 function (user, context, callback) {
@@ -27,8 +27,8 @@ function (user, context, callback) {
   const uuid = require('uuid');
 
   const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
-  const consumerKey = 'UPDATE-WITH-YOUR-CONSUMER-KEY';
-  const consumerSecretKey = 'UPDATE-WITH-YOUR-CONSUMER-SECRET-KEY';
+  const consumerKey = configuration.TWITTER_CONSUMER_KEY;
+  const consumerSecretKey = configuration.TWITTER_CONSUMER_SECRET_KEY;
 
   const twitterIdentity = _.find(user.identities, { connection: 'twitter' });
   const oauthToken = twitterIdentity.access_token;

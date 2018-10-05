@@ -22,7 +22,7 @@ function (user, context, callback) {
     update_last_request_at: true,
     new_session: true
   };
-  const accessToken = 'YOUR INTERCOM ACCESS TOKEN';
+  const accessToken = configuration.INTERCOM_ACCESS_TOKEN;
 
   request.post({
     url: 'https://api.intercom.io/users',

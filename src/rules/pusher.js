@@ -9,8 +9,8 @@
  */
 
 function (user, context, callback) {
-  const pusherKey = 'YOUR PUSHER KEY';
-  const pusherSecret = '{YOUR PUSHER SECRET}';
+  const pusherKey = configuration.PUSHER_KEY;
+  const pusherSecret = configuration.PUSHER_SECRET;
 
   if (context.request.query.channel && context.request.query.socket_id) {
     context.idToken['https://example.com/pusherAuth'] = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);

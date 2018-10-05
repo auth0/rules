@@ -10,8 +10,8 @@
 
 function (user, context, callback) {
   const jwt = require('jsonwebtoken');
-  const CLIENT_SECRET = 'TARGET_API_CLIENT_SECRET';
-  const CLIENT_ID = 'TARGET_API_CLIENT_ID';
+  const CLIENT_SECRET = configuration.TARGET_API_CLIENT_SECRET;
+  const CLIENT_ID = configuration.TARGET_API_CLIENT_ID;
 
   //Copies user profile attributes needed in the API (equivalent to `scope`)
   const api_user = {
