@@ -5,7 +5,7 @@
   "main": "./rules",
   "scripts": {
     "preversion": "./build && git add rules.json && git commit -m 'update rules.json'",
-    "build": "./build-new",
+    "build": "./build",
     "test": "jest"
   },
   "repository": {
@@ -24,10 +24,8 @@
     "glob": "7.1.2",
     "ipaddr.js": "^1.8.1",
     "jest": "^21.2.1",
-    "js-yaml": "3.11.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "4.17.9",
-    "marked": "0.3.19",
     "moment-timezone": "^0.5.21",
     "nock": "^10.0.0",
     "parse-comments": "0.4.3",
