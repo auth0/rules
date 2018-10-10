@@ -21,11 +21,11 @@ function(user, context, callback) {
 
   const request = require('request');
 
-  const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
+  const MY_SLACK_WEBHOOK_URL = configuration.SLACK_WEBHOOK_URL;
   const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
-  const writeKey = 'YOUR KEEN IO WRITE KEY';
-  const projectId = 'YOUR KEEN IO PROJECT ID';
+  const projectId = configuration.KEEN_PROJ_ID;
+  const writeKey  = configuration.KEEN_WRITE_KEY;
   const eventCollection = 'signups';
 
   const keenEvent = {
@@ -35,9 +35,10 @@ function(user, context, callback) {
   };
 
   request.post({
-    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,
+    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection,
     headers: {
       'Content-type': 'application/json',
+      'Authorization': writeKey,
     },
     body: JSON.stringify(keenEvent),
   },

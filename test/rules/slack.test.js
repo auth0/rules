@@ -10,15 +10,18 @@ describe(ruleName, () => {
   let context;
   let rule;
   let success;
+  const configuration = {
+    SLACK_HOOK_URL: 'YOUR SLACK HOOK URL'
+  };
   const stubs = {
     'slack-notify': function(webhook) {
-      expect(webhook).toEqual('YOUR SLACK HOOK URL');
+      expect(webhook).toEqual(configuration.SLACK_HOOK_URL);
       return { success };
     }
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { UnauthorizedError: Error }, stubs);
+    rule = loadRule(ruleName, { configuration, UnauthorizedError: Error }, stubs);
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

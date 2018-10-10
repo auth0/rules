@@ -11,10 +11,10 @@
 function (user, context, callback) {
   // We check users only authenticated with 'fitbit'
   if(context.connection === 'fitbit'){
-    const whitelist = [ 'user1', 'user2' ]; //authorized users
+    const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized user emails
     const userHasAccess = whitelist.some(
-      function (name) {
-        return name === user.name;
+      function (email) {
+        return (user.email_verified && email === user.email);
       });
 
     if (!userHasAccess) {

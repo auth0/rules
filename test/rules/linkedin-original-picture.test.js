@@ -11,19 +11,24 @@ const ruleName = 'linkedin-original-picture';
 describe(ruleName, () => {
   let context;
   let rule;
+  let globals;
   const user = {
     user_id: 'uid1',
     email: 'duck.t@example.com',
     name: 'Terrified Duck',
     identities: [
       {
+        connection  : 'linkedin',
         access_token: 'access_token'
       }
     ]
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    globals = {
+      _: require('lodash')
+    };
+    rule = loadRule(ruleName, globals);
   });
 
   describe('should do nothing', () => {

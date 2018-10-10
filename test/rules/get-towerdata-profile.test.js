@@ -19,7 +19,10 @@ describe(ruleName, () => {
           .fn()
           .mockImplementationOnce((url, obj, cb) => {
             cb(null, { statusCode: 200 }, towerdataBody)
-          })   
+          })
+      },
+      configuration: {
+        TOWERDATA_API_KEY: 'YOUR towerdata API KEY'
       }
     };
 

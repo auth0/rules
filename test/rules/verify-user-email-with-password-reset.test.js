@@ -73,4 +73,20 @@ describe(ruleName, () => {
       done();
     });
   });
+
+  it('should do nothing if patch request fails', (done) => {
+    nock('https://example.com', { reqheaders: { Authorization: 'Bearer accessToken' } })
+      .intercept('/users/uid1', 'PATCH', (body) => {
+        expect(body.email_verified).toEqual(true);
+        return true;
+      })
+      .replyWithError('whoops');
+
+    rule({ user_id: 'uid1', last_password_reset: true }, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c.idToken.email_verified).toEqual(false);
+      done();
+    });
+  });
+
 });

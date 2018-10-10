@@ -11,7 +11,7 @@
 function (user, context, callback) {
   const request = require('request');
   const userApiUrl = auth0.baseUrl + '/users/';
-  
+
   // This rule is only for Auth0 databases
   if (context.connectionStrategy !== 'auth0') {
     return callback(null, user, context);
@@ -26,13 +26,17 @@ function (user, context, callback) {
       },
       json: { email_verified: true },
       timeout: 5000
-    }, 
+    },
     function(err, response, body) {
-      // Setting email verified isn't propaged to id_token in this 
-      // authentication cycle so explicitly set it to true 
-      context.idToken.email_verified = true;
+      // Setting email verified isn't propagated to id_token in this
+      // authentication cycle so explicitly set it to true given no errors.
+      if (err) {
+        context.idToken.email_verified = false;
+      } else {
+        context.idToken.email_verified = true;
+      };
 
-      // Always return with success, ignore any management api errors 
+      // Return with success at this point.
       return callback(null, user, context);
     });
   } else {

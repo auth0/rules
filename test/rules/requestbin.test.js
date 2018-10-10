@@ -22,7 +22,7 @@ describe(ruleName, () => {
   });
 
   it('should return error if call fails', (done) => {
-    nock('http://requestbin.fullcontact.com')
+    nock('https://requestbin.fullcontact.com')
       .post('/YourBinUrl', function() {
         return true;
       })
@@ -43,10 +43,26 @@ describe(ruleName, () => {
       email: 'duck.t@example.com'
     };
 
-    nock('http://requestbin.fullcontact.com')
+    function filter(dict, whitelist) {
+      var filtered = {};
+      Object.keys(dict).forEach(function(key) {
+        if (whitelist.indexOf(key) >= 0) {
+          filtered[key] = dict[key];
+        }
+      });
+      return filtered;
+    }
+
+    const user_whitelist = ['user_id', 'email', 'email_verified'];
+    const user_filtered  = filter(user, user_whitelist);
+
+    const context_whitelist = ['clientID', 'connection', 'stats'];
+    const context_filtered  = filter(context, context_whitelist);
+
+    nock('https://requestbin.fullcontact.com')
       .post('/YourBinUrl', function(body) {
-        expect(body.user).toEqual(user);
-        expect(body.context).toEqual(context);
+        expect(body.user).toEqual(user_filtered);
+        expect(body.context).toEqual(context_filtered);
         return true;
       })
       .reply(200);

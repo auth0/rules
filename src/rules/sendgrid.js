@@ -24,7 +24,7 @@ function (user, context, callback) {
   request.post({
     url: 'https://api.sendgrid.com/api/mail.send.json',
     headers: {
-      'Authorization': 'Bearer ...'
+      'Authorization': 'Bearer ' + configuration.SENDGRID_API_KEY
     },
     form: {
       'to': 'admin@example.com',

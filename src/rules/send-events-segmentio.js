@@ -42,9 +42,10 @@ function (user, context, callback) {
     // you must use Segment's Debugger (https://segment.com/docs/libraries/http/#errors)
     request({
       method: 'POST',
-      url: 'https://SEGMENTIO_WRITE_KEY@api.segment.io/v1/track',
+      url: 'https://api.segment.io/v1/track',
       headers: {
-        'Content-type': 'application/json',
+        'Content-type' : 'application/json',
+        'Authorization': 'Basic ' + Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ':').toString('base64')
       },
       body: JSON.stringify(sioTrack),
     });

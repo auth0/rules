@@ -49,7 +49,7 @@ function (user, context, callback) {
     const originalUser = data[0];
     const provider = user.identities[0].provider;
     const providerUserId = user.identities[0].user_id;
-    
+
     request.post({
       url: userApiUrl + '/' + originalUser.user_id + '/identities',
       headers: {

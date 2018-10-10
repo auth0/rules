@@ -22,7 +22,6 @@ function (user, context, callback) {
 
   user.app_metadata = user.app_metadata || {};
   const endpoint = 'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; // replace with your Splunk HEC endpoint;
-  const token = 'YOUR_SPLUNK_HEC_TOKEN';
 
   //Add any interesting info to the event
   const hec_event = {
@@ -41,7 +40,7 @@ function (user, context, callback) {
   request.post({
     url: endpoint,
     headers: {
-      'Authorization': 'Splunk ' + token
+      'Authorization': 'Splunk ' + configuration.SPLUNK_HEC_TOKEN
     },
     strictSSL: true, // set to false if using a self-signed cert
     json: hec_event

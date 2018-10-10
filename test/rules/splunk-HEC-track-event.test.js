@@ -12,6 +12,10 @@ describe(ruleName, () => {
   let context;
   let rule;
 
+  const configuration = {
+    SPLUNK_HEC_TOKEN: 'YOUR_SPLUNK_HEC_TOKEN'
+  };
+
   const auth0 = {
     users: {
       updateAppMetadata: (id, metadata) => {
@@ -28,7 +32,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0 });
+    rule = loadRule(ruleName, { configuration, auth0 });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

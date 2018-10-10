@@ -2,11 +2,11 @@
  * @overview Disable signups from social connections.
  * @gallery true
  * @category access control
- * 
+ *
  * Disable social signups
- * 
+ *
  * This rule is used to prevent signups using social connections.
- * 
+ *
  */
 
 function (user, context, callback) {
@@ -19,13 +19,14 @@ function (user, context, callback) {
 
   // initialize app_metadata
   user.app_metadata = user.app_metadata || {};
-  
+
+  const is_social = context.connectionStrategy === context.connection;
   // if it is the first login (hence the `signup`) and it is a social login
-  if (context.stats.loginsCount === 1 && user.identities[0].isSocial) {
-    
+  if (context.stats.loginsCount === 1 && is_social) {
+
     // turn on the flag
-    user.app_metadata.is_signup = true; 
-    
+    user.app_metadata.is_signup = true;
+
     // store the app_metadata
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
       .then(function(){
@@ -35,15 +36,15 @@ function (user, context, callback) {
       .catch(function(err){
         callback(err);
       });
-    
+
     return;
   }
-  
+
   // if flag is enabled, throw error
   if (user.app_metadata.is_signup) {
     return callback(new Error('Signup disabled'));
   }
-  
+
   // else it is a non social login or it is not a signup
   callback(null, user, context);
 }

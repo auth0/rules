@@ -15,7 +15,7 @@ function(user, context, callback) {
   }
 
   // get your slack's hook url from: https://slack.com/services/10525858050
-  const SLACK_HOOK = 'YOUR SLACK HOOK URL';
+  const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
   const slack = require('slack-notify')(SLACK_HOOK);
   const message = 'New User: ' + (user.name || user.email) + ' (' + user.email + ')';
@@ -25,7 +25,7 @@ function(user, context, callback) {
    text: message,
    channel: channel
   });
-  
+
   // don’t wait for the Slack API call to finish, return right away (the request will continue on the sandbox)`
   callback(null, user, context);
 }
