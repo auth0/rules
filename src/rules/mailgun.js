@@ -1,9 +1,8 @@
 /**
- * @overview Send an email to an administrator on the first login of a user using Mailgun
+ * @title Send emails through Mailgun
+ * @overview Send an email to an administrator on the first login of a user using Mailgun.
  * @gallery true
  * @category webhook
- *
- * Send emails through Mailgun
  *
  * This rule will send an email to an administrator on the first login of a user using [Mailgun](https://mailgun.com).
  *

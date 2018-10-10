@@ -1,9 +1,8 @@
 /**
+ * @title Send events to Keen
  * @overview Send a signup event to Keen IO, tracked by the user.signedUp property
  * @gallery true
  * @category webhook
- *
- * Send events to Keen
  *
  * This rule is used to send a `signup` event to [Keen IO](http://keen.io)
  *
@@ -12,6 +11,7 @@
  *
  * Once enabled, events will be displayed on Keen IO dashboard:
  * ![](http://puu.sh/7k4qN.png)
+ *
  */
 
 function(user, context, callback) {
@@ -31,7 +31,7 @@ function(user, context, callback) {
   const keenEvent = {
     userId: user.user_id,
     name: user.name,
-    ip: context.request.ip //Potentially any other properties in the user profile/context
+    ip: context.request.ip // Potentially any other properties in the user profile/context
   };
 
   request.post({
@@ -43,7 +43,7 @@ function(user, context, callback) {
     body: JSON.stringify(keenEvent),
   },
   function (error, response, body) {
-    if(error || (response && response.statusCode !== 200) ) {
+    if (error || (response && response.statusCode !== 200)) {
       slack.alert({
         channel: '#some_channel',
         text: 'KEEN API ERROR',

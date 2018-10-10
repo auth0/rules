@@ -1,13 +1,13 @@
 /**
- * @overview Guardian mfa + authorization extension working together
+ * @title Multifactor with Auth0 Guardian + Authorization Extension
+ * @overview Guardian mfa + authorization extension working together.
  * @gallery true
- * @category multifactor guardian
+ * @category multifactor, guardian
  *
- * Multifactor with Auth0 Guardian + Authorization Extension
- * This rule is used to trigger multifactor authentication with Auth0 for
- * or more groups on the authorization extension.
+ * This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.
  *
  * Upon first login, the user can enroll the device.
+ *
  */
 
 function (user, context, callback) {

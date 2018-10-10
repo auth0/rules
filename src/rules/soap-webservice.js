@@ -1,11 +1,11 @@
 /**
- * @overview Show how to query a basic profile http binding SOAP web service for roles
+ * @title Roles from a SOAP Service
+ * @overview Show how to query a basic profile http binding SOAP web service for roles.
  * @gallery true
  * @category enrich profile
  *
- * Roles from a SOAP Service
- *
  * This rule shows how to query a basic profile http binding SOAP web service for roles and add those to the user.
+ *
  */
 
 function (user, context, callback) {

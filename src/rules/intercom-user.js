@@ -1,11 +1,11 @@
 /**
- * @overview Guardian mfa + authorization extension working together
+ * @title Record or update an Intercom User
+ * @overview Call the Intercom API to record/update an User.
  * @gallery true
  * @category webhook
  *
- * Record or update an Intercom User
- *
  * This rule will call the Intercom API to create a new contact or update an existing contact's activity, whenever there is a signup or login with Auth0.
+ *
  */
 
 function (user, context, callback) {

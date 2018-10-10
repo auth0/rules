@@ -1,10 +1,11 @@
 /**
- * @overview Default picture for null avatars.
+ * @title Default picture for null avatars
+ * @overview Set a default picture for null avatars.
  * @gallery true
  * @category enrich profile
- * 
- * Set a default picture for null avatars
- * 
+ *
+ * This rule will set a default picture for null avatars via a rule for email-based logins:
+ *
  */
 
 function (user, context, callback) {

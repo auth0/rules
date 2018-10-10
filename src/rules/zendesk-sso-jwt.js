@@ -1,15 +1,15 @@
 /**
- * @overview Zendesk SSO for users using JWT
+ * @title Zendesk SSO for users using JWT
+ * @overview Zendesk SSO for users using JWT.
  * @gallery false
  * @category access control
- *
- * Zendesk SSO for users using JWT
  *
  * The specific details for how this works can be read here: https://support.zendesk.com/hc/en-us/articles/203663816-Setting-up-single-sign-on-with-JWT-JSON-Web-Token-
  *
  * This rule assumes you've set a configuration variable named `ZENDESK_JWT_SECRET`.
  *
  * When the user authenticates, redirect to the URL returned in the `https://example.com/zendesk_jwt_url` claim, optionally adding the `return_to` query string parameter.
+ *
  */
 
 function (user, context, callback) {

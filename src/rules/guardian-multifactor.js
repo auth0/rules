@@ -1,19 +1,23 @@
 /**
- * @overview Trigger multifactor authentication with Auth0 when a condition is met
+ * @title Multifactor with Auth0 Guardian
+ * @overview Trigger multifactor authentication with Auth0 when a condition is met.
  * @gallery true
- * @category multifactor guardian
+ * @category multifactor, guardian
  *
- * Multifactor with Auth0 Guardian
  * This rule is used to trigger multifactor authentication with Auth0 when a condition is met.
+ *
  * Upon first login, the user can enroll the device.
+ *
  */
 
 function (user, context, callback) {
   //const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];
+
   // run only for the specified clients
-  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {
-    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true
-    // if (user.user_metadata && user.user_metadata.use_mfa){
+  //if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {
+
+  // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true
+    //if (user.user_metadata && user.user_metadata.use_mfa){
       context.multifactor = {
         // required
         provider: 'guardian',
@@ -22,7 +26,7 @@ function (user, context, callback) {
         // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
         allowRememberBrowser: false
       };
-    // }
+    //}
   //}
 
   callback(null, user, context);

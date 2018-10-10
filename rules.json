@@ -5,155 +5,162 @@
       {
         "id": "access-on-weekdays-only-for-an-app",
         "title": "Allow Access during weekdays for a specific App",
+        "overview": "Prevent access to app during weekends.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule is used to prevent access during weekends for a specific app.</p>\n",
-        "code": "function (user, context, callback) {\n\n  if (context.clientName === 'TheAppToCheckAccessTo') {\n    var d = new Date().getDay();\n\n    if (d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to prevent access during weekends for a specific app.</p>",
+        "code": "function (user, context, callback) {\n\n  if (context.clientName === 'TheAppToCheckAccessTo') {\n    const d = Date.getDay();\n\n    if (d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "active-directory-groups",
         "title": "Active Directory group membership",
+        "overview": "Check Active Directory membership, else return Access Denied.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule checks if a user belongs to an AD group and if not, it will return Access Denied.</p>\n<blockquote>\n<p>Note: you can mix this with <code>context.clientID</code> or <code>clientName</code> to do it only for specific application</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n    var groupAllowed = 'group1';\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "description": "<p>This rule checks if a user belongs to an AD group and if not, it will return Access Denied.</p>\n<blockquote>\n  <p>Note: you can mix this with <code>context.clientID</code> or <code>clientName</code> to do it only for specific application</p>\n</blockquote>",
+        "code": "function (user, context, callback) {\n  var groupAllowed = 'group1';\n  var userHasAccess = user.groups.some(\n    function (group) {\n      return groupAllowed === group;\n    });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "check-domains-against-connection-aliases",
-        "title": "Check user email domain matches domains configured in connection",
+        "title": "Check if user email domain matches configured domain",
+        "overview": "Check user email domain matches domains configured in connection.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule checks if the user&#39;s login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.</p>\n<p>Use this rule to only allow users from specific email domains to login.</p>\n<p>For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.</p>\n",
-        "code": "function (user, context, callback) {\n  const connectionOptions = context.connectionOptions;\n  const domainAliases = connectionOptions.domain_aliases || [];\n  const tenantDomain = connectionOptions.tenant_domain;\n\n  // No domains -> access allowed\n  if (!tenantDomain && !domainAliases.length) {\n    return callback(null, user, context);\n  }\n\n  // Domain aliases exist but no tenant domain exists\n  if (domainAliases.length && !tenantDomain) return callback('Access denied');\n\n  let allowedDomains = new Set([tenantDomain]);\n  domainAliases.forEach(function (alias) {\n    if (alias) allowedDomains.add(alias.toLowerCase());\n  });\n\n  // Access allowed if domain is found\n  const userEmailDomain = user.email.split('@')[1].toLowerCase();\n  if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);\n\n  return callback('Access denied');\n}"
+        "description": "<p>This rule checks if the user's login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.</p>\n<p>Use this rule to only allow users from specific email domains to login.</p>\n<p>For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.</p>",
+        "code": " function (user, context, callback) {\n  const connectionOptions = context.connectionOptions;\n  const domainAliases = connectionOptions.domain_aliases || [];\n  const tenantDomain = connectionOptions.tenant_domain;\n\n  if (!tenantDomain && !domainAliases.length) {\n    return callback(null, user, context);\n  }\n\n  if (domainAliases.length && !tenantDomain) return callback('Access denied');\n\n  const allowedDomains = new Set([tenantDomain]);\n  domainAliases.forEach(function (alias) {\n    if (alias) allowedDomains.add(alias.toLowerCase());\n  });\n\n  const emailSplit = user.email.split('@');\n  const userEmailDomain = emailSplit[emailSplit.length - 1].toLowerCase();\n  if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);\n\n  return callback('Access denied');\n}\n"
       },
       {
-        "id": "check_last_password_reset",
+        "id": "check-last-password-reset",
         "title": "Check last password reset",
+        "overview": "Check the last time that a user changed his or her account password.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will check the last time that a user changed his or her account password.</p>\n",
-        "code": "function (user, context, callback) {\n\n  function daydiff (first, second) {\n    return (second-first)/(1000*60*60*24);\n  }\n\n  var last_password_change = user.last_password_reset || user.created_at;\n\n  if (daydiff(new Date(last_password_change), new Date()) > 30) {\n    return callback(new UnauthorizedError('please change your password'));\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will check the last time that a user changed his or her account password.</p>",
+        "code": "function (user, context, callback) {\n  function daydiff (first, second) {\n    return (second-first)/(1000*60*60*24);\n  }\n\n  const last_password_change = user.last_password_reset || user.created_at;\n\n  if (daydiff(new Date(last_password_change), new Date()) > 30) {\n    return callback(new UnauthorizedError('please change your password'));\n  }\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "disable-resource-owner",
         "title": "Disable the Resource Owner endpoint",
+        "overview": "Disable the Resource Owner endpoint to prevent users from bypassing MFA policies.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule is used to disable the Resource Owner endpoint (to prevent users from bypassing MFA policies).</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.protocol === 'oauth2-resource-owner') {\n    return callback(\n      new UnauthorizedError('The resource owner endpoint cannot be used.'));\n  }\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to disable the Resource Owner endpoint (to prevent users from bypassing MFA policies).</p>",
+        "code": "function (user, context, callback) {\n  if (context.protocol === 'oauth2-resource-owner') {\n    return callback(\n      new UnauthorizedError('The resource owner endpoint cannot be used.'));\n  }\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "disable-social-signup",
         "title": "Disable social signups",
+        "overview": "Disable signups from social connections.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule is used to prevent signups using social connections.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var CLIENTS_ENABLED = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_ENABLED.indexOf(context.clientID) === -1) {\n    return callback(null, user, context);\n  }\n\n  // initialize app_metadata\n  user.app_metadata = user.app_metadata || {};\n\n  // if it is the first login (hence the `signup`) and it is a social login\n  if (context.stats.loginsCount === 1 && user.identities[0].isSocial) {\n\n    // turn on the flag\n    user.app_metadata.is_signup = true; \n\n    // store the app_metadata\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        // throw error\n        return callback('Signup disabled');\n      })\n      .catch(function(err){\n        callback(err);\n      });\n\n    return;\n  } \n\n  // if flag is enabled, throw error\n  if (user.app_metadata.is_signup) {\n    return callback('Signup disabled');\n  }\n\n  // else it is a non social login or it is not a signup\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to prevent signups using social connections.</p>",
+        "code": "function (user, context, callback) {\n\n  const CLIENTS_ENABLED = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  if (CLIENTS_ENABLED.indexOf(context.clientID) === -1) {\n    return callback(null, user, context);\n  }\n\n  user.app_metadata = user.app_metadata || {};\n\n  if (context.stats.loginsCount === 1 && user.identities[0].isSocial) {\n\n    user.app_metadata.is_signup = true;\n\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        return callback(new Error('Signup disabled'));\n      })\n      .catch(function(err){\n        callback(err);\n      });\n\n    return;\n  }\n\n  if (user.app_metadata.is_signup) {\n    return callback(new Error('Signup disabled'));\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "dropbox-whitelist",
         "title": "Whitelist on the cloud",
+        "overview": "Determine access to users based on a whitelist of emails stored in Dropbox.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule denies/grant access to users based on a list of emails stored in Dropbox.</p>\n",
-        "code": "function (user, context, callback) {\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/21665105/users.txt'\n  }, function (err, response, body) {\n    var whitelist = body.split('\\r\\n');\n\n    var userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule denies/grant access to users based on a list of emails stored in Dropbox.</p>",
+        "code": "function (user, context, callback) {\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/21665105/users.txt'\n  }, (err, response, body) => {\n    const whitelist = body.split('\\n');\n\n    const userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "email-verified",
         "title": "Force email verification",
+        "overview": "Only allow access to users with verified emails.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access users that have verified their emails.\nNote that it might be a better UX to make this verification from your application.</p>\n<p>If you are using <a href=\"https://auth0.com/docs/lock\">Lock</a>, the default behavior is to log in a user immediately after they have signed up.\nTo prevent this from immediately displaying an error to the user, you can pass the following option to <code>lock.show()</code> or similar: <code>loginAfterSignup: false</code>.\nIf you are using <a href=\"https://auth0.com/docs/libraries/auth0js\">auth0.js</a>, the equivalent option is <code>auto_login: false</code>.</p>\n",
-        "code": "function (user, context, callback) {\n  if (!user.email_verified) {\n    return callback(new UnauthorizedError('Please verify your email before logging in.'));\n  } else {\n    return callback(null, user, context);\n  }\n}"
+        "description": "<p>This rule will only allow access users that have verified their emails.\nNote that it might be a better UX to make this verification from your application.</p>\n<p>If you are using <a href=\"https://auth0.com/docs/lock\">Lock</a>, the default behavior is to log in a user immediately after they have signed up.\nTo prevent this from immediately displaying an error to the user, you can pass the following option to <code>lock.show()</code> or similar: <code>loginAfterSignup: false</code>.\nIf you are using <a href=\"https://auth0.com/docs/libraries/auth0js\">auth0.js</a>, the equivalent option is <code>auto_login: false</code>.</p>",
+        "code": "function (user, context, callback) {\n  if (!user.email_verified) {\n    return callback(new UnauthorizedError('Please verify your email before logging in.'));\n  } else {\n    return callback(null, user, context);\n  }\n}\n"
       },
       {
         "id": "ip-address-whitelist",
         "title": "IP Address whitelist",
+        "overview": "Only allow access to an app from a specific set of IP addresses.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access to an app from a specific set of IP addresses</p>\n",
-        "code": "function (user, context, callback) {\n    var whitelist = ['1.2.3.4', '2.3.4.5']; //authorized IPs\n    var userHasAccess = whitelist.some(\n      function (ip) {\n        return context.request.ip === ip;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied from this IP address.'));\n    }\n\n    return callback(null, user, context);\n}"
+        "description": "<p>This rule will only allow access to an app from a specific set of IP addresses</p>",
+        "code": "function (user, context, callback) {\n  const whitelist = ['1.2.3.4', '2.3.4.5']; \n  const userHasAccess = whitelist.some(function (ip) {\n    return context.request.ip === ip;\n  });\n\n  if (!userHasAccess) {\n    return callback(new Error('Access denied from this IP address.'));\n  }\n\n  return callback(null, user, context);\n}\n"
       },
       {
         "id": "link-users-by-email-with-metadata",
         "title": "Link Accounts with Same Email Address while Merging Metadata",
+        "overview": "Link any accounts that have the same email address while merging metadata.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will link any accounts that have the same email address while merging metadata.</p>\n",
-        "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n  var userApiUrl = auth0.baseUrl + '/users';\n  var userSearchApiUrl = auth0.baseUrl + '/users-by-email';\n\n  request({\n   url: userSearchApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     email: user.email\n   }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    // Ignore non-verified users and current user, if present\n    data = data.filter(function(u) {\n      return u.email_verified && (u.user_id !== user.user_id);\n    });\n\n    if (data.length > 1) {\n      return callback(new Error('[!] Rule: Multiple user profiles already exist - cannot select base profile to link with'));\n    }\n    if (data.length === 0) {\n      console.log('[-] Skipping link rule');\n      return callback(null, user, context);\n    }\n\n    var originalUser = data[0];\n    var provider = user.identities[0].provider;\n    var providerUserId = user.identities[0].user_id;\n\n    user.app_metadata = user.app_metadata || {};\n    user.user_metadata = user.user_metadata || {};\n    auth0.users.updateAppMetadata(originalUser.user_id, user.app_metadata)\n    .then(auth0.users.updateUserMetadata(originalUser.user_id, user.user_metadata))\n    .then(function(){\n      request.post({\n        url: userApiUrl + '/' + originalUser.user_id + '/identities',\n        headers: {\n          Authorization: 'Bearer ' + auth0.accessToken\n        },\n        json: { provider: provider, user_id: String(providerUserId) }\n      }, function(err, response, body) {\n          if (response && response.statusCode >= 400) {\n            return callback(new Error('Error linking account: ' + response.statusMessage));\n          }\n          context.primaryUser = originalUser.user_id;\n          callback(null, user, context);\n      });\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
+        "description": "<p>This rule will link any accounts that have the same email address while merging metadata.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  const userApiUrl = auth0.baseUrl + '/users';\n  const userSearchApiUrl = auth0.baseUrl + '/users-by-email';\n\n  request({\n   url: userSearchApiUrl,\n   headers: {\n     Authorization: 'Bearer ' + auth0.accessToken\n   },\n   qs: {\n     email: user.email\n   }\n  },\n  function (err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    data = data.filter(function (u) {\n      return u.email_verified && (u.user_id !== user.user_id);\n    });\n\n    if (data.length > 1) {\n      return callback(new Error('[!] Rule: Multiple user profiles already exist - cannot select base profile to link with'));\n    }\n    if (data.length === 0) {\n      console.log('[-] Skipping link rule');\n      return callback(null, user, context);\n    }\n\n    const originalUser = data[0];\n    const provider = user.identities[0].provider;\n    const providerUserId = user.identities[0].user_id;\n\n    user.app_metadata = user.app_metadata || {};\n    user.user_metadata = user.user_metadata || {};\n    auth0.users.updateAppMetadata(originalUser.user_id, user.app_metadata)\n    .then(auth0.users.updateUserMetadata(originalUser.user_id, user.user_metadata))\n    .then(function() {\n      request.post({\n        url: userApiUrl + '/' + originalUser.user_id + '/identities',\n        headers: {\n          Authorization: 'Bearer ' + auth0.accessToken\n        },\n        json: { provider: provider, user_id: String(providerUserId) }\n      }, function (err, response, body) {\n          if (response && response.statusCode >= 400) {\n            return callback(new Error('Error linking account: ' + response.statusMessage));\n          }\n          context.primaryUser = originalUser.user_id;\n          callback(null, user, context);\n      });\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n  });\n}\n"
       },
       {
         "id": "link-users-by-email",
         "title": "Link Accounts with Same Email Address",
+        "overview": "Link any accounts that have the same email address.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will link any accounts that have the same email address.</p>\n<blockquote>\n<p>Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on <a href=\"https://auth0.com/docs/link-accounts\">Linking Accounts</a> for more details.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  // Check if email is verified, we shouldn't automatically\n  // merge accounts if this is not the case.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n  var userApiUrl = auth0.baseUrl + '/users';\n  var userSearchApiUrl = auth0.baseUrl + '/users-by-email';\n\n  request({\n    url: userSearchApiUrl,\n    headers: {\n      Authorization: 'Bearer ' + auth0.accessToken\n    },\n    qs: {\n      email: user.email\n    }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    // Ignore non-verified users and current user, if present\n    data = data.filter(function(u) {\n      return u.email_verified && (u.user_id !== user.user_id);\n    });\n\n    if (data.length > 1) {\n      return callback(new Error('[!] Rule: Multiple user profiles already exist - cannot select base profile to link with'));\n    }\n    if (data.length === 0) {\n      console.log('[-] Skipping link rule');\n      return callback(null, user, context);\n    }\n\n    var originalUser = data[0];\n    var provider = user.identities[0].provider;\n    var providerUserId = user.identities[0].user_id;\n\n    request.post({\n      url: userApiUrl + '/' + originalUser.user_id + '/identities',\n      headers: {\n        Authorization: 'Bearer ' + auth0.accessToken\n      },\n      json: {\n        provider: provider,\n        user_id: String(providerUserId)\n      }\n    }, function(err, response, body) {\n      if (response.statusCode >= 400) {\n        return callback(new Error('Error linking account: ' + response.statusMessage));\n      }\n      context.primaryUser = originalUser.user_id;\n      callback(null, user, context);\n    });\n  });\n}"
+        "description": "<p>This rule will link any accounts that have the same email address.</p>\n<blockquote>\n  <p>Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on <a href=\"https://auth0.com/docs/link-accounts\">Linking Accounts</a> for more details.</p>\n</blockquote>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n  const userApiUrl = auth0.baseUrl + '/users';\n  const userSearchApiUrl = auth0.baseUrl + '/users-by-email';\n\n  request({\n    url: userSearchApiUrl,\n    headers: {\n      Authorization: 'Bearer ' + auth0.accessToken\n    },\n    qs: {\n      email: user.email\n    }\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    var data = JSON.parse(body);\n    data = data.filter(function(u) {\n      return u.email_verified && (u.user_id !== user.user_id);\n    });\n\n    if (data.length > 1) {\n      return callback(new Error('[!] Rule: Multiple user profiles already exist - cannot select base profile to link with'));\n    }\n    if (data.length === 0) {\n      console.log('[-] Skipping link rule');\n      return callback(null, user, context);\n    }\n\n    const originalUser = data[0];\n    const provider = user.identities[0].provider;\n    const providerUserId = user.identities[0].user_id;\n\n    request.post({\n      url: userApiUrl + '/' + originalUser.user_id + '/identities',\n      headers: {\n        Authorization: 'Bearer ' + auth0.accessToken\n      },\n      json: {\n        provider: provider,\n        user_id: String(providerUserId)\n      }\n    }, function(err, response, body) {\n      if (response.statusCode >= 400) {\n        return callback(new Error('Error linking account: ' + response.statusMessage));\n      }\n      context.primaryUser = originalUser.user_id;\n      callback(null, user, context);\n    });\n  });\n}\n"
       },
       {
         "id": "roles-creation",
         "title": "Set roles to a user",
+        "overview": "Add a Roles field to the user based on some pattern.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule adds a Roles field to the user based on some pattern</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  var addRolesToUser = function(user, cb) {\n    var endsWith = '@example.com';\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      cb(null, ['admin']);\n    } else {\n      cb(null, ['user']);\n    }\n  };\n\n  addRolesToUser(user, function(err, roles) {\n    if (err) {\n      callback(err);\n    } else {\n      user.app_metadata.roles = roles;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  });\n}"
+        "description": "<p>This rule adds a Roles field to the user based on some pattern.</p>",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  const addRolesToUser = function(user) {\n    const endsWith = '@example.com';\n\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      return ['admin']\n    }\n    return ['user'];\n  };\n\n  const roles = addRolesToUser(user);\n\n  user.app_metadata.roles = roles;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function() {\n      context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n      callback(null, user, context);\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n}\n"
       },
       {
         "id": "simple-domain-whitelist",
         "title": "Email domain whitelist",
+        "overview": "Only allow access to users with specific whitelist email domains.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access to users with specific email domains.</p>\n",
-        "code": "function (user, context, callback) {\n    var whitelist = ['example.com', 'example.org']; //authorized domains\n    var userHasAccess = whitelist.some(\n      function (domain) {\n        var emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    return callback(null, user, context);\n}"
+        "description": "<p>This rule will only allow access to users with specific email domains.</p>",
+        "code": "function (user, context, callback) {\n  const whitelist = ['example.com', 'example.org']; \n  const userHasAccess = whitelist.some(\n      function (domain) {\n        const emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  return callback(null, user, context);\n}\n"
       },
       {
         "id": "simple-user-whitelist-for-app",
         "title": "Whitelist for a Specific App",
+        "overview": "Only allow access to users with whitelist email addresses on a specific app",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access to users with specific email addresses on a specific app.</p>\n",
-        "code": "function (user, context, callback) {\n    //we just care about NameOfTheAppWithWhiteList\n    //bypass this rule for every other app\n    if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n      return callback(null, user, context);\n    }\n\n    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "description": "<p>This rule will only allow access to users with specific email addresses on a specific app.</p>",
+        "code": "function (user, context, callback) {\n  if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n  const userHasAccess = whitelist.some(function (email) {\n    return email === user.email;\n  });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "simple-user-whitelist",
         "title": "Whitelist",
+        "overview": "Only allow access to users with specific whitelist email addresses.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access to users with specific email addresses.</p>\n",
-        "code": "function (user, context, callback) {\n    var whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n    var userHasAccess = whitelist.some(\n      function (email) {\n        return email === user.email;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n}"
+        "description": "<p>This rule will only allow access to users with specific email addresses.</p>",
+        "code": "function (user, context, callback) {\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n  const userHasAccess = whitelist.some(\n    function (email) {\n      return email === user.email;\n    });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "simple-whitelist-on-a-connection",
         "title": "Whitelist on Specific Connection",
+        "overview": "Only allow access to users coming from a whitelist on specific connection.",
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).</p>\n",
-        "code": "function (user, context, callback) {\n\n    // We check users only authenticated with 'fitbit'\n    if(context.connection === 'fitbit'){\n\n      var whitelist = [ 'user1', 'user2' ]; //authorized users\n      var userHasAccess = whitelist.some(\n        function (name) {\n          return name === user.name;\n        });\n\n      if (!userHasAccess) {\n        return callback(new UnauthorizedError('Access denied.'));\n      }\n    }\n\n    callback(null, user, context);\n}"
-      },
-      {
-        "id": "thisdata-deny-anomalies",
-        "title": "Account Takeover Prevention via ThisData",
-        "categories": [
-          "access control"
-        ],
-        "description": "<p>This rule is designed to detect phished or compromised user accounts and block\nattackers from logging in to hacked accounts. Even if the primary user\nauthentication is approved (e.g. correct username and password) it will deny\naccess if the login appears to be highly suspicious.</p>\n<p>It uses <a href=\"https://thisdata.com\">ThisData&#39;s</a> anomaly detection\nalgorithms which take into account many behavioral factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>This rule uses ThisData&#39;s API to get a risk score for the login, and then blocks\nthe login by raising an <code>UnauthorizedError</code> error if the risk is very high.</p>\n<p>You will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n<p><strong>Important</strong> This rule should be used with the &quot;Account Takeover Detection via ThisData&quot;\nAuth0 rule, which allows you to teach our algorithms about your users. Using\nboth rules allows you to achieve results of higher accuracy.</p>\n<p>Read our guide &quot;How to add login anomaly detection to Auth0&quot;\n  <a href=\"https://thisdata.com/blog/how-to-add-login-anomaly-detection-to-auth0/\">https://thisdata.com/blog/how-to-add-login-anomaly-detection-to-auth0/</a></p>\n<p>Contact ThisData: <a href=\"mailto:support@thisdata.com\">support@thisdata.com</a></p>\n",
-        "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  // 0.85 will generally block irregular Tor usage\n  // or sudden changes in location and device\n  var riskLimit = 0.85;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/verify?api_key=' + apiKey,\n    json: {\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options, function(e, r, b){\n    if(e || r.statusCode !== 200){\n      // If anything fails dont block the login\n      callback(null, user, context);\n    } else {\n\n      // If the risk is high then block the login\n      if(b.score >= riskLimit){\n        return callback(new UnauthorizedError('Login anomaly detected by ThisData. Risk: ' + b.score));\n      }\n\n      callback(null, user, context);\n    }\n  });\n}"
+        "description": "<p>This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).</p>",
+        "code": "function (user, context, callback) {\n  if (context.connection === 'fitbit'){\n    const whitelist = [ 'user1', 'user2' ]; \n    const userHasAccess = whitelist.some(function (name) {\n      return name === user.name;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n  }\n\n  callback(null, user, context);\n}\n"
       }
     ]
   },
@@ -163,164 +170,182 @@
       {
         "id": "add-attributes",
         "title": "Add attributes to a user for specific connection",
+        "overview": "Add attributes to a user for specific connection.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won&#39;t be persisted to the user). This is useful for cases where you want to enrich the user information for a specific application.</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    context.idToken['https://example.com/vip'] = true;\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won't be persisted to the user).\nThis is useful for cases where you want to enrich the user information for a specific application.</p>",
+        "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    context.idToken['https://example.com/vip'] = true;\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "add-country",
         "title": "Add country to the user profile",
+        "overview": "Add a country attribute to the user based on their IP address.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will add a <code>country</code> attribute to the user based on their ip address.</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.request.geoip) {\n    context.idToken['https://example.com/country'] = context.request.geoip.country_name;\n    context.idToken['https://example.com/timezone'] = context.request.geoip.time_zone;\n  }\n\n   // Example geoip object:\n   // \"geoip\": {\n   //    \"country_code\": \"AR\",\n   //    \"country_code3\": \"ARG\",\n   //    \"country_name\": \"Argentina\",\n   //    \"region\": \"05\",\n   //    \"city\": \"Cordoba\",\n   //    \"latitude\": -31.41349983215332,\n   //    \"longitude\": -64.18109893798828,\n   //    \"continent_code\": \"SA\",\n   //    \"time_zone\": \"America/Argentina/Cordoba\"\n   //  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will add a <code>country</code> attribute to the user based on their ip address.</p>\n<p>Example geoip object:</p>\n<pre><code>\"geoip\": {\n    \"country_code\": \"AR\",\n    \"country_code3\": \"ARG\",\n    \"country_name\": \"Argentina\",\n    \"region\": \"05\",\n    \"city\": \"Cordoba\",\n    \"latitude\": -31.41349983215332,\n    \"longitude\": -64.18109893798828,\n    \"continent_code\": \"SA\",\n    \"time_zone\": \"America/Argentina/Cordoba\"\n}\n</code></pre>",
+        "code": "function (user, context, callback) {\n  if (context.request.geoip) {\n    context.idToken['https://example.com/country'] = context.request.geoip.country_name;\n    context.idToken['https://example.com/timezone'] = context.request.geoip.time_zone;\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "add-income",
         "title": "Add zipcode median household income to the user profile",
+        "overview": "Add income attribute based on user's IP zipcode.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will add an <code>income</code> (median household income) attribute to the user based on the zipcode of their ip address. It is based on the last US Census data (not available for other countries).</p>\n",
-        "code": "function (user, context, callback) {\n\n    user.user_metadata = user.user_metadata || {};\n    var geoip = user.user_metadata.geoip || context.request.geoip;\n\n    if (!geoip || geoip.country_code !== 'US') return callback(null, user, context);\n\n    if(global.incomeData === undefined) {\n        retrieveIncomeData(user, geoip, context, callback);\n    } else {\n        setIncomeData(global.incomeData, user, geoip, context, callback);\n    }\n\n    function retrieveIncomeData(user, geoip, context, callback) {\n        request({\n            url: 'http://cdn.auth0.com/zip-income/householdincome.json'\n        }, function (e,r,b) {\n            if(e) return callback(e);\n            if(r.statusCode===200){\n                var incomeData = JSON.parse(b);\n                global.incomeData = incomeData;\n                setIncomeData(incomeData,user,context, callback);\n            }\n            callback(null, user, context);\n        });\n    }\n\n    function setIncomeData(incomeData, user, geoip, context, callback) {\n        if (incomeData[geoip.postal_code]) {\n\n            user.user_metadata.zipcode_income = incomeData[geoip.postal_code];\n            context.idToken['https://example.com/zipcode_income'] = incomeData[geoip.postal_code];\n\n            auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n                .then(function(){\n                    callback(null, user, context);\n                })\n                .catch(function(err){\n                    callback(err);\n                });\n        }\n    }\n}"
+        "description": "<p>This rule will add an <code>income</code> (median household income) attribute to the user based on the zipcode of their ip address.\nIt is based on the last US Census data (not available for other countries).</p>",
+        "code": "function (user, context, callback) {\n\n  user.user_metadata = user.user_metadata || {};\n  const geoip = user.user_metadata.geoip || context.request.geoip;\n\n  if (!geoip || geoip.country_code !== 'US') return callback(null, user, context);\n\n  if(global.incomeData === undefined) {\n    retrieveIncomeData(user, geoip, context, callback);\n  } else {\n    setIncomeData(global.incomeData, user, geoip, context, callback);\n  }\n\n  function retrieveIncomeData(user, geoip, context, callback) {\n    request.get('http://cdn.auth0.com/zip-income/householdincome.json', { json: true }, (err, resp, body) => {\n      if(err) return callback(err);\n      if(resp.statusCode===200) {\n        global.incomeData = body;\n        setIncomeData(body, user, geoip, context, callback);\n      }\n      callback(null, user, context);\n    });\n  }\n\n  function setIncomeData(incomeData, user, geoip, context, callback) {\n    if (incomeData[geoip.postal_code]) {\n\n      user.user_metadata.zipcode_income = incomeData[geoip.postal_code];\n      context.idToken['https://example.com/zipcode_income'] = incomeData[geoip.postal_code];\n\n      auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    }\n  }\n}\n"
       },
       {
-        "id": "add-persistent-attributes",
+        "id": "add-persistence-attribute",
         "title": "Add persistent attributes to the user",
+        "overview": "Set the default color of a user's `user_metadata`.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule count set the default color (an example preference) to a user (using user_metadata`).</p>\n",
-        "code": "function (user, context, callback) {\n  user.user_metadata = user.user_metadata || {};\n  user.user_metadata.color = user.user_metadata.color || 'blue';\n  context.idToken['https://example.com/favorite_color'] = user.user_metadata.color;\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n        callback(null, user, context);\n    })\n    .catch(function(err){\n        callback(err);\n    });\n}"
+        "description": "<p>This rule count set the default color (an example preference) to a user (using <code>user_metadata</code>).</p>",
+        "code": "function (user, context, callback) {\n  user.user_metadata = user.user_metadata || {};\n  user.user_metadata.color = user.user_metadata.color || 'blue';\n  context.idToken['https://example.com/favorite_color'] = user.user_metadata.color;\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n        callback(null, user, context);\n    })\n    .catch(function(err){\n        callback(err);\n    });\n}\n"
       },
       {
         "id": "add-roles-from-sqlserver",
         "title": "Add user roles from a SQL Server database",
+        "overview": "Query a SQL server database on each login and add a roles array to the user.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will query a SQL server database on each login and add a <code>roles</code> array to the user.</p>\n<blockquote>\n<p>Note: you can store the connection string securely on Auth0 encrypted configuration. Also make sure when you call an external endpoint to open your firewall/ports to our IP address which you can find it in the rules editor. This happens when you query SQL Azure for example.</p>\n</blockquote>\n",
-        "code": "function (user, context, callback) {\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    context.idToken['https://example.com/roles'] = roles;\n\n    callback(null, user, context);\n  });\n\n  // Queries a table by e-mail and returns associated 'Roles'\n  function getRoles(email, done) {\n    var connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', function (error) {\n      console.log(error.message);\n    });\n\n    var query = \"SELECT Email, Role \" +\n                \"FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', function (err) {\n      if (err) return done(new Error(err));\n\n      var request = new sqlserver.Request(query, function (err, rowCount, rows) {\n        if (err) return done(new Error(err));\n\n        var roles = rows.map(function (row) {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}"
+        "description": "<p>This rule will query a SQL server database on each login and add a <code>roles</code> array to the user.</p>\n<blockquote>\n  <p>Note: you can store the connection string securely on Auth0 encrypted configuration. Also make sure when you call an external endpoint to open your firewall/ports to our IP address which you can find it in the rules editor. This happens when you query SQL Azure for example.</p>\n</blockquote>",
+        "code": "function (user, context, callback) {\n  getRoles(user.email, (err, roles) => {\n    if (err) return callback(err);\n\n    context.idToken['https://example.com/roles'] = roles;\n\n    callback(null, user, context);\n  });\n\n  function getRoles(email, done) {\n    const connection = sqlserver.connect({\n      userName:  '<user_name>',\n      password:  '<password>',\n      server:    '<db_server_name>',\n      options: {\n        database: '<db_name>',\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', (error) => {\n      console.log(error.message);\n    });\n\n    const query = \"SELECT Email, Role FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', (err) => {\n      if (err) return done(new Error(err));\n\n      const request = new sqlserver.Request(query, (err, rowCount, rows) => {\n        if (err) return done(new Error(err));\n\n        const roles = rows.map((row) => {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}\n"
       },
       {
         "id": "decrypt-sensitive-data",
-        "title": "Decrypt sensitive data from the user profile",
+        "title": "Decrypt sensitive data from the user profile (.NET)",
+        "overview": ".NET example of decrypting sensitive data from the user profile.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will get a sensitive value in the app_metadata and decrypt it (see the <a href=\"https://auth0.com/rules/encrypt-sensitive-data\">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>\n<p>Note, for this to work you&#39;ll need to set 2 configuration settings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code>, eg: <strong>S0me,Password!è§</strong></li>\n<li><code>ENCRYPT_IV</code>, eg: <strong>abcjfiekdpaifjfd</strong></li>\n</ul>\n<p>And here&#39;s an example of how you would decrypt this in .NET:</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n\n  var private_data = decrypt(user.app_metadata.private_data);\n  if (private_data.license_key === '1234567') {\n    user.role = 'admin';\n  }\n\n  return callback(null, user, context);\n\n  function decrypt(data) {\n    if (!data) {\n      return {};\n    }\n    var iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');\n    var encodeKey = crypto.createHash('sha256')\n    .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();\n    var cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);\n    var decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');\n    return JSON.parse(decrypted);\n  }\n}"
+        "description": "<p>This rule will get a sensitive value in the <code>app_metadata</code> and decrypt it\n(see the <a href=\"https://auth0.com/rules/src/rules/encrypt-sensitive-data.js\">Encrypt sensitive data in the user profile</a> rule for information on how to encrypt the data).</p>\n<p>Note, for this to work you'll need to set 2 configuration settings:\n<code>ENCRYPT_PASSWORD</code>, eg: <strong>S0me,Password!è§</strong>\n<code>ENCRYPT_IV</code>, eg: <strong>abcjfiekdpaifjfd</strong></p>",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || { };\n\n  const private_data = decrypt(user.app_metadata.private_data);\n  if (private_data.license_key === '1234567') {\n    user.role = 'admin';\n  }\n\n  return callback(null, user, context);\n\n  function decrypt(data) {\n    if (!data) {\n      return {};\n    }\n    const iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');\n    const encodeKey = crypto.createHash('sha256')\n    .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();\n    const cipher = crypto.createDecipheriv('aes-256-cbc', encodeKey, iv);\n    const decrypted = cipher.update(data, 'base64', 'utf8') + cipher.final('utf8');\n    return JSON.parse(decrypted);\n  }\n}\n"
       },
       {
         "id": "default-picture-null-avatars",
         "title": "Default picture for null avatars",
+        "overview": "Set a default picture for null avatars.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>Here is how to set a default picture for null avatars via a rule. \nHere&#39;s an example that does this for email-based logins:</p>\n",
-        "code": "function (user, context, callback) {\n  if (user.picture.indexOf('cdn.auth0.com') > -1) {\n    var url = require('url');\n    var u = url.parse(user.picture, true);\n    u.query.d = '<URL TO YOUR DEFAULT PICTURE HERE>';\n    delete u.search;\n    user.picture = url.format(u);\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will set a default picture for null avatars via a rule for email-based logins:</p>",
+        "code": "function (user, context, callback) {\n  if (user.picture.indexOf('cdn.auth0.com') > -1) {\n    const url = require('url');\n    const u = url.parse(user.picture, true);\n    u.query.d = 'URL_TO_YOUR_DEFAULT_PICTURE_HERE';\n    delete u.search;\n    user.picture = url.format(u);\n  }\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "encrypt-sensitive-data",
         "title": "Encrypt sensitive data in the user profile",
+        "overview": "Set a sensitive value in the app_metadata and encrypt it.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will set a sensitive value in the app_metadata and encrypt it (see the <a href=\"https://auth0.com/rules/decrypt-sensitive-data\">Decrypt sensitive data from the user profile</a> rule for information on how to decrypt the data).</p>\n<p>The <code>user</code> will look like this after the encryption:</p>\n<p>Note, for this to work you&#39;ll need to set two configuration settings. Both should be random strings:</p>\n<ul>\n<li><code>ENCRYPT_PASSWORD</code></li>\n<li><code>ENCRYPT_IV</code></li>\n</ul>\n",
-        "code": "function (user, context, callback) {\n  context.idToken['https://example.com/private_data'] = encrypt({\n    license_key: '1234567',\n    social_security_number: '56789'\n  });\n\n  callback(null, user, context);\n\n  function encrypt(data) {\n    var iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');\n    var decodeKey = crypto.createHash('sha256')\n      .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();\n    var cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);\n    return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');\n  }\n}"
+        "description": "<p>This rule will set a sensitive value in the app_metadata and encrypt it\n(see the <a href=\"https://auth0.com/rules/src/rules/decrypt-sensitive-data.js\">Decrypt sensitive data from the user profile</a> rule for information on how to decrypt the data).</p>\n<p>Note, for this to work you'll need to set 2 configuration settings:\n<code>ENCRYPT_PASSWORD</code>, eg: <strong>S0me,Password!è§</strong>\n<code>ENCRYPT_IV</code>, eg: <strong>abcjfiekdpaifjfd</strong></p>",
+        "code": "function (user, context, callback) {\n  context.idToken['https://example.com/private_data'] = encrypt({\n    license_key: '1234567',\n    social_security_number: '56789'\n  });\n\n  callback(null, user, context);\n\n  function encrypt(data) {\n    const iv = Buffer.from(configuration.ENCRYPT_IV, 'utf8');\n    const decodeKey = crypto.createHash('sha256')\n      .update(configuration.ENCRYPT_PASSWORD, 'utf8').digest();\n    const cipher = crypto.createCipheriv('aes-256-cbc', decodeKey, iv);\n    return cipher.update(JSON.stringify(data || {}), 'utf8', 'base64') + cipher.final('base64');\n  }\n}\n"
       },
       {
         "id": "facebook-custom-picture",
         "title": "Use a custom sized profile picture for Facebook connections",
+        "overview": "Set a custom sized profile picture for Facebook connections",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will set the <code>picture</code> to a custom size for users who login with Facebook.</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.connection === 'facebook') {\n    var fbIdentity = _.find(user.identities, { connection: 'facebook' });\n    // See: https://developers.facebook.com/docs/graph-api/reference/user/picture/ for more \n    // sizes and types of images that can be returned\n    var pictureType = 'large';\n    context.idToken.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;\n  }\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will set the <code>picture</code> to a custom size for users who login with Facebook.</p>",
+        "code": "function (user, context, callback) {\n  if (context.connection === 'facebook') {\n    const fbIdentity = _.find(user.identities, { connection: 'facebook' });\n    const pictureType = 'large';\n    context.idToken.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;\n  }\n  callback(null, user, context);\n}\n"
       },
       {
-        "id": "get-FullContact-profile",
+        "id": "get-fullcontact-profile",
         "title": "Enrich profile with FullContact",
+        "overview": "Get the user profile from FullContact using the email then add a new property to user_metadata.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user_metadata and returns. Any other conditions are ignored. See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>\n",
-        "code": "function (user, context, callback) {\n  var FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY';\n  var SLACK_HOOK = 'YOUR SLACK HOOK URL';\n\n  var slack = require('slack-notify')(SLACK_HOOK);\n\n  // skip if no email\n  if(!user.email) return callback(null, user, context);\n  // skip if fullcontact metadata is already there\n  if(user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);\n  request({\n    url: 'https://api.fullcontact.com/v2/person.json',\n    qs: {\n      email:  user.email,\n      apiKey: FULLCONTACT_KEY\n    }\n  }, function (error, response, body) {\n    if (error || (response && response.statusCode !== 200)) {\n\n      slack.alert({\n        channel: '#slack_channel',\n        text: 'Fullcontact API Error',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n\n      // swallow fullcontact api errors and just continue login\n      return callback(null, user, context);\n    }\n\n\n    // if we reach here, it means fullcontact returned info and we'll add it to the metadata\n    user.user_metadata = user.user_metadata || {};\n    user.user_metadata.fullcontact = JSON.parse(body);\n\n    auth0.users.updateUserMetadata(user.user_id, user.user_metadata);\n    context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;\n    return callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available).\nIf the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> t\no the user_metadata and returns. Any other conditions are ignored.</p>\n<p>See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>",
+        "code": "function (user, context, callback) {\n  const FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY';\n  const SLACK_HOOK = 'YOUR SLACK HOOK URL';\n\n  const slack = require('slack-notify')(SLACK_HOOK);\n\n  if (!user.email) return callback(null, user, context);\n\n  if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);\n\n  request.get('https://api.fullcontact.com/v2/person.json', {\n    qs: {\n      email:  user.email,\n      apiKey: FULLCONTACT_KEY\n    },\n    json: true\n  }, (error, response, body) => {\n    if (error || (response && response.statusCode !== 200)) {\n\n      slack.alert({\n        channel: '#slack_channel',\n        text: 'Fullcontact API Error',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n\n      return callback(null, user, context);\n    }\n\n    user.user_metadata = user.user_metadata || {};\n    user.user_metadata.fullcontact = body;\n\n    auth0.users.updateUserMetadata(user.user_id, user.user_metadata);\n    context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;\n    return callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "get-getIP",
         "title": "Enrich profile with the locations where the user logs in",
+        "overview": "Get the user locations based on IP address and add to the app_metadata in the geoip attribute",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets the user locations based on the IP and is added to the <code>user_metadata</code> in the <code>geoip</code> attribute.</p>\n",
-        "code": "function (user, context, callback) {\n\n  user.user_metadata = user.user_metadata || {};\n\n  user.user_metadata.geoip = context.request.geoip;\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n      context.idToken['https://example.com/geoip'] = context.request.geoip;\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n}"
+        "description": "<p>This rule gets the user locations based on the IP and is added to the <code>user_metadata</code> in the <code>geoip</code> attribute.</p>",
+        "code": "function (user, context, callback) {\n\n  user.user_metadata = user.user_metadata || {};\n\n  user.user_metadata.geoip = context.request.geoip;\n\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(() => {\n      context.idToken['https://example.com/geoip'] = context.request.geoip;\n      callback(null, user, context);\n    })\n    .catch((err) => {\n      callback(err);\n    });\n}\n"
       },
       {
-        "id": "get-rapLeaf-profile",
-        "title": "Enrich profile with Rapleaf",
+        "id": "get-towerdata-profile",
+        "title": "Enrich profile with Towerdata (formerly RapLeaf)",
+        "overview": "Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets user information from <strong>rapleaf</strong> using the e-mail (if available). If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>rapLeafInfo</code> to the user profile and returns. Any other conditions are ignored. See <a href=\"http://www.rapleaf.com/developers/personalization-api/\">RapLeaf docs</a> for full details.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //Filter by app\n  //if(context.clientName !== 'AN APP') return callback(null, user, context);\n\n  var rapLeafAPIKey = 'YOUR RAPLEAF API KEY';\n\n  if(user.email){\n    return callback(null, user, context);\n  }\n\n  request({\n    url: 'https://personalize.rapleaf.com/v4/dr',\n    qs: {\n      email: user.email,\n      api_key: rapLeafAPIKey\n    }\n  }, function(err, response, body){\n    if(err) return callback(err);\n\n    if(response.statusCode===200){\n     context.idToken['https://example.com/rapLeafData'] = JSON.parse(body);\n    }\n\n    return callback(null, user, context);\n  });\n\n}"
+        "description": "<p>This rule gets user information from towerdata using the e-mail (if available).\nIf the information is immediately available (signaled by a <code>statusCode=200</code>),\nit adds a new property <code>towerdata</code> to the user profile and returns. Any other conditions are ignored.\nSee <a href=\"http://docs.towerdata.com/#introduction-3\">Towerdata docs</a> for full details.</p>",
+        "code": "function (user, context, callback) {\n\n  const towerdataApiKey = 'YOUR towerdata API KEY';\n\n  if (!user.email) {\n    return callback(null, user, context);\n  }\n\n  request.get('https://api.towerdata.com/v5/td', {\n      qs: {\n        email: user.email,\n        api_key: towerdataApiKey\n      },\n      json: true\n    },\n    (err, response, body) => {\n      if (err) return callback(err);\n\n      if (response.statusCode === 200) {\n        context.idToken['https://example.com/towerdata'] = body;\n      }\n\n      return callback(null, user, context);\n    });\n}\n"
       },
       {
         "id": "get-twitter-email",
         "title": "Get email address from Twitter",
+        "overview": "Get user email address from Twitter.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>NOTE: Further configuration is needed to enable fetching user emails through your Twitter App. Take a look at <a href=\"https://dev.twitter.com/rest/reference/get/account/verify_credentials\">Twitter&#39;s doc</a> for specifics.</p>\n<p>The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to update\n<code>consumerKey</code> and <code>oauthTokenSecret</code> properly.</p>\n<p>This rule will not persist the returned email to the Auth0 user profile, but will return it to your application. If you want to persist the email, it will need to be <a href=\"https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata\">done with app_metadata as described here</a>. For example, you can save it under app_metadata.social_email. Then, to access it, you can do the following from a rule or the equivalent in your application:</p>\n",
-        "code": "function (user, context, callback) {\n    // additional request below is specific to Twitter\n    if (context.connectionStrategy !== 'twitter') {\n        return callback(null, user, context);\n    }\n\n    var oauth = require('oauth-sign');\n    var request = require('request');\n    var uuid = require('uuid');\n\n    var url = 'https://api.twitter.com/1.1/account/verify_credentials.json';\n    var consumerKey = 'UPDATE-WITH-YOUR-CONSUMER-KEY';\n    var consumerSecretKey = 'UPDATE-WITH-YOUR-CONSUMER-SECRET-KEY';\n\n    var twitterIdentity = _.find(user.identities, { connection: 'twitter' });\n    var oauthToken = twitterIdentity.access_token;\n    var oauthTokenSecret = twitterIdentity.access_token_secret;\n\n    var timestamp = Date.now() / 1000;\n    var nonce = uuid.v4().replace(/-/g, '');\n\n    var params = {\n        include_email: true,\n        oauth_consumer_key: consumerKey,\n        oauth_nonce: nonce,\n        oauth_signature_method: 'HMAC-SHA1',\n        oauth_timestamp: timestamp,\n        oauth_token: oauthToken,\n        oauth_version: '1.0'\n    };\n\n    params.oauth_signature = oauth.hmacsign('GET', url, params, consumerSecretKey, oauthTokenSecret);\n\n    var auth = Object.keys(params).sort().map(function (k) {\n        return k + '=\"' + oauth.rfc3986(params[k]) + '\"';\n    }).join(', ');\n\n    request({\n        url: url + '?include_email=true',\n        headers: {\n            'Authorization': 'OAuth ' + auth\n        }\n    }, function (err, resp, body) {\n        if (resp.statusCode !== 200) {\n            return callback(new Error('Error retrieving email from twitter: ' + body || err));\n        }\n        user.email = JSON.parse(body).email;\n        return callback(err, user, context);\n    });\n}"
+        "description": "<p>The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to update\n<code>consumerKey</code> and <code>oauthTokenSecret</code> properly.</p>\n<p>This rule will not persist the returned email to the Auth0 user profile, but will return it to your application.\nIf you want to persist the email, it will need to be done with app<em>metadata as described here: https://auth0.com/docs/rules/metadata-in-rules#updating-app</em>metadata.\nFor example, you can save it under <code>app_metadata.social_email</code>.</p>\n<blockquote>\n  <p>NOTE: Further configuration is needed to enable fetching user emails through your Twitter App. Take a look at <a href=\"https://dev.twitter.com/rest/reference/get/account/verify_credentials\">Twitter's doc</a> for specifics.</p>\n</blockquote>",
+        "code": "function (user, context, callback) {\n  if (context.connectionStrategy !== 'twitter') {\n    return callback(null, user, context);\n  }\n\n  const oauth = require('oauth-sign');\n  const uuid = require('uuid');\n\n  const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';\n  const consumerKey = 'UPDATE-WITH-YOUR-CONSUMER-KEY';\n  const consumerSecretKey = 'UPDATE-WITH-YOUR-CONSUMER-SECRET-KEY';\n\n  const twitterIdentity = _.find(user.identities, { connection: 'twitter' });\n  const oauthToken = twitterIdentity.access_token;\n  const oauthTokenSecret = twitterIdentity.access_token_secret;\n\n  const timestamp = Date.now() / 1000;\n  const nonce = uuid.v4().replace(/-/g, '');\n\n  const params = {\n    include_email: true,\n    oauth_consumer_key: consumerKey,\n    oauth_nonce: nonce,\n    oauth_signature_method: 'HMAC-SHA1',\n    oauth_timestamp: timestamp,\n    oauth_token: oauthToken,\n    oauth_version: '1.0'\n  };\n\n  params.oauth_signature = oauth.hmacsign('GET', url, params, consumerSecretKey, oauthTokenSecret);\n\n  const auth = Object.keys(params).sort().map(function (k) {\n    return k + '=\"' + oauth.rfc3986(params[k]) + '\"';\n  }).join(', ');\n\n  request.get(url + '?include_email=true', {\n    headers: {\n      'Authorization': 'OAuth ' + auth\n    },\n    json: true\n  }, (err, resp, body) => {\n    if (resp.statusCode !== 200) {\n      return callback(new Error('Error retrieving email from twitter: ' + body || err));\n    }\n    user.email = body.email;\n    return callback(err, user, context);\n  });\n}\n"
       },
       {
         "id": "linkedin-original-picture",
         "title": "Use the original sized profile picture for LinkedIn connections",
+        "overview": "Set the picture to the profile picture for users who login with LinkedIn",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will set the <code>picture</code> to the original sized profile picture for users who login with LinkedIn.</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.connection !== 'linkedin') {\n    callback(null, user, context);\n  }\n\n  var request = require('request');\n  var options = {\n    url: 'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',\n    headers: {\n      Authorization: 'Bearer ' + user.identities[0].access_token\n    }\n  };\n\n  request(options, function(error, response) {\n    if (!error && response.statusCode === 200) {\n      var json = JSON.parse(response.body);\n      if (json.values && json.values.length >= 1) {\n        context.idToken.picture = json.values[0];\n      }\n    }\n    callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule will set the <code>picture</code> to the original sized profile picture for users who login with LinkedIn.</p>",
+        "code": "function (user, context, callback) {\n  if (context.connection !== 'linkedin') {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  const options = {\n    url: 'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',\n    headers: {\n      Authorization: 'Bearer ' + user.identities[0].access_token\n    },\n    json: true\n  };\n\n  request(options, function (error, response, body) {\n    if (error) return callback(error);\n    if (response.statusCode !== 200) return callback(new Error(body));\n\n    if (body.values && body.values.length >= 1) {\n      context.idToken.picture = body.values[0];\n    }\n\n    return callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "remove-attributes",
         "title": "Remove attributes from a user",
+        "overview": "Remove attributes from a user",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>Sometimes you don&#39;t need every attribute from the user. You can use a rule to delete attributes.</p>\n",
-        "code": "function (user, context, callback) {\n  delete user.some_attribute;\n\n  // another option would be to define a whitelist of attributes you want,\n  // instead of delete the ones you don't want\n  /*\n  var whitelist = ['email', 'name', 'identities'];\n  Object.keys(user).forEach(function(key) {\n    console.log(whitelist.indexOf(key));\n    if (whitelist.indexOf(key) === -1) delete user[key];\n  });\n  */\n\n  callback(null, user, context);\n}"
+        "description": "<p>Sometimes you don't need every attribute from the user. You can use a rule to delete attributes.</p>",
+        "code": "function (user, context, callback) {\n  const blacklist = [ 'some_attribute' ];\n\n  Object.keys(user).forEach(function(key) {\n    if (blacklist.indexOf(key) > -1) {\n      delete user[key];\n    }\n  });\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "saml-attribute-mapping",
         "title": "SAML Attributes mapping",
+        "overview": "In a SAML application customize the mapping between the Auth0 user and the SAML attributes",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, look at <a href=\"https://docs.auth0.com/saml-configuration\">https://docs.auth0.com/saml-configuration</a>.</p>\n",
-        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}"
+        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, see the <a href=\"https://docs.auth0.com/saml-configuration\">SAML Configuration docs</a>.</p>",
+        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "soap-webservice",
         "title": "Roles from a SOAP Service",
+        "overview": "Show how to query a basic profile http binding SOAP web service for roles.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule shows how to query a basic profile http binding SOAP web service for roles and add those to the user.</p>\n",
-        "code": "function (user, context, callback) {\n  function getRoles(callback) {\n    request.post({\n      url:  'https://somedomain.com/RoleService.svc',\n      body: '<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><GetRolesForCurrentUser xmlns=\"http://tempuri.org\"/></s:Body></s:Envelope>',\n      headers: { 'Content-Type': 'text/xml; charset=utf-8',\n              'SOAPAction': 'http://tempuri.org/RoleService/GetRolesForCurrentUser' }\n    }, function (err, response, body) {\n      if (err) return callback(err);\n\n      var parser = new xmldom.DOMParser();\n      var doc = parser.parseFromString(body);\n      var roles = xpath.select(\"//*[local-name(.)='string']\", doc).map(function(node) { return node.textContent; });\n      return callback(null, roles);\n    });\n  }\n\n  getRoles(user.email, function(err, roles) {\n    if (err) return callback(err);\n\n    context.idToken['https://example.com/roles'] = roles;\n\n    callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule shows how to query a basic profile http binding SOAP web service for roles and add those to the user.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n  const xmldom = require('xmldom');\n  const xpath = require('xpath');\n\n  function getRoles(cb) {\n    request.post({\n      url:  'https://somedomain.com/RoleService.svc',\n      body: '<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><GetRolesForCurrentUser xmlns=\"http://tempuri.org\"/></s:Body></s:Envelope>',\n      headers: { 'Content-Type': 'text/xml; charset=utf-8',\n              'SOAPAction': 'http://tempuri.org/RoleService/GetRolesForCurrentUser' }\n    }, function (err, response, body) {\n      if (err) return cb(err);\n\n      const parser = new xmldom.DOMParser();\n      const doc = parser.parseFromString(body);\n      const roles = xpath.select(\"//*[local-name(.)='string']\", doc).map(function(node) { return node.textContent; });\n      return cb(null, roles);\n    });\n  }\n\n  getRoles(function(err, roles) {\n    if (err) return callback(err);\n\n    context.idToken['https://example.com/roles'] = roles;\n\n    callback(null, user, context);\n  });\n}\n"
       },
       {
-        "id": "socure_fraudscore",
+        "id": "socure-fraudscore",
         "title": "Detect Fraud Users",
+        "overview": "Get the fraud score from socure.com and store it on app_metadata.",
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets the fraud score from socure.com and store it on app_metadata.</p>\n",
-        "code": "function (user, context, callback) {\n  // score fraudscore once (if it's already set, skip this)\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.socure_fraudscore) return callback(null, user, context);\n\n  var SOCURE_KEY = 'YOUR SOCURE API KEY';\n\n  if(!user.email) {\n    // the profile doesn't have email so we can't query their api.\n    return callback(null, user, context);\n  }\n\n  // socurekey=A678hF8E323172B78E9&email=jdoe@acmeinc.com&ipaddress=1.2.3.4&mobilephone=%2B12015550157\n  request({\n    url: 'https://service.socure.com/api/1/EmailAuthScore',\n    qs: {\n      email:  user.email,\n      socurekey: SOCURE_KEY,\n      ipaddress: context.request.ip\n    }\n  }, function (err, resp, body) {\n    if (err) return callback(null, user, context);\n    if (resp.statusCode !== 200) return callback(null, user, context);\n    var socure_response = JSON.parse(body);\n    if (socure_response.status !== 'Ok') return callback(null, user, context);\n\n    user.app_metadata = user.app_metadata || {};\n    user.app_metadata.socure_fraudscore = socure_response.data.fraudscore;\n    user.app_metadata.socure_confidence = socure_response.data.confidence;\n    // \"details\":[  \n    //     \"blacklisted\":{  \n    //        \"industry\":\"Banking and Finance\",\n    //        \"reporteddate\":\"2014-07-02\",\n    //        \"reason\":\"ChargeBack Fraud\"\n    //     }\n    // ] \n    user.app_metadata.socure_details = socure_response.data.details;\n\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        context.idToken['https://example.com/socure_fraudscore'] = user.app_metadata.socure_fraudscore;\n        context.idToken['https://example.com/socure_confidence'] = user.app_metadata.socure_confidence;\n        context.idToken['https://example.com/socure_details'] = user.app_metadata.socure_details;\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(null, user, context);\n      });\n  });\n}"
+        "description": "<p>This rule gets the fraud score from socure.com and store it on app_metadata.</p>",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.socure_fraudscore) return callback(null, user, context);\n\n  const SOCURE_KEY = 'YOUR_SOCURE_API_KEY';\n\n  if (!user.email) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  request({\n    url: 'https://service.socure.com/api/1/EmailAuthScore',\n    qs: {\n      email:  user.email,\n      socurekey: SOCURE_KEY,\n      ipaddress: context.request.ip\n    }\n  }, function (err, resp, body) {\n    if (err) return callback(null, user, context);\n    if (resp.statusCode !== 200) return callback(null, user, context);\n    const socure_response = JSON.parse(body);\n    if (socure_response.status !== 'Ok') return callback(null, user, context);\n\n    user.app_metadata = user.app_metadata || {};\n    user.app_metadata.socure_fraudscore = socure_response.data.fraudscore;\n    user.app_metadata.socure_confidence = socure_response.data.confidence;\n    user.app_metadata.socure_details = socure_response.data.details;\n\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        context.idToken['https://example.com/socure_fraudscore'] = user.app_metadata.socure_fraudscore;\n        context.idToken['https://example.com/socure_confidence'] = user.app_metadata.socure_confidence;\n        context.idToken['https://example.com/socure_details'] = user.app_metadata.socure_details;\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(null, user, context);\n      });\n  });\n}\n"
       }
     ]
   },
@@ -330,146 +355,152 @@
       {
         "id": "aspnet-webapi",
         "title": "Custom webhook with ASPNET WebApi2",
+        "overview": "Post variables sent to your Rule as a custom webhook in an ASP.NET WebApi application.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User&#39;s profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.</p>\n<p>In this example, we&#39;re going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.</p>\n<p>Within the snippet, the &quot;secretToken&quot; is a simple way to ensure that the communication is coming from Auth0. Just type in a random string into the Rule, and then check for that string in your WebApi request.</p>\n<p>In your WebApi code, complete whatever operations are necessary, then call <code>return Json(new { customId = USERSCUSTOMID });</code> to return the required JSON to the Rule.</p>\n<blockquote>\n<p>Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the <code>[HttpPost]</code> attribute.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.customId) {\n    console.log('Found ID!');\n    return callback(null, user, context);\n  }\n\n  // You should make your requests over SSL to protect your app secrets.\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: \";ojhsajk;h;Kh:Jh\",\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n\n    user.app_metadata.customId = body.customId;\n    context.idToken['https://example.com/custom_id'] = body.customId;\n\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}"
+        "description": "<p>This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User's profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.\nIn this example, we're going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.\nWithin the snippet, the \"secretToken\" is a simple way to ensure that the communication is coming from Auth0. Just type in a random string into the Rule, and then check for that string in your WebApi request.\nIn your WebApi code, complete whatever operations are necessary, then call <code>return Json(new { customId = USERSCUSTOMID });</code> to return the required JSON to the Rule.</p>\n<blockquote>\n  <p>Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the <code>[HttpPost]</code> attribute.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.customId) {\n    console.log('Found ID!');\n    return callback(null, user, context);\n  }\n\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: \";ojhsajk;h;Kh:Jh\",\n    },\n    timeout: 15000\n  }, (err, response, body) => {\n    if (err) return callback(new Error(err));\n\n    user.app_metadata.customId = body.customId;\n    context.idToken['https://example.com/custom_id'] = body.customId;\n\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}\n"
       },
       {
         "id": "creates-lead-salesforce",
         "title": "Creates a new Lead in Salesforce on First Login",
+        "overview": "On first login call the Salesforce API to record the contact as a new Lead.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the <code>resource owner</code> flow to obtain an <code>access_token</code>. The username you use to authenticate the API will appear as the <strong>creator</strong> of the lead.</p>\n<blockquote>\n<p>Note: this sample implements very basic error handling.</p>\n</blockquote>\n",
-        "code": "function (user, context, done) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.recordedAsLead) {\n    return done(null,user,context);\n  }\n\n  var MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  //Populate the variables below with appropriate values\n  var SFCOM_CLIENT_ID = configuration.SALESFORCE_CLIENT_ID;\n  var SFCOM_CLIENT_SECRET = configuration.SALESFORCE_CLIENT_SECRET;\n  var USERNAME = configuration.SALESFORCE_USERNAME;\n  var PASSWORD = configuration.SALESFORCE_PASSWORD;\n\n  getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD,\n    function(r) {\n      if (!r.instance_url || !r.access_token) {\n        slack.alert({\n          channel: '#some_channel',\n          text: 'Error Getting SALESFORCE Access Token',\n          fields: {\n            error: r\n          }\n        });\n\n        return;\n      }\n\n      createLead(r.instance_url, r.access_token, function (e, result) {\n        if (e || !result || !result.id) {\n          slack.alert({\n            channel: '#some_channel',\n            text: 'Error Creating SALESFORCE Lead',\n            fields: {\n              error: e || result\n            }\n          });\n\n          return;\n        }\n\n        user.app_metadata.recordedAsLead = true;\n        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);\n      });\n    });\n\n  //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm\n  function createLead(url, access_token, callback){\n    //Can use many more fields\n    var data = {\n      LastName: user.name,\n      Company: 'Web channel signups'\n    };\n\n    request.post({\n      url: url + \"/services/data/v20.0/sobjects/Lead\",\n      headers: {\n        \"Authorization\": \"OAuth \" + access_token\n      },\n      json: data\n      }, function(e,r,b) {\n        return callback(e, b);\n      });\n  }\n\n  //Obtains a SFCOM access_token with user credentials\n  function getAccessToken(client_id, client_secret, username, password, callback) {\n    request.post({\n      url: 'https://login.salesforce.com/services/oauth2/token',\n      form: {\n        grant_type: 'password',\n        client_id: client_id,\n        client_secret: client_secret,\n        username: username,\n        password: password\n      }}, function(e,r,b) {\n        return callback(JSON.parse(b));\n      });\n  }\n\n  // don’t wait for the SF API call to finish, return right away (the request will continue on the sandbox)`\n  done(null, user, context);\n}"
+        "description": "<p>This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the <code>resource owner</code> flow to obtain an <code>access_token</code>.\nThe username you use to authenticate the API will appear as the <strong>creator</strong> of the lead.</p>\n<blockquote>\n  <p>Note: this sample implements very basic error handling.</p>\n</blockquote>",
+        "code": "function (user, context, done) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.recordedAsLead) {\n    return done(null,user,context);\n  }\n\n  const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  const SFCOM_CLIENT_ID = configuration.SALESFORCE_CLIENT_ID;\n  const SFCOM_CLIENT_SECRET = configuration.SALESFORCE_CLIENT_SECRET;\n  const USERNAME = configuration.SALESFORCE_USERNAME;\n  const PASSWORD = configuration.SALESFORCE_PASSWORD;\n  getAccessToken(\n    SFCOM_CLIENT_ID,\n    SFCOM_CLIENT_SECRET,\n    USERNAME,\n    PASSWORD,\n    (response) => {\n      if (!response.instance_url || !response.access_token) {\n        slack.alert({\n          channel: '#some_channel',\n          text: 'Error Getting SALESFORCE Access Token',\n          fields: {\n            error: response\n          }\n        });\n\n        return;\n      }\n\n      createLead(\n        response.instance_url,\n        response.access_token,\n        (err, result) => {\n        if (err || !result || !result.id) {\n          slack.alert({\n            channel: '#some_channel',\n            text: 'Error Creating SALESFORCE Lead',\n            fields: {\n              error: err || result\n            }\n          });\n\n          return;\n        }\n\n        user.app_metadata.recordedAsLead = true;\n        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);\n      });\n    });\n\n  function createLead(url, access_token, callback){\n    const data = {\n      LastName: user.name,\n      Company: 'Web channel signups'\n    };\n\n    request.post({\n      url: url + \"/services/data/v20.0/sobjects/Lead\",\n      headers: {\n        \"Authorization\": \"OAuth \" + access_token\n      },\n      json: data\n      }, (err, response, body) => {\n        return callback(err, body);\n      });\n  }\n\n  function getAccessToken(client_id, client_secret, username, password, callback) {\n    request.post({\n      url: 'https://login.salesforce.com/services/oauth2/token',\n      form: {\n        grant_type: 'password',\n        client_id: client_id,\n        client_secret: client_secret,\n        username: username,\n        password: password\n      }}, (err, respose, body) => {\n        return callback(JSON.parse(body));\n      });\n  }\n\n  done(null, user, context);\n}\n"
       },
       {
         "id": "intercom-user",
         "title": "Record or update an Intercom User",
+        "overview": "Call the Intercom API to record/update an User.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will call the Intercom API to create a new contact or update an existing contact&#39;s activity, whenever there is a signup or login with Auth0.</p>\n",
-        "code": "function (user, context, callback) {\n  var moment = require('moment-timezone');\n\n  var data = {\n    \"user_id\": user.user_id,\n    \"email\": user.email,\n    \"name\": user.name,\n    \"signed_up_at\": moment(user.created_at).unix(),\n    \"last_seen_ip\" : context.request.ip,\n    \"last_seen_user_agent\": context.request.userAgent,\n    \"update_last_request_at\": true,\n    \"new_session\": true\n  };\n  var accessToken = 'YOUR INTERCOM ACCESS TOKEN';\n\n  request.post({\n    url: 'https://api.intercom.io/users',\n    headers: {\n      'Authorization': 'Bearer ' + accessToken,\n      'Accept': 'application/json'\n    },\n    json: data\n  });\n  // don’t wait for the Intercom API call to finish, return right away.\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will call the Intercom API to create a new contact or update an existing contact's activity, whenever there is a signup or login with Auth0.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n  const moment = require('moment-timezone');\n\n  const data = {\n    user_id: user.user_id,\n    email: user.email,\n    name: user.name,\n    signed_up_at: moment(user.created_at).unix(),\n    last_seen_ip : context.request.ip,\n    last_seen_user_agent: context.request.userAgent,\n    update_last_request_at: true,\n    new_session: true\n  };\n  const accessToken = 'YOUR INTERCOM ACCESS TOKEN';\n\n  request.post({\n    url: 'https://api.intercom.io/users',\n    headers: {\n      Authorization: 'Bearer ' + accessToken,\n      Accept: 'application/json'\n    },\n    json: data\n  });\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "mailgun",
         "title": "Send emails through Mailgun",
+        "overview": "Send an email to an administrator on the first login of a user using Mailgun.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send an email to an administrator on the first login of a user using <a href=\"https://mailgun.com\">Mailgun</a>.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',\n      auth:\n      {\n          user: 'api',\n          pass: '{YOUR MAILGUN KEY}'\n      },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
+        "description": "<p>This rule will send an email to an administrator on the first login of a user using <a href=\"https://mailgun.com\">Mailgun</a>.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  request.post( {\n    url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',\n\t  auth:\n\t  {\n  \t\tuser: 'api',\n\t  \tpass: '{YOUR MAILGUN KEY}'\n\t  },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(err, response, body) {\n    if (err) return callback(err);\n    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}\n"
       },
       {
         "id": "mandrill",
         "title": "Send email with Mandrill",
+        "overview": "Send email with Mandrill",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send an email to an administrator on a user&#39;s first login. We use a persistent <code>signedUp</code> property to track whether this is the case or not. This rule assumes you&#39;ve stored a secure value named <code>MANDRILL_API_KEY</code>, which contains your secret API key for Mandrill. It is sent in each request.</p>\n<p>In the same way, other services such as <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a> and <a href=\"https://auth0.com/rules/sendgrid\">SendGrid</a> can be used.</p>\n<p>Make sure to change the sender and destination emails.</p>\n",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  // Only send an email when user signs up\n  if (!user.app_metadata.signedUp) {\n    // See https://mandrillapp.com/api/docs/messages.JSON.html#method=send\n    var body = {\n      key: configuration.MANDRILL_API_KEY,\n      message: {\n        subject: 'User ' + user.name + ' signed up to ' + context.clientName,\n        text: 'Sent from an Auth0 rule',\n        from_email: 'SENDER_EMAIL@example.com',\n        from_name: 'Auth0 Rule',\n        to: [\n          {\n            email: 'DESTINATION_EMAIL@example.com',\n            type: 'to'\n          }\n        ],\n      }\n    };\n    var mandrill_send_endpoint = 'https://mandrillapp.com/api/1.0/messages/send.json';\n\n    request.post({url: mandrill_send_endpoint, form: body}, function (err, resp, body) {\n      if (err) { return callback(err); }\n      user.app_metadata.signedUp = true;\n      auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n        .then(function(){\n          callback(null, user, context);\n        })\n        .catch(function(err){\n          callback(err);\n        });\n    });\n  } else {\n    // User had already logged in before, do nothing\n    callback(null, user, context);\n  }\n}"
+        "description": "<p>This rule will send an email to an administrator on a user's first login. We use a persistent <code>signedUp</code> property to track whether this is the case or not. This rule assumes you've stored a secure value named <code>MANDRILL_API_KEY</code>, which contains your secret API key for Mandrill. It is sent in each request.</p>\n<p>In the same way, other services such as <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a> and <a href=\"https://auth0.com/rules/sendgrid\">SendGrid</a> can be used.</p>\n<p>Make sure to change the sender and destination emails.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  const body = {\n    key: 'MANDRILL_API_KEY',\n    message: {\n      subject: 'User ' + user.name + ' signed up to ' + context.clientName,\n      text: 'Sent from an Auth0 rule',\n      from_email: 'SENDER_EMAIL@example.com',\n      from_name: 'Auth0 Rule',\n      to: [\n        {\n          email: 'DESTINATION_EMAIL@example.com',\n          type: 'to'\n        }\n      ],\n    }\n  };\n  const mandrill_send_endpoint = 'https://mandrillapp.com/api/1.0/messages/send.json';\n\n  request.post({url: mandrill_send_endpoint, form: body}, function (err, resp, body) {\n    if (err) return callback(err);\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function() {\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}\n"
       },
       {
         "id": "mixpanel-track-event",
         "title": "Tracks Logins in MixPanel",
+        "overview": "Send a Sign In event to MixPanel to track logins",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property. See <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": \"{REPLACE_WITH_YOUR_MIXPANEL_TOKEN}\",\n        \"application\": context.clientName\n    }\n  };\n\n  var base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/',\n    qs: {\n      data: base64Event\n    }\n  }, function (e, r, b){\n      // don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`\n      callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property.\nSee <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>",
+        "code": "function (user, context, callback) {\n\n  const mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": \"{REPLACE_WITH_YOUR_MIXPANEL_TOKEN}\",\n        \"application\": context.clientName\n    }\n  };\n\n  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/',\n    qs: {\n      data: base64Event\n    }\n  }, (err, res, body) => {\n      callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "pusher",
         "title": "Obtains a Pusher token for subscribing/publishing to private channels",
+        "overview": "Obtain a Pusher token for subscribing/publishing to private channels.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will generate a [pusher.com] token that can be used to send and receive messages from private channels. See <a href=\"https://github.com/auth0/auth0-pusher\">a complete example here</a>.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var pusherKey='YOUR PUSHER KEY';\n  var pusherSecret = '{YOUR PUSHER SECRET}';\n\n  if( context.request.query.channel && context.request.query.socket_id)\n  {\n    context.idToken['https://example.com/pusherAuth'] = pusherKey + \":\" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);\n  }\n\n  callback(null, user, context);\n\n  function sign(secret, channel, socket_id)\n  {\n    var string_to_sign = socket_id + \":\" + channel;\n    var sha = crypto.createHmac('sha256', secret);\n    return sha.update(string_to_sign).digest('hex');\n  }\n}"
+        "description": "<p>This rule will generate a [pusher.com] token that can be used to send and receive messages from private channels. See <a href=\"https://github.com/auth0/auth0-pusher\">a complete example here</a>.</p>",
+        "code": "function (user, context, callback) {\n  function sign(secret, channel, socket_id) {\n    const string_to_sign = socket_id + \":\" + channel;\n    const sha = crypto.createHmac('sha256', secret);\n    return sha.update(string_to_sign).digest('hex');\n  }\n\n  const pusherKey = 'YOUR PUSHER KEY';\n  const pusherSecret = '{YOUR PUSHER SECRET}';\n\n  if (context.request.query.channel && context.request.query.socket_id) {\n    const pusherSigned = sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);\n    context.idToken['https://example.com/pusherAuth'] = pusherKey + \":\" + pusherSigned;\n  }\n\n  callback(null, user, context);\n }\n"
       },
       {
         "id": "send-events-keenio",
         "title": "Send events to Keen",
+        "overview": "Send a signup event to Keen IO, tracked by the user.signedUp property",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule is used to send a <code>signup</code> event to <a href=\"http://keen.io\">Keen IO</a></p>\n<p>The rule checks whether the user has already signed up before or not. This is tracked by the persistent <code>user.signedUp</code> property. If the property is present, everything else is skipped.\nIf not, then we POST a new event with some information to a <code>signups Collection</code> on Keen IO.</p>\n<p>Once enabled, events will be displayed on Keen IO dashboard:\n<img src=\"http://puu.sh/7k4qN.png\" alt=\"\"></p>\n",
-        "code": "function(user, context, callback) {\n  if (context.stats.loginsCount > 1) {\n    return callback(null, user, context);\n  }\n\n  var MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  var slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  var writeKey = 'YOUR KEEN IO WRITE KEY';\n  var projectId = 'YOUR KEEN IO PROJECT ID';\n  var eventCollection = 'signups';\n\n  var keenEvent = {\n    userId: user.user_id,\n    name: user.name,\n    ip: context.request.ip //Potentially any other properties in the user profile/context\n  };\n\n  request.post({\n    method: 'POST',\n    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,\n    headers: {\n      'Content-type': 'application/json',\n    },\n    body: JSON.stringify(keenEvent),\n  },\n  function (error, response, body) {\n\n    if( error || (response && response.statusCode !== 200) ) {\n      slack.alert({\n        channel: '#some_channel',\n        text: 'KEEN API ERROR',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n    }\n  });\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to send a <code>signup</code> event to <a href=\"http://keen.io\">Keen IO</a></p>\n<p>The rule checks whether the user has already signed up before or not. This is tracked by the persistent <code>user.signedUp</code> property. If the property is present, everything else is skipped.\nIf not, then we POST a new event with some information to a <code>signups Collection</code> on Keen IO.</p>\n<p>Once enabled, events will be displayed on Keen IO dashboard:\n<img src=\"http://puu.sh/7k4qN.png\" alt=\"\" /></p>",
+        "code": "function(user, context, callback) {\n  if (context.stats.loginsCount > 1) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  const writeKey = 'YOUR KEEN IO WRITE KEY';\n  const projectId = 'YOUR KEEN IO PROJECT ID';\n  const eventCollection = 'signups';\n\n  const keenEvent = {\n    userId: user.user_id,\n    name: user.name,\n    ip: context.request.ip \n  };\n\n  request.post({\n    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection + '?api_key=' + writeKey,\n    headers: {\n      'Content-type': 'application/json',\n    },\n    body: JSON.stringify(keenEvent),\n  },\n  function (error, response, body) {\n    if (error || (response && response.statusCode !== 200)) {\n      slack.alert({\n        channel: '#some_channel',\n        text: 'KEEN API ERROR',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n    }\n  });\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "sendgrid",
         "title": "Send emails through SendGrid",
+        "overview": "Send an email to an administrator through SendGrind on the first login of a user.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send an email to an administrator on the first login of a user.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>In the same way you can use other services like <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a>, <a href=\"https://auth0.com/mandrill\">Mandrill</a> and few others.</p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (!user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  request.post( {\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ...'\n    },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n}"
+        "description": "<p>This rule will send an email to an administrator on the first login of a user.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>In the same way you can use other services like <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a>, <a href=\"https://auth0.com/mandrill\">Mandrill</a> and few others.</p>",
+        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  request.post({\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ...'\n    },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function (error, response, body) {\n    if (error) return callback(error);\n    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function () {\n        callback(null, user, context);\n      })\n      .catch(function (err) {\n        callback(err);\n      });\n  });\n}\n"
+      },
+      {
+        "id": "sends-sms-with-twilio",
+        "title": "Notify users if login happens from a different IP or machine",
+        "overview": "Notify users if login happens from a different IP or machine.",
+        "categories": [
+          "webhook"
+        ],
+        "description": "<p>This rule checks if the user has changed device or location since last login and sends him an SMS if that happened. Location &amp; device are computed as a hash of the <code>userAgent</code> and the <code>IP address</code>. SMS are sent through <a href=\"http://www.twilio.com\">Twilio</a> and uses the <code>user.phone</code> property.</p>\n<p>If <code>user.phone</code> is not available, then everything is ignored; but signature is computed.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n  const crypto = require('crypto');\n\n  user.app_metadata = user.app_metadata || {};\n  const currentFingerprint = clientFingerprint();\n\n  const previousFingerprint = user.app_metadata.lastDeviceFingerPrint;\n  user.app_metadata.lastDeviceFingerPrint = currentFingerprint;\n\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function () {\n      if (!user.phone) return callback(null, user, context);\n      if (!previousFingerprint || previousFingerprint === currentFingerprint) {\n        return callback(null, user, context);\n      }\n\n      notifyUser(function (e) {\n        return callback(e, user, context);\n      });\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n\n  function clientFingerprint() {\n    const shasum = crypto.createHash('sha1');\n    shasum.update(context.request.userAgent);\n    shasum.update(context.request.ip);\n    return shasum.digest('hex');\n  }\n\n  function notifyUser(done) {\n    const twilioAccount = 'YOUR_TWILIO_ACCOUNT';\n    const twilioAuthToken = 'YOUR_TWILIO_AUTH_TOKEN';\n\n    request.post({\n      url: 'https://api.twilio.com/2010-04-01/Accounts/' + twilioAccount + '/Messages.json',\n      auth: {\n        'user': twilioAccount,\n        'pass': twilioAuthToken,\n      },\n      form: {\n        body: 'You\\'ve logged in from a different device or location.',\n        to: user.phone,\n        from: '+18668888888'\n      }\n    }, function (error, response, body) {\n      if (error) return done(error);\n      if (response.statusCode !== 201) return done(new Error(response.statusCode));\n      return done(null);\n    });\n  }\n}\n"
       },
       {
         "id": "slack",
         "title": "Slack Notification on User Signup",
+        "overview": "Slack notification on user signup.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule sends a message to a slack channel on every user signup.</p>\n",
-        "code": "function(user, context, callback) {\n  // short-circuit if the user signed up already or is using a refresh token\n  if (context.stats.loginsCount > 1 || context.protocol === 'oauth2-refresh-token') {\n    return callback(null, user, context);\n  }\n\n  // get your slack's hook url from: https://slack.com/services/10525858050\n  var SLACK_HOOK = 'YOUR SLACK HOOK URL';\n\n  var slack = require('slack-notify')(SLACK_HOOK);\n  var message = 'New User: ' + (user.name || user.email) + ' (' + user.email + ')';\n  var channel = '#some_channel';\n\n  slack.success({\n   text: message,\n   channel: channel\n  });\n\n  // don’t wait for the Slack API call to finish, return right away (the request will continue on the sandbox)`\n  callback(null, user, context);\n}"
+        "description": "<p>This rule sends a message to a slack channel on every user signup.</p>",
+        "code": "function (user, context, callback) {\n  if (context.stats.loginsCount > 1 || context.protocol === 'oauth2-refresh-token') {\n    return callback(null, user, context);\n  }\n\n  const SLACK_HOOK = 'YOUR SLACK HOOK URL';\n\n  const slack = require('slack-notify')(SLACK_HOOK);\n  const message = 'New User: ' + (user.name || user.email) + ' (' + user.email + ')';\n  const channel = '#some_channel';\n\n  slack.success({\n    text: message,\n    channel: channel\n  });\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "splunk-HEC-track-event",
         "title": "Tracks Logins/SignUps with Splunk HEC",
+        "overview": "Send SignUp and Login events to Splunk's [HTTP Event Collector] (http://dev.splunk.com/view/event-collector/SP-CAAAE7F), including some contextual information of the user.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk&#39;s HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>Events will show up on the Splunk console shortly after user access:</p>\n<p>In order to use this rule, you need to enable HTTP Event Collector (HEC) on your Splunk instance and get an HEC token. You can learn more how to do this <a href=\"http://dev.splunk.com/view/event-collector/SP-CAAAE7F\">here</a> </p>\n<p>Below is a screenshot showing an SingUp event sent to Splunk Cloud.</p>\n<p><img src=\"https://cdn.auth0.com/website/rules/splunk-hec-rule.png\" alt=\"\"></p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  var host = 'YOUR SPLUNK HEC ENDPOINT, like https://localhost:8088';\n  var token = 'YOUR SPLUNK HEC TOKEN';\n\n  //Add any interesting info to the event\n  var hec_event = {\n    event: {\n      message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n      application: context.clientName,\n      clientIP: context.request.ip,\n      protocol: context.protocol,\n      userName: user.name,\n      userId: user.user_id\n    },\n    source: \"auth0\",\n    sourcetype: \"auth0_activity\"\n  };\n\n  request.post( {\n    url: host + '/services/collector',\n    headers: {\n        'Authorization': 'Splunk ' + token\n      },\n    strictSSL: true, // set to false if using a self-signed cert\n    json: hec_event\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true; \n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n\n}"
-      },
-      {
-        "id": "splunk-track-event",
-        "title": "Tracks Logins/SignUps with Splunk",
-        "categories": [
-          "webhook"
-        ],
-        "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.</p>\n<p>Events will show up on the Splunk console shortly after user access:</p>\n<p><img src=\"http://puu.sh/7R1EW.png\" alt=\"\"></p>\n",
-        "code": "function(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  var splunkBaseUrl = 'YOUR SPLUNK SERVER, like: https://your server:8089';\n\n  //Add any interesting info to the event\n  var event = {\n    message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n    application: context.clientName,\n    clientIP: context.request.ip,\n    protocol: context.protocol,\n    userName: user.name,\n    userId: user.user_id\n  };\n\n  request.post( {\n    url: splunkBaseUrl + '/services/receivers/simple',\n    auth: {\n        'user': 'YOUR SPLUNK USER',\n        'pass': 'YOUR SPLUNK PASSWORD',\n      },\n    json: event,\n    qs: {\n      'source': 'auth0',\n      'sourcetype': 'auth0_activity'\n    }\n  }, function(e,r,b) {\n    if (e) return callback(e);\n    if (r.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  });\n\n}"
-      },
-      {
-        "id": "thisdata-alert-anomalies",
-        "title": "Account Takeover Detection via ThisData",
-        "categories": [
-          "webhook"
-        ],
-        "description": "<p>This rule is designed to detect phished or compromised user accounts, and\noptionally send an email or SMS notification to the user asking\n&quot;Was This You?&quot;. This is similar to the emails you get signing in to Google or\nFacebook from a new device or location.\nThe users&#39; response can be used to take further action, like shutting\ndown a compromised account.</p>\n<p>It uses <a href=\"https://thisdata.com\">ThisData&#39;s</a> anomaly detection\nalgorithms which take into account many behavioral factors including:</p>\n<ul>\n<li>Location &amp; Velocity</li>\n<li>Devices</li>\n<li>Time of day</li>\n<li>Tor usage</li>\n<li>Risky IP addresses</li>\n<li>And more...</li>\n</ul>\n<p>This rule works in the background, and will never stop your users from logging\nin to your application. Use our &quot;Account Takeover Prevention via ThisData&quot; Auth0\nrule to stop suspicious log-ins in their tracks.</p>\n<p>You will need a ThisData API Key. Sign up for a free ThisData\naccount at <a href=\"https://thisdata.com/sign-up\">https://thisdata.com/sign-up</a></p>\n<p>Notifications are disabled by default - you have full control over how we\ncontact your users. Visit ThisData.com to configure:</p>\n<ul>\n<li>Sending &quot;Was This You&quot; notifications via email or SMS (text message)</li>\n<li>Slack notifications</li>\n<li>webhooks to your app</li>\n</ul>\n<p>Read our guide &quot;How to add login anomaly detection to Auth0&quot;\n  <a href=\"https://thisdata.com/blog/how-to-add-login-anomaly-detection-to-auth0/\">https://thisdata.com/blog/how-to-add-login-anomaly-detection-to-auth0/</a></p>\n<p>Contact ThisData: <a href=\"mailto:support@thisdata.com\">support@thisdata.com</a></p>\n",
-        "code": "function (user, context, callback) {\n  // Get this from your ThisData account\n  var apiKey = configuration.THISDATA_API_KEY;\n\n  var options = {\n    method: 'POST',\n    headers: {\n      'User-Agent': 'thisdata-auth0'\n    },\n    uri: 'https://api.thisdata.com/v1/events?api_key=' + apiKey,\n    json: {\n      verb: 'log-in',\n      ip: context.request.ip,\n      user_agent: context.request.userAgent,\n      user: {\n        id: user.user_id,\n        name: user.name,\n        email: user.email\n      }\n    }\n  };\n\n  request.post(options);\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk's HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.\nEvents will show up on the Splunk console shortly after user access:</p>\n<h2 id=\"setup\">Setup</h2>\n<p>In order to use this rule, you need to enable HTTP Event Collector (HEC) on your Splunk instance and get an HEC token. You can learn more how to do this <a href=\"http://dev.splunk.com/view/event-collector/SP-CAAAE7F\">here</a></p>\n<p>Below is a screenshot showing an SingUp event sent to Splunk Cloud.\n<img src=\"https://cdn.auth0.com/website/rules/splunk-hec-rule.png\" alt=\"\" /></p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n\n  user.app_metadata = user.app_metadata || {};\n  const endpoint = 'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; \n  const token = 'YOUR_SPLUNK_HEC_TOKEN';\n\n  const hec_event = {\n    event: {\n      message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n      application: context.clientName,\n      clientIP: context.request.ip,\n      protocol: context.protocol,\n      userName: user.name,\n      userId: user.user_id\n    },\n    source: 'auth0',\n    sourcetype: 'auth0_activity'\n  };\n\n  request.post({\n    url: endpoint,\n    headers: {\n      'Authorization': 'Splunk ' + token\n    },\n    strictSSL: true, \n    json: hec_event\n  }, function(error, response, body) {\n    if (error) return callback(error);\n    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function () {\n        callback(null, user, context);\n      })\n      .catch(function (err) {\n        callback(err);\n      });\n  });\n\n}\n"
       },
       {
         "id": "update-firebase-user",
         "title": "Update user profile identity in Firebase",
+        "overview": "Create or update identity information for a user profile stored in Firebase using the Firebase REST API.",
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule is used to create or update identity information for a user profile\nstored in Firebase using the Firebase REST API. The unique <code>user.user_id</code> is\nbase64 encoded to provide a unique generated key for the user.</p>\n<p>Each time the user logs into the system, properties of their user\nprofile can updated in Firebase to keep identity properties (like\nname, email, etc) in sync with authentication credentials.</p>\n<p>You can find more information in the Firebase API: <a href=\"https://www.firebase.com/docs/rest-api.html\">REST API</a></p>\n",
-        "code": "function (user, context, callback) {\n\n  var baseURL = configuration.FIREBASE_URL;\n  var secret = configuration.FIREBASE_SECRET;\n  var fb_id = Buffer.from(user.user_id).toString('base64');\n\n  var fbIdentity = {\n    \"identity\": {\n      \"user_id\": user.user_id,\n      \"email\": user.email,\n      \"name\": user.name,\n      \"nickname\": user.nickname,\n      \"picture\": user.picture\n    }\n  };\n\n  var putURL = baseURL + \"/users/\" + fb_id + \".json?auth=\" + secret;\n  request.put({\n    \"url\": putURL,\n    \"json\": fbIdentity\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    return callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule is used to create or update identity information for a user profile stored in Firebase using the Firebase REST API. The unique <code>user.user_id</code> is base64 encoded to provide a unique generated key for the user.</p>\n<p>Each time the user logs into the system, properties of their user profile can updated in Firebase to keep identity properties (like <code>name</code>, <code>email</code>, etc) in sync with authentication credentials.</p>\n<p>You can find more information in the Firebase API: <a href=\"https://www.firebase.com/docs/rest-api.html\">REST API</a></p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n\n  const baseURL = configuration.FIREBASE_URL;\n  const secret = configuration.FIREBASE_SECRET;\n  const fb_id = Buffer.from(user.user_id).toString('base64');\n\n  const fbIdentity = {\n    identity: {\n      user_id: user.user_id,\n      email: user.email,\n      name: user.name,\n      nickname: user.nickname,\n      picture: user.picture\n    }\n  };\n\n  const putURL = baseURL + '/users/' + fb_id + '.json?auth=' + secret;\n  request.put({\n    url: putURL,\n    json: fbIdentity\n  },\n  function(err, response, body) {\n    if (err) return callback(err);\n    return callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "zapier-new-login",
         "title": "Trigger a Zap on Every User Login",
+        "overview": "Trigger a Zap on Every User Login to Zapier",
         "categories": [
           "webhook"
         ],
-        "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/iGyywQuJqIb+\" alt=\"\"></p>\n<p>This rule will call Zapier static hook every time a user logs in.</p>\n",
-        "code": "function (user, context, callback) {\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n  var payload_to_zap = extend({}, user, small_context);\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    // swallow error\n    callback(null, user, context);\n  });\n\n  function extend(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i],\n          keys = Object.keys(source);\n\n      for (var j = 0; j < keys.length; j++) {\n          var name = keys[j];\n          target[name] = source[name];\n      }\n    }\n    return target;\n  }\n}"
+        "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/iGyywQuJqIb+\" alt=\"\" /></p>\n<p>This rule will call Zapier static hook every time a user logs in.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n  const _ = require('lodash');\n\n  const ZAP_HOOK_URL = 'https://zap.example.com/hook-path'; \n\n  const small_context = {\n    appName: context.clientName,\n    userAgent: context.request.userAgent,\n    ip: context.request.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n\n  const payload_to_zap = _.extend({}, user, small_context);\n\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  },\n  function (err, response, body) {\n    callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "zapier-new-user",
         "title": "Trigger a Zap on New Users",
+        "overview": "Trigger a Zap on every new user signup to Zapier.",
         "categories": [
           "webhook"
         ],
-        "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/cgwZds8MjA7+\" alt=\"\"></p>\n<p>This rule will call Zapier static hook every time a new user signs up.</p>\n",
-        "code": "function (user, context, callback) {\n  // short-circuit if the user signed up already\n  if (context.stats.loginsCount > 1) {\n    return callback(null, user, context);\n  }\n\n  var _ = require('lodash');\n\n  var ZAP_HOOK_URL = 'REPLACE_ME';\n\n  var small_context = {\n    appName: context.clientName,\n    userAgent: context.userAgent,\n    ip: context.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n\n  var payload_to_zap = _.extend({}, user, small_context);\n\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  });\n\n  // don’t wait for the Zapier WebHook call to finish, return right away (the request will continue on the sandbox)`\n  callback(null, user, context);\n}"
+        "description": "<p><strong>What is Zapier?</strong> <a href=\"http://zapier.com\">Zapier</a> is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.</p>\n<p><img src=\"https://cloudup.com/cgwZds8MjA7+\" alt=\"\" /></p>\n<p>This rule will call Zapier static hook every time a new user signs up.</p>",
+        "code": "function (user, context, callback) {\n  if (context.stats.loginsCount > 1) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n  const _ = require('lodash');\n\n  const ZAP_HOOK_URL = 'https://zap.example.com/hook-path'; \n\n  const small_context = {\n    appName: context.clientName,\n    userAgent: context.request.userAgent,\n    ip: context.request.ip,\n    connection: context.connection,\n    strategy: context.connectionStrategy\n  };\n\n  const payload_to_zap = _.extend({}, user, small_context);\n\n  request.post({\n    url: ZAP_HOOK_URL,\n    json: payload_to_zap\n  });\n\n  callback(null, user, context);\n}\n"
       }
     ]
   },
@@ -479,85 +510,118 @@
       {
         "id": "duo-multifactor",
         "title": "Multifactor with Duo Security",
+        "overview": "Trigger multifactor authentication with Duo Security when a condition is met.",
         "categories": [
           "multifactor"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>\n",
-        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        //required\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        // optional, defaults to true. Set to false to force DuoSecurity every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false,\n\n        // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n        // username: user.nickname,\n\n        // optional. Admin credentials. If you provide an Admin SDK type of credentials. auth0 will update the realname and email in DuoSecurity.\n        // admin: {\n        //  ikey: 'DIAN...NV6UM',\n        //  skey: 'YL8OVzvoeeh...I1uiYrKoHvuzHnSRj'\n        // },\n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>",
+        "code": "function (user, context, callback) {\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n      context.multifactor = {\n        provider: 'duo',\n        ikey: 'DIXBMN...LZO8IOS8',\n        skey: 'nZLxq8GK7....saKCOLPnh',\n        host: 'api-3....049.duosecurity.com',\n\n        allowRememberBrowser: false,\n\n      };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "google-multifactor",
         "title": "Multifactor with Google Authenticator",
+        "overview": "Trigger multifactor authentication with Google Authenticator when a condition is met.",
         "categories": [
           "multifactor"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code. Subsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -&gt; Multifactor.</p>\n",
-        "code": "function (user, context, callback) {\n  // Uncomment the following to skip MFA when impersonating a user\n  // if (user.impersonated) { return callback(null, user, context); }\n\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from users that have app_metadata.use_mfa === true\n    // if (user.app_metadata && user.app_metadata.use_mfa){\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        // optional\n        // issuer: 'Label on Google Authenticator App', \n\n        // optional, defaults to true. Set to false to force Google Authenticator every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false \n      };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code.\nSubsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users,\nsearch for the specific user and click on Actions -&gt; Multifactor.</p>",
+        "code": "function (user, context, callback) {\n  const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
-        "id": "guardian-multifactor-authorization-extension",
-        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "id": "mfa",
+        "title": "Multifactor Authentication",
+        "overview": "Trigger multifactor authentication when a condition is met.",
         "categories": [
-          "multifactor",
-          "guardian"
+          "multifactor"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor-ip-range",
-        "title": "Multifactor when request comes from outside an IP range",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
-        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor",
-        "title": "Multifactor with Auth0 Guardian",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        // required\n        provider: 'guardian', \n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication when a condition is met.</p>",
+        "code": "function (user, context, callback) {\n    context.multifactor = {\n      provider: 'any',\n\n      allowRememberBrowser: false\n    };\n  callback(null, user, context);\n}\n"
       }
     ]
   },
   {
-    "name": "guardian",
+    "name": " guardian",
     "templates": [
       {
         "id": "guardian-multifactor-authorization-extension",
         "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "overview": "Guardian mfa + authorization extension working together.",
         "categories": [
           "multifactor",
-          "guardian"
+          " guardian"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for\nor more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n  !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  var groups = user.app_metadata.authorization.groups;\n  var GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    // 'admins': true,\n  };\n\n  var needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n      context.multifactor = {\n        // required\n        provider: 'guardian', //required\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
+      },
+      {
+        "id": "guardian-multifactor-authorization-extension",
+        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "overview": "Guardian mfa + authorization extension working together.",
+        "categories": [
+          "multifactor",
+          " guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "guardian-multifactor-ip-range",
         "title": "Multifactor when request comes from outside an IP range",
+        "overview": "Trigger multifactor authentication when IP is outside the expected range.",
         "categories": [
           "multifactor",
-          "guardian"
+          " guardian"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>\n",
-        "code": "function (user, context, callback) {\n  var ipaddr = require('ipaddr.js');\n  var corp_network = \"192.168.1.134/26\";\n\n  var current_ip = ipaddr.parse(context.request.ip); \n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n        provider: 'guardian',\n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n    };  \n  }\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
+        "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
+      },
+      {
+        "id": "guardian-multifactor-ip-range",
+        "title": "Multifactor when request comes from outside an IP range",
+        "overview": "Trigger multifactor authentication when IP is outside the expected range.",
+        "categories": [
+          "multifactor",
+          " guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
+        "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "guardian-multifactor",
         "title": "Multifactor with Auth0 Guardian",
+        "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
         "categories": [
           "multifactor",
-          "guardian"
+          " guardian"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n",
-        "code": "function (user, context, callback) {\n\n  //var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  // if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n      context.multifactor = {\n        // required\n        provider: 'guardian', \n\n        // optional, defaults to true. Set to false to force Guardian authentication every time. \n        // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n        allowRememberBrowser: false\n      };\n    // }\n  //}\n\n  callback(null, user, context);\n}"
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function (user, context, callback) {\n      context.multifactor = {\n        provider: 'guardian',\n\n        allowRememberBrowser: false\n      };\n  callback(null, user, context);\n}\n"
+      },
+      {
+        "id": "guardian-multifactor",
+        "title": "Multifactor with Auth0 Guardian",
+        "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
+        "categories": [
+          "multifactor",
+          " guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function (user, context, callback) {\n      context.multifactor = {\n        provider: 'guardian',\n\n        allowRememberBrowser: false\n      };\n  callback(null, user, context);\n}\n"
+      }
+    ]
+  },
+  {
+    "name": "token",
+    "templates": [
+      {
+        "id": "jwt",
+        "title": "Generate a JSON Web Token",
+        "overview": "Generate a signed JSON Web Token based on the `user` object.",
+        "categories": [
+          "token"
+        ],
+        "description": "<p>This rule generates a signed JSON Web Token based on the <code>user</code> object. Useful when using other protocols like SAML or WS-Federation and you need to call a downstream API that accepts JSON Web Tokens. The <code>id_token</code> will be part of the user profile, which will be translated to a SAML Attribute.</p>",
+        "code": "function (user, context, callback) {\n  const jwt = require('jsonwebtoken');\n  const CLIENT_SECRET = 'TARGET_API_CLIENT_SECRET';\n  const CLIENT_ID = 'TARGET_API_CLIENT_ID';\n\n  const api_user = {\n  \tuser_id: user.user_id,\n  \temail: user.email,\n  \tname: user.name\n  };\n\n  const options = {\n  \tsubject: user.user_id,\n    expiresIn: '10h', \n  \taudience: CLIENT_ID,\n  \tissuer: 'https://{your auth0 account}.auth0.com'\n  };\n\n  context.idToken['https://example.com/id_token'] = jwt.sign(api_user,\n  \t\t\t\t\t\t   Buffer.from(CLIENT_SECRET, 'base64'),\n  \t\t\t\t\t\t   options);\n\n  callback(null, user, context);\n}\n"
       }
     ]
   },
@@ -567,11 +631,12 @@
       {
         "id": "requestbin",
         "title": "Dump rule variables to RequestBin",
+        "overview": "Shows how to post the variables sent to your Rule to RequestBin to help troubleshoot rule issues",
         "categories": [
           "debugging"
         ],
-        "description": "<p>This rule shows how to post the variables sent to your Rule to <a href=\"https://requestbin.fullcontact.com\">https://requestbin.fullcontact.com</a> to help troubleshoot issues with your Rules.</p>\n<p>You can run this rule by itself, or paste it into an existing rule. Once the rule has posted data to RequestBin, you can use a site like <a href=\"http://bodurov.com/JsonFormatter/\">http://bodurov.com/JsonFormatter/</a> to more easily visualize the data.</p>\n<blockquote>\n<p>Note: You should deactivate this rule or comment out the code once you are finished troubleshooting.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>\n",
-        "code": "function (user, context, callback) {\n  request.post({\n    url: 'http://requestbin.fullcontact.com/YourBinUrl',\n    json: {\n      user: user,\n      context: context,\n    },\n    timeout: 15000\n  }, function(err, response, body){\n    if (err) return callback(new Error(err));\n    return callback(null, user, context);\n  });\n}"
+        "description": "<p>This rule shows how to post the variables sent to your Rule to <a href=\"https://requestbin.fullcontact.com\">RequestBin</a> to help troubleshoot issues with your Rules.</p>\n<p>You can run this rule by itself, or paste it into an existing rule. Once the rule has posted data to RequestBin, you can use a site like <a href=\"http://bodurov.com/JsonFormatter/\">JsonFormatter</a> to more easily visualize the data.</p>\n<blockquote>\n  <p>Note: You should deactivate this rule or comment out the code once you are finished troubleshooting.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n\n  request.post({\n    url: 'http://requestbin.fullcontact.com/YourBinUrl',\n    json: {\n      user: user,\n      context: context,\n    },\n    timeout: 15000\n  }, function (err, response, body){\n    if (err) return callback(err);\n    return callback(null, user, context);\n  });\n}\n"
       }
     ]
   },
@@ -580,12 +645,13 @@
     "templates": [
       {
         "id": "saml-configuration",
-        "title": "Change your SAML configuration",
+        "title": "Change SAML configuration",
+        "overview": "Change your SAML configuration.",
         "categories": [
           "saml"
         ],
-        "description": "<p>At some point you may want to add fields to your SAML Configuration. The way to do this is to add specific fields as done in the example code snippet below. <code>samlConfiguration</code> is an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for SAMLP and WS-Fed protocol).</p>\n<p>To know more about SAML configuration options check <a href=\"https://auth0.com/docs/saml-configuration#configuration-options\">this documentation page</a>.</p>\n",
-        "code": "function (user, context, callback) {\n  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);\n\n  context.samlConfiguration = context.samlConfiguration || {};\n  //context.samlConfiguration.audience = \"urn:foo\";\n  //context.samlConfiguration.recipient = \"http://foo\";\n  //context.samlConfiguration.destination = \"http://foo\";\n  //context.samlConfiguration.lifetimeInSeconds = 3600;\n  //context.samlConfiguration.mappings = {\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\":     \"user_id\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":       \"email\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":        \"name\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname\":  \"given_name\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname\": \"family_name\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\":         \"upn\",\n  //   \"http://schemas.xmlsoap.org/claims/Group\":      \"groups\"\n  // };\n  //context.samlConfiguration.nameIdentifierFormat = \"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified\";\n  //context.samlConfiguration.nameIdentifierProbes = [\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\",\n  //   \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\",\n  // ];\n  //context.samlConfiguration.signatureAlgorithm = \"rsa-sha1\";\n  //context.samlConfiguration.digestAlgorithm = \"sha1\";\n  //context.samlConfiguration.signResponse = false;\n  //context.samlConfiguration.authnContextClassRef = \"urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified\";\n  //context.samlConfiguration.mapIdentities = false;\n  //context.samlConfiguration.mapUnknownClaimsAsIs = false;\n  //context.samlConfiguration.passthroughClaimsWithNoMapping = true;\n  //context.samlConfiguration.createUpnClaim = true;\n  //context.samlConfiguration.logout = {\n  //   \"callback\": \"http://foo/logout\"\n  // }\n\n  //context.samlConfiguration.RelayState = \"foo=bar\"; // SAMLP protocol only\n  //context.samlConfiguration.wctx = \"foo=bar\"; // WS-Fed protocol only\n\n  callback(null, user, context);\n}"
+        "description": "<p>At some point you may want to add fields to your SAML Configuration. The way to do this is to add specific fields as done in the example code snippet below. <code>samlConfiguration</code> is an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for SAMLP and WS-Fed protocol).</p>\n<p>To know more about SAML configuration options check <a href=\"https://auth0.com/docs/saml-configuration#configuration-options\">this documentation page</a>.</p>",
+        "code": "function (user, context, callback) {\n  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);\n\n  context.samlConfiguration = context.samlConfiguration || {};\n  context.samlConfiguration.audience = \"urn:foo\";\n  context.samlConfiguration.recipient = \"http://foo\";\n  context.samlConfiguration.destination = \"http://foo\";\n  context.samlConfiguration.lifetimeInSeconds = 3600;\n  callback(null, user, context);\n}\n"
       }
     ]
   },
@@ -595,11 +661,12 @@
       {
         "id": "verify-user-email-with-password-reset",
         "title": "Verify user email with password reset",
+        "overview": "Verify user email with password reset.",
         "categories": [
           "default"
         ],
-        "description": "<p>This rule will set the user&#39;s email as verified in the next login sequence after the password is reset successfully.</p>\n",
-        "code": "function (user, context, callback) {\n  var request = require('request@2.56.0');\n  var userApiUrl = auth0.baseUrl + '/users/';\n\n  // This rule is only for Auth0 databases\n  if (context.connectionStrategy !== \"auth0\") {\n    return callback(null, user, context);\n  }\n\n  // Set email verified if a user has already updated his/her password\n  if (!user.email_verified && user.last_password_reset) {\n    request.patch({\n      url: userApiUrl + user.user_id,\n      headers: {\n        Authorization: 'Bearer ' + auth0.accessToken\n      },\n      json: { \"email_verified\": true },\n      timeout: 5000\n    }, \n    function(err, response, body) {\n      // Setting email verified isn't propaged to id_token in this \n      // authentication cycle so explicitly set it to true \n      context.idToken.email_verified = true;\n\n      // Always return with success, ignore any management api errors \n      return callback(null, user, context);\n    });\n  } else {\n    return callback(null, user, context);\n  }\n}"
+        "description": "<p>This rule will set the user's email as verified in the next login sequence after the password is reset successfully.</p>",
+        "code": "function (user, context, callback) {\n  const request = require('request');\n  const userApiUrl = auth0.baseUrl + '/users/';\n\n  if (context.connectionStrategy !== 'auth0') {\n    return callback(null, user, context);\n  }\n\n  if (user.email_verified || !user.last_password_reset) {\n    return callback(null, user, context);\n  }\n\n  request.patch({\n    url: userApiUrl + user.user_id,\n    headers: {\n      Authorization: 'Bearer ' + auth0.accessToken\n    },\n    json: { email_verified: true },\n    timeout: 5000\n  },\n  function(err, response, body) {\n    context.idToken.email_verified = true;\n\n    return callback(null, user, context);\n  });\n}\n"
       }
     ]
   }

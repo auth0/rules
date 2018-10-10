@@ -1,12 +1,11 @@
 /**
- * @overview Set the default color of a user's user_metadata field.
+ * @title Add persistent attributes to the user
+ * @overview Set the default color of a user's `user_metadata`.
  * @gallery true
  * @category enrich profile
- * 
- * Add persistent attributes to the user
- * 
- * This rule count set the default color (an example preference) to a user (using user_metadata`).
- * 
+ *
+ * This rule count set the default color (an example preference) to a user (using `user_metadata`).
+ *
  */
 
 function (user, context, callback) {

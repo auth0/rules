@@ -1,12 +1,9 @@
 /**
+ * @title Generate an Parse Session Token
  * @overview Generate a session token for accessing the Parse API
- * @gallery true
  * @category enrich profile
  *
- * Generate an Parse Session Token
- *
- * This rule is used to generate a session token for accessing [Parse API](http://parse.com/). The rule
- * adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls.
+ * This rule is used to generate a session token for accessing [Parse API](http://parse.com/). The rule adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls.
  *
  * The only way of generating a session token is using the [`login`](https://parse.com/docs/rest#users-login) endpoint with a username/password credentials. Since you will be storing users on Auth0, we have to create a rule that uses a long random string with high entropy as a password for all users. You can think of it as a replacement for an API master key to obtain `session tokens`.
  *
@@ -15,7 +12,7 @@
  * <img src="https://docs.google.com/drawings/d/1vCyhpNkW2rOktXI5bp4sogmR6p8qBqJeJY-A5vfHA8c/pub?w=1219&amp;h=558">
  */
 
-function rule (user, context, callback) {
+function (user, context, callback) {
   // run this only for the Parse application
   // if (context.clientID !== 'PARSE CLIENT ID IN AUTH0') return callback(null, user, context);
 
@@ -48,7 +45,7 @@ function rule (user, context, callback) {
     }
 
     // Not found. Likely the user doesn't exist, we provision one
-    if(response.statusCode === 404) {
+    if (response.statusCode === 404) {
       request.post({
         url: 'https://api.parse.com/1/users',
         json: {
@@ -71,9 +68,7 @@ function rule (user, context, callback) {
         }
         return callback(new Error('The user provisioning returned an unknown error. Body: ' + JSON.stringify(body)));
       });
-    }
-    else
-    {
+    } else {
       return callback(new Error('The login returned an unknown error. Status: ' + response.statusCode + ' Body: ' + body));
     }
   });

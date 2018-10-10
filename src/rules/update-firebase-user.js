@@ -1,19 +1,15 @@
 /**
- * @overview Create or update identity information for a user profile stored in Firebase using the Firebase REST API
+ * @title Update user profile identity in Firebase
+ * @overview Create or update identity information for a user profile stored in Firebase using the Firebase REST API.
  * @gallery true
  * @category webhook
  *
- * Update user profile identity in Firebase
+ * This rule is used to create or update identity information for a user profile stored in Firebase using the Firebase REST API. The unique `user.user_id` is base64 encoded to provide a unique generated key for the user.
  *
- * This rule is used to create or update identity information for a user profile
- * stored in Firebase using the Firebase REST API. The unique `user.user_id` is
- * base64 encoded to provide a unique generated key for the user.
- *
- * Each time the user logs into the system, properties of their user
- * profile can updated in Firebase to keep identity properties (like
- * name, email, etc) in sync with authentication credentials.
+ * Each time the user logs into the system, properties of their user profile can updated in Firebase to keep identity properties (like `name`, `email`, etc) in sync with authentication credentials.
  *
  * You can find more information in the Firebase API: [REST API](https://www.firebase.com/docs/rest-api.html)
+ *
  */
 
 function (user, context, callback) {

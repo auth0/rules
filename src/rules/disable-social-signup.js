@@ -1,9 +1,8 @@
 /**
+ * @title Disable social signups
  * @overview Disable signups from social connections.
  * @gallery true
  * @category access control
- *
- * Disable social signups
  *
  * This rule is used to prevent signups using social connections.
  *

@@ -1,14 +1,13 @@
 /**
+ * @title Creates a new Lead in Salesforce on First Login
  * @overview On first login call the Salesforce API to record the contact as a new Lead.
  * @gallery true
  * @category webhook
  *
- * Creates a new Lead in Salesforce on First Login
- *
  * This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the `resource owner` flow to obtain an `access_token`.
  * The username you use to authenticate the API will appear as the __creator__ of the lead.
  *
- * Note: this sample implements very basic error handling.
+ * > Note: this sample implements very basic error handling.
  *
  */
 

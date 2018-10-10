@@ -1,5 +1,6 @@
 /**
- * @overview Get user email address from Twitter
+ * @title Get email address from Twitter
+ * @overview Get user email address from Twitter.
  * @gallery true
  * @category enrich profile
  *
