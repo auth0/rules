@@ -1,9 +1,8 @@
 /**
- * @overview Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile
+ * @title Enrich profile with Towerdata (formerly RapLeaf)
+ * @overview Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile.
  * @gallery true
  * @category enrich profile
- *
- * Enrich profile with Towerdata (formerly RapLeaf)
  *
  * This rule gets user information from towerdata using the e-mail (if available).
  * If the information is immediately available (signaled by a `statusCode=200`),

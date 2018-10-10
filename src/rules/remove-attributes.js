@@ -1,9 +1,8 @@
 /**
+ * @title Remove attributes from a user
  * @overview Remove attributes from a user
  * @gallery true
  * @category enrich profile
- *
- * Remove attributes from a user
  *
  * Sometimes you don't need every attribute from the user. You can use a rule to delete attributes.
  */

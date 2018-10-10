@@ -1,11 +1,10 @@
 /**
- * @overview Query mongoDB and add a property to the user
- * @gallery true
+ * @title Query mongodb and enrich profile
+ * @overview Query mongoDB and add a property to the user.
  * @category database
  *
- * Query mongodb and enrich profile
- *
  * This rule will query mongodb and add a property to the user.
+ *
  */
 
 function (user, context, callback) {

@@ -1,9 +1,9 @@
 /**
+ * @title Link Accounts with Same Email Address while Merging Metadata
  * @overview Link any accounts that have the same email address while merging metadata.
  * @gallery true
  * @category access control
  *
- * Link Accounts with Same Email Address while Merging Metadata
  * This rule will link any accounts that have the same email address while merging metadata.
  */
 
@@ -28,13 +28,13 @@ function (user, context, callback) {
      email: user.email
    }
   },
-  function(err, response, body) {
+  function (err, response, body) {
     if (err) return callback(err);
     if (response.statusCode !== 200) return callback(new Error(body));
 
     var data = JSON.parse(body);
     // Ignore non-verified users and current user, if present
-    data = data.filter(function(u) {
+    data = data.filter(function (u) {
       return u.email_verified && (u.user_id !== user.user_id);
     });
 
@@ -54,14 +54,14 @@ function (user, context, callback) {
     user.user_metadata = user.user_metadata || {};
     auth0.users.updateAppMetadata(originalUser.user_id, user.app_metadata)
     .then(auth0.users.updateUserMetadata(originalUser.user_id, user.user_metadata))
-    .then(function(){
+    .then(function() {
       request.post({
         url: userApiUrl + '/' + originalUser.user_id + '/identities',
         headers: {
           Authorization: 'Bearer ' + auth0.accessToken
         },
         json: { provider: provider, user_id: String(providerUserId) }
-      }, function(err, response, body) {
+      }, function (err, response, body) {
           if (response && response.statusCode >= 400) {
             return callback(new Error('Error linking account: ' + response.statusMessage));
           }
@@ -69,7 +69,7 @@ function (user, context, callback) {
           callback(null, user, context);
       });
     })
-    .catch(function(err){
+    .catch(function (err) {
       callback(err);
     });
   });

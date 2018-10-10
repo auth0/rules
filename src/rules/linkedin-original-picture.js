@@ -1,10 +1,11 @@
 /**
+ * @title Use the original sized profile picture for LinkedIn connections
  * @overview Set the picture to the profile picture for users who login with LinkedIn
  * @gallery true
  * @category enrich profile
  *
- * Use the original sized profile picture for LinkedIn connections
  * This rule will set the `picture` to the original sized profile picture for users who login with LinkedIn.
+ *
  */
 
 function (user, context, callback) {
@@ -20,16 +21,16 @@ function (user, context, callback) {
     url: 'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',
     headers: {
       Authorization: 'Bearer ' + liIdentity.access_token
-    }
+    },
+    json: true
   };
 
-  request(options, function(error, response) {
-    if (!error && response.statusCode === 200) {
-      const json = JSON.parse(response.body);
+  request(options, function (error, response, body) {
+    if (error) return callback(error);
+    if (response.statusCode !== 200) return callback(new Error(body));
 
-      if (json.values && json.values.length >= 1) {
-        context.idToken.picture = json.values[0];
-      }
+    if (body.values && body.values.length >= 1) {
+      context.idToken.picture = body.values[0];
     }
 
     return callback(null, user, context);

@@ -1,11 +1,12 @@
 /**
- * @overview Get the fraud score from socure.com and store it on app_metadata
+ * @title Detect Fraud Users
+ * @overview Get the fraud score from socure.com and store it on app_metadata.
  * @gallery true
  * @category enrich profile
  *
- * Detect Fraud Users
  *
  * This rule gets the fraud score from socure.com and store it on app_metadata.
+ *
  */
 
 function (user, context, callback) {

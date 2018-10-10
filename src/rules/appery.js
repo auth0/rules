@@ -1,7 +1,6 @@
 /**
+ * @title Generate an Appery.io Session Token
  * @overview Generate a session token for accessing Appery.io Database Services.
- *
- * Generate an Appery.io Session Token
  *
  * This rule is used to generate a session token for accessing [Appery.io Database Services](http://appery.io/). The rule
  * adds a new `user.apperyio_session_token` property set to the user profile containing the Appery.io session token. You can use this `session token` to make further Appery.io API calls.
@@ -10,7 +9,6 @@
  * If the user doesn't exist, this rule will auto-provision one, with `email`, `name` or `user_id` as the handle.
  *
  */
-
 
 function (user, context, callback) {
   // run this only for the Appery.io application

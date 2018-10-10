@@ -1,13 +1,13 @@
 /**
- * @overview Change SAML configuration
+ * @title Change SAML configuration
+ * @overview Change your SAML configuration.
  * @gallery true
  * @category saml
- *
- * Change your SAML configuration
  *
  * At some point you may want to add fields to your SAML Configuration. The way to do this is to add specific fields as done in the example code snippet below. `samlConfiguration` is an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for SAMLP and WS-Fed protocol).
  *
  * To know more about SAML configuration options check [this documentation page](https://auth0.com/docs/saml-configuration#configuration-options).
+ *
  */
 
 function (user, context, callback) {

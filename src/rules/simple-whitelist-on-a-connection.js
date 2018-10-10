@@ -1,21 +1,20 @@
 /**
- * @overview Only allow access to users coming from a whitelist on specific connection
+ * @title Whitelist on Specific Connection
+ * @overview Only allow access to users coming from a whitelist on specific connection.
  * @gallery true
  * @category access control
  *
- * Whitelist on Specific Connection
- *
  * This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).
+ *
  */
 
 function (user, context, callback) {
   // We check users only authenticated with 'fitbit'
-  if(context.connection === 'fitbit'){
+  if(context.connection === 'fitbit') {
     const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized user emails
-    const userHasAccess = whitelist.some(
-      function (email) {
-        return (user.email_verified && email === user.email);
-      });
+    const userHasAccess = whitelist.some(function (email) {
+      return (user.email_verified && email === user.email);
+    });
 
     if (!userHasAccess) {
       return callback(new UnauthorizedError('Access denied.'));
