@@ -1,6 +1,7 @@
 'use strict';
 
 const nock = require('nock');
+const _ = require('lodash');
 
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
@@ -11,9 +12,13 @@ const ruleName = 'requestbin';
 describe(ruleName, () => {
   let context;
   let rule;
+  let globals;
 
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    globals = {
+      _: _
+    };
+    rule = loadRule(ruleName, globals);
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()
@@ -43,21 +48,11 @@ describe(ruleName, () => {
       email: 'duck.t@example.com'
     };
 
-    function filter(dict, whitelist) {
-      var filtered = {};
-      Object.keys(dict).forEach(function(key) {
-        if (whitelist.indexOf(key) >= 0) {
-          filtered[key] = dict[key];
-        }
-      });
-      return filtered;
-    }
-
     const user_whitelist = ['user_id', 'email', 'email_verified'];
-    const user_filtered  = filter(user, user_whitelist);
+    const user_filtered  = _.pick(user, user_whitelist);
 
     const context_whitelist = ['clientID', 'connection', 'stats'];
-    const context_filtered  = filter(context, context_whitelist);
+    const context_filtered  = _.pick(context, context_whitelist);
 
     nock('https://requestbin.fullcontact.com')
       .post('/YourBinUrl', function(body) {

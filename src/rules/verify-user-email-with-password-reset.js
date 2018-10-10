@@ -30,11 +30,7 @@ function (user, context, callback) {
     function(err, response, body) {
       // Setting email verified isn't propagated to id_token in this
       // authentication cycle so explicitly set it to true given no errors.
-      if (err) {
-        context.idToken.email_verified = false;
-      } else {
-        context.idToken.email_verified = true;
-      };
+      context.idToken.email_verified = (!err && response.statusCode === 200);
 
       // Return with success at this point.
       return callback(null, user, context);

@@ -16,23 +16,13 @@
 function (user, context, callback) {
   const request = require('request');
 
-  function filter(dict, whitelist) {
-    var filtered = {};
-    Object.keys(dict).forEach(function(key) {
-      if (whitelist.indexOf(key) >= 0) {
-        filtered[key] = dict[key];
-      }
-    });
-    return filtered;
-  }
-
   // https://auth0.com/docs/user-profile/user-profile-structure
   const user_whitelist = ['user_id', 'email', 'email_verified'];
-  const user_filtered  = filter(user, user_whitelist);
+  const user_filtered  = _.pick(user, user_whitelist);
 
   // https://auth0.com/docs/rules/current/context
   const context_whitelist = ['clientID', 'connection', 'stats'];
-  const context_filtered  = filter(context, context_whitelist);
+  const context_filtered  = _.pick(context, context_whitelist);
 
   request.post({
     url: 'https://requestbin.fullcontact.com/YourBinUrl',
