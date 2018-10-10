@@ -23,6 +23,7 @@ describe(ruleName, () => {
     const user = {
       user_id: 'uid1',
       email: 'duck.t@example.com',
+      email_verified: false,
       name: 'Terrified Duck'
     };
 
@@ -39,6 +40,7 @@ describe(ruleName, () => {
     const user = {
       user_id: 'uid2',
       email: 'user2@example.com',
+      email_verified: true,
       name: 'user2'
     };
 
@@ -55,6 +57,7 @@ describe(ruleName, () => {
     const user = {
       user_id: 'uid1',
       email: 'duck.t@example.com',
+      email_verified: false,
       name: 'Terrified Duck'
     };
 

@@ -14,9 +14,6 @@
 
 function (user, context, callback) {
   const request = require('request');
-  const _ = require('lodash');
-
-  const ZAP_HOOK_URL = 'https://zap.example.com/hook-path'; // replace with your hook url
 
   const small_context = {
     appName: context.clientName,
@@ -29,7 +26,7 @@ function (user, context, callback) {
   const payload_to_zap = _.extend({}, user, small_context);
 
   request.post({
-    url: ZAP_HOOK_URL,
+    url : configuration.ZAP_HOOK_URL,
     json: payload_to_zap
   },
   function (err, response, body) {

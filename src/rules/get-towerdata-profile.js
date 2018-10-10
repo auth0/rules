@@ -2,22 +2,20 @@
  * @overview Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile
  * @gallery true
  * @category enrich profile
- * 
+ *
  * Enrich profile with Towerdata (formerly RapLeaf)
- * 
- * This rule gets user information from towerdata using the e-mail (if available). 
- * If the information is immediately available (signaled by a `statusCode=200`), 
- * it adds a new property `towerdata` to the user profile and returns. Any other conditions are ignored. 
+ *
+ * This rule gets user information from towerdata using the e-mail (if available).
+ * If the information is immediately available (signaled by a `statusCode=200`),
+ * it adds a new property `towerdata` to the user profile and returns. Any other conditions are ignored.
  * See http://docs.towerdata.com/#introduction-3 for full details.
- * 
+ *
  */
 
 function (user, context, callback) {
 
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);
-
-  const towerdataApiKey = 'YOUR towerdata API KEY';
 
   if (!user.email) {
     return callback(null, user, context);
@@ -26,7 +24,7 @@ function (user, context, callback) {
   request.get('https://api.towerdata.com/v5/td', {
       qs: {
         email: user.email,
-        api_key: towerdataApiKey
+        api_key: configuration.TOWERDATA_API_KEY
       },
       json: true
     },

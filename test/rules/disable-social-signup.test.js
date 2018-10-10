@@ -30,7 +30,7 @@ describe(ruleName, () => {
       context = new ContextBuilder().build();
     });
 
-    it('should allow login/signup', (done) => {    
+    it('should allow login/signup', (done) => {
       rule(user, context, (err, user, ctx) => {
         expect(err).toBeNull();
         expect(globals.auth0.users.updateAppMetadata.mock.calls.length).toBe(0);
@@ -44,8 +44,10 @@ describe(ruleName, () => {
       context = new ContextBuilder()
         .withClientId('REPLACE_WITH_YOUR_CLIENT_ID')
         .withStats({ loginsCount: 1 })
+        .withConnection('social')
+        .withConnectionStrategy('social')
         .build();
-      
+
       globals.auth0.users.updateAppMetadata.mockReturnValue(Promise.resolve());
     });
 
@@ -63,7 +65,7 @@ describe(ruleName, () => {
       context = new ContextBuilder()
         .withClientId('REPLACE_WITH_YOUR_CLIENT_ID')
         .build();
-      
+
       user = new UserBuilder()
         .withAppMetadata({ is_signup: true })
         .build();

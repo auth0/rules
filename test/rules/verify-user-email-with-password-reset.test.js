@@ -73,4 +73,35 @@ describe(ruleName, () => {
       done();
     });
   });
+
+  it('should do nothing if response status isn`t 200', (done) => {
+    nock('https://example.com', { reqheaders: { Authorization: 'Bearer accessToken' } })
+      .intercept('/users/uid1', 'PATCH', (body) => {
+        expect(body.email_verified).toEqual(true);
+        return true;
+      })
+      .reply(400);
+
+    rule({ user_id: 'uid1', last_password_reset: true }, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c.idToken.email_verified).toEqual(false);
+      done();
+    });
+  });
+
+  it('should do nothing if a mgmt api error occurs', (done) => {
+    nock('https://example.com', { reqheaders: { Authorization: 'Bearer accessToken' } })
+      .intercept('/users/uid1', 'PATCH', (body) => {
+        expect(body.email_verified).toEqual(true);
+        return true;
+      })
+      .replyWithError('whoops');
+
+    rule({ user_id: 'uid1', last_password_reset: true }, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c.idToken.email_verified).toEqual(false);
+      done();
+    });
+  });
+
 });

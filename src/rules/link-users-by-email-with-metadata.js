@@ -45,7 +45,7 @@ function (user, context, callback) {
       console.log('[-] Skipping link rule');
       return callback(null, user, context);
     }
-    
+
     const originalUser = data[0];
     const provider = user.identities[0].provider;
     const providerUserId = user.identities[0].user_id;

@@ -2,20 +2,20 @@
  * @overview On first login call the Salesforce API to record the contact as a new Lead.
  * @gallery true
  * @category webhook
- * 
+ *
  * Creates a new Lead in Salesforce on First Login
- * 
+ *
  * This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the `resource owner` flow to obtain an `access_token`.
  * The username you use to authenticate the API will appear as the __creator__ of the lead.
- * 
+ *
  * Note: this sample implements very basic error handling.
- * 
+ *
  */
 
-function (user, context, done) {
+function (user, context, callback) {
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.recordedAsLead) {
-    return done(null,user,context);
+    return callback(null,user,context);
   }
 
   const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
@@ -98,7 +98,7 @@ function (user, context, done) {
         return callback(JSON.parse(body));
       });
   }
-  
+
   // don’t wait for the SF API call to finish, return right away (the request will continue on the sandbox)`
-  done(null, user, context);
+  callback(null, user, context);
 }

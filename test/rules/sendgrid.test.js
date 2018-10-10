@@ -11,6 +11,9 @@ const ruleName = 'sendgrid';
 describe(ruleName, () => {
   let context;
   let rule;
+  const configuration = {
+    SENDGRID_API_KEY: 'SENDGRID_API_KEY'
+  };
   const auth0 = {
     users: {
       updateAppMetadata: function(id, metadata) {
@@ -28,7 +31,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0 });
+    rule = loadRule(ruleName, { configuration, auth0 });
   });
 
   describe('should do nothing', () => {
@@ -66,7 +69,7 @@ describe(ruleName, () => {
         email: 'duck.t@example.com'
       };
 
-      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ...'} })
+      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ' + configuration.SENDGRID_API_KEY} })
         .post('/api/mail.send.json', function(body) {
           const expectations = {
             to: 'admin@example.com',
@@ -89,7 +92,7 @@ describe(ruleName, () => {
     });
 
     it('and return error if call fails', (done) => {
-      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ...'} })
+      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ' + configuration.SENDGRID_API_KEY} })
         .post('/api/mail.send.json', function() {
           return true;
         })
@@ -104,7 +107,7 @@ describe(ruleName, () => {
     });
 
     it('and return error if call fails', (done) => {
-      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ...'} })
+      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ' + configuration.SENDGRID_API_KEY} })
         .post('/api/mail.send.json', function() {
           return true;
         })
@@ -119,7 +122,7 @@ describe(ruleName, () => {
     });
 
     it('and return error if metadata update fails', (done) => {
-      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ...'} })
+      nock('https://api.sendgrid.com', { reqheaders: { Authorization: 'Bearer ' + configuration.SENDGRID_API_KEY} })
         .post('/api/mail.send.json', function() {
           return true;
         })

@@ -11,6 +11,7 @@ const ruleName = 'zapier-new-login';
 describe(ruleName, () => {
   let context;
   let rule;
+  let globals;
 
   const stubs = {
     lodash: {
@@ -21,7 +22,13 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, {}, stubs);
+    globals = {
+      _: require('lodash'),
+      configuration: {
+        ZAP_HOOK_URL: 'https://zap.example.com/hook-path'
+      }
+    };
+    rule = loadRule(ruleName, globals, stubs);
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

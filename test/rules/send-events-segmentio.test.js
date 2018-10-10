@@ -11,6 +11,9 @@ const ruleName = 'send-events-segmentio';
 describe(ruleName, () => {
   let context;
   let rule;
+  const configuration = {
+    SEGMENTIO_WRITE_KEY: 'SEGMENTIO_WRITE_KEY'
+  };
   const user = {
     user_id: 'uid1',
     name: 'Terrified Duck',
@@ -18,7 +21,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    rule = loadRule(ruleName, { configuration });
   });
 
   describe('should do nothing', () => {
@@ -51,7 +54,7 @@ describe(ruleName, () => {
     });
 
     it('as "Signed up" if it`s first login', (done) => {
-      nock('https://SEGMENTIO_WRITE_KEY@api.segment.io')
+      nock('https://api.segment.io')
         .post('/v1/track', function(body) {
           const expectations = {
             userId: user.user_id,
@@ -79,7 +82,7 @@ describe(ruleName, () => {
     });
 
     it('as "Logged in" if login count > 1', (done) => {
-      nock('https://SEGMENTIO_WRITE_KEY@api.segment.io')
+      nock('https://api.segment.io')
         .post('/v1/track', function(body) {
           const expectations = {
             userId: user.user_id,

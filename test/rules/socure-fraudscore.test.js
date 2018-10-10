@@ -12,6 +12,10 @@ describe(ruleName, () => {
   let context;
   let rule;
 
+  const configuration = {
+    SOCURE_KEY: 'YOUR_SOCURE_API_KEY'
+  };
+
   const auth0 = {
     users: {
       updateAppMetadata: (id, metadata) => {
@@ -30,7 +34,7 @@ describe(ruleName, () => {
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { auth0 });
+    rule = loadRule(ruleName, { configuration, auth0 });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

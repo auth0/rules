@@ -12,15 +12,20 @@ describe(ruleName, () => {
   let context;
   let rule;
   let alert;
+  const configuration = {
+    SLACK_WEBHOOK_URL: 'YOUR SLACK WEBHOOK URL' ,
+    KEEN_PROJ_ID     : 'YOUR KEEN IO PROJECT ID',
+    KEEN_WRITE_KEY   : 'YOUR KEEN IO WRITE KEY'
+  }
   const stubs = {
     'slack-notify': function(webhook) {
-      expect(webhook).toEqual('YOUR SLACK WEBHOOK URL');
+      expect(webhook).toEqual(configuration.SLACK_WEBHOOK_URL);
       return { alert };
     }
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, {}, stubs);
+    rule = loadRule(ruleName, { configuration }, stubs);
   });
 
   describe('should do nothing', () => {
@@ -57,8 +62,10 @@ describe(ruleName, () => {
         name: 'Terrified Duck'
       };
 
-      nock('https://api.keen.io')
-        .post('/3.0/projects/YOUR%20KEEN%20IO%20PROJECT%20ID/events/signups?api_key=YOUR%20KEEN%20IO%20WRITE%20KEY', function(body) {
+      nock(
+        'https://api.keen.io',
+        { reqheaders: {'authorization': configuration.KEEN_WRITE_KEY} }
+      ).post('/3.0/projects/YOUR%20KEEN%20IO%20PROJECT%20ID/events/signups', function(body) {
           expect(body.userId).toEqual(user.user_id);
           expect(body.name).toEqual(user.name);
           expect(body.ip).toEqual(context.request.ip);
@@ -84,8 +91,10 @@ describe(ruleName, () => {
         done();
       };
 
-      nock('https://api.keen.io')
-        .post('/3.0/projects/YOUR%20KEEN%20IO%20PROJECT%20ID/events/signups?api_key=YOUR%20KEEN%20IO%20WRITE%20KEY', function() {
+      nock(
+        'https://api.keen.io',
+        { reqheaders: {'authorization': configuration.KEEN_WRITE_KEY} }
+      ).post('/3.0/projects/YOUR%20KEEN%20IO%20PROJECT%20ID/events/signups', function() {
           return true;
         })
         .replyWithError(new Error('test error'));

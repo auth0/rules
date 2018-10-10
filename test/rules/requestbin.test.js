@@ -1,6 +1,7 @@
 'use strict';
 
 const nock = require('nock');
+const _ = require('lodash');
 
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
@@ -11,9 +12,13 @@ const ruleName = 'requestbin';
 describe(ruleName, () => {
   let context;
   let rule;
+  let globals;
 
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    globals = {
+      _: _
+    };
+    rule = loadRule(ruleName, globals);
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()
@@ -22,7 +27,7 @@ describe(ruleName, () => {
   });
 
   it('should return error if call fails', (done) => {
-    nock('http://requestbin.fullcontact.com')
+    nock('https://requestbin.fullcontact.com')
       .post('/YourBinUrl', function() {
         return true;
       })
@@ -43,10 +48,16 @@ describe(ruleName, () => {
       email: 'duck.t@example.com'
     };
 
-    nock('http://requestbin.fullcontact.com')
+    const user_whitelist = ['user_id', 'email', 'email_verified'];
+    const user_filtered  = _.pick(user, user_whitelist);
+
+    const context_whitelist = ['clientID', 'connection', 'stats'];
+    const context_filtered  = _.pick(context, context_whitelist);
+
+    nock('https://requestbin.fullcontact.com')
       .post('/YourBinUrl', function(body) {
-        expect(body.user).toEqual(user);
-        expect(body.context).toEqual(context);
+        expect(body.user).toEqual(user_filtered);
+        expect(body.context).toEqual(context_filtered);
         return true;
       })
       .reply(200);
