@@ -9,6 +9,12 @@
  */
 
 function (user, context, callback) {
+
+  // Roles should only be set to verified users.
+  if (!user.email || !user.email_verified) {
+    return callback(null, user, context);
+  }
+
   user.app_metadata = user.app_metadata || {};
   // You can add a Role based on what you want
   // In this case I check domain

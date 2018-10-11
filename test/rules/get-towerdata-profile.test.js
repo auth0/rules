@@ -32,6 +32,32 @@ describe(ruleName, () => {
     rule = loadRule(ruleName, globals);
   });
 
+  describe('when the rule is executed', () => {
+    beforeEach(() => {
+      user = new UserBuilder()
+        .build();
+
+      context = new ContextBuilder()
+        .build();
+    });
+
+    it('should do nothing if the user has no email', (done) => {
+      user.email = '';
+      rule(user, context, (e) => {
+        expect(e).toBeFalsy();
+        done();
+      });
+    });
+
+    it('should do nothing if user`s email isn`t verified', (done) => {
+      user.email_verified = false;
+      rule(user, context, (e) => {
+        expect(e).toBeFalsy();
+        done();
+      });
+    });
+  });
+
   it('should set the tower data body on the context idToken', (done) => {
     rule(user, context, (e, u, c) => {
       expect(c.idToken['https://example.com/towerdata']).toBe(towerdataBody);

@@ -9,6 +9,12 @@
  */
 
 function (user, context, callback) {
+
+  // Access should only be granted to verified users.
+  if (!user.email || !user.email_verified) {
+    return callback(null, user, context);
+  }
+
   const whitelist = ['example.com', 'example.org']; //authorized domains
   const userHasAccess = whitelist.some(
       function (domain) {

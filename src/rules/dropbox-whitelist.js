@@ -10,6 +10,12 @@
  */
 
 function (user, context, callback) {
+
+  // Access should only be granted to verified users.
+  if (!user.email || !user.email_verified) {
+    return callback(null, user, context);
+  }
+
   request.get({
     url: 'https://dl.dropboxusercontent.com/u/12345678/email_list.txt'
   }, (err, response, body) => {

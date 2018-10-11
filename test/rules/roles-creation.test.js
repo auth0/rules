@@ -2,14 +2,16 @@
 
 const nock = require('nock');
 
-const loadRule = require('../utils/load-rule');
+const loadRule       = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
+const UserBuilder    = require('../utils/userBuilder');
 const RequestBuilder = require('../utils/requestBuilder');
 
 const ruleName = 'roles-creation';
 
 describe(ruleName, () => {
   let context;
+  let user;
   let rule;
 
   const auth0 = {
@@ -18,13 +20,6 @@ describe(ruleName, () => {
         if (id === 'broken') {
           return Promise.reject(new Error('test error'));
         }
-
-        if (id === 'uid1') {
-          expect(metadata.roles).toEqual(['admin']);
-        } else {
-          expect(metadata.roles).toEqual(['user']);
-        }
-
         return Promise.resolve();
       }
     }
@@ -34,47 +29,54 @@ describe(ruleName, () => {
     rule = loadRule(ruleName, { auth0 });
 
     const request = new RequestBuilder().build();
+    user = new UserBuilder()
+      .withEmail('denied@nope.com')
+      .build();
     context = new ContextBuilder()
       .withRequest(request)
       .build();
   });
 
-  it('should return error if metadata update fails', (done) => {
-    rule({ user_id: 'broken' }, context, (err) => {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toEqual('test error');
-
+  it('should do nothing if the user has no email', (done) => {
+    user.email = '';
+    rule(user, context, (e) => {
+      expect(e).toBeFalsy();
       done();
     });
   });
 
-  it('should apply admin role', (done) => {
-    const user = {
-      user_id: 'uid1',
-      name: 'Terrified Duck',
-      email: 'duck.t@example.com'
-    };
+  it('should do nothing if user`s email isn`t verified', (done) => {
+    user.email_verified = false;
+    rule(user, context, (e) => {
+      expect(e).toBeFalsy();
+      done();
+    });
+  });
 
-    rule(user, context, (err, u, c) => {
-      expect(err).toBeFalsy();
-      expect(c.idToken['https://example.com/roles']).toEqual(['admin']);
-
+  it('should return error if metadata update fails', (done) => {
+    user.user_id = 'broken';
+    rule(user, context, (err) => {
+      expect(err).toBeInstanceOf(Error);
+      expect(err.message).toEqual('test error');
       done();
     });
   });
 
   it('should apply user role', (done) => {
-    const user = {
-      user_id: 'uid2',
-      name: 'Terrified Duck',
-      email: 'duck.t@ducks.com'
-    };
-
     rule(user, context, (err, u, c) => {
       expect(err).toBeFalsy();
       expect(c.idToken['https://example.com/roles']).toEqual(['user']);
-
       done();
     });
   });
+
+  it('should apply admin role', (done) => {
+    user.email = 'admin@example.com';
+    rule(user, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c.idToken['https://example.com/roles']).toEqual(['admin']);
+      done();
+    });
+  });
+
 });

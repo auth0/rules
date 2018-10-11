@@ -17,7 +17,7 @@ function (user, context, callback) {
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);
 
-  if (!user.email) {
+  if (!user.email || !user.email_verified) {
     return callback(null, user, context);
   }
 

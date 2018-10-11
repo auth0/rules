@@ -28,6 +28,32 @@ describe(ruleName, () => {
     rule = loadRule(ruleName, globals);
   });
 
+  describe('when the rule is executed', () => {
+    beforeEach(() => {
+      user = new UserBuilder()
+        .build();
+
+      context = new ContextBuilder()
+        .build();
+    });
+
+    it('should do nothing if the user has no email', (done) => {
+      user.email = '';
+      rule(user, context, (e) => {
+        expect(e).toBeFalsy();
+        done();
+      });
+    });
+
+    it('should do nothing if user`s email isn`t verified', (done) => {
+      user.email_verified = false;
+      rule(user, context, (e) => {
+        expect(e).toBeFalsy();
+        done();
+      });
+    });
+  });
+
   describe('when user email is in dropbox', () => {
     beforeEach(() => {
       user = new UserBuilder()
@@ -35,7 +61,7 @@ describe(ruleName, () => {
         .build();
     });
 
-    it('should authorize the user', (done) => {      
+    it('should authorize the user', (done) => {
       rule(user, context, (err, user, ctx) => {
         expect(err).toBeNull();
 
@@ -51,7 +77,7 @@ describe(ruleName, () => {
         .build();
     });
 
-    it('should not authorize the user', (done) => {      
+    it('should not authorize the user', (done) => {
       rule(user, context, (err, user, ctx) => {
         expect(err).toBeInstanceOf(globals.UnauthorizedError);
 
@@ -61,7 +87,7 @@ describe(ruleName, () => {
   });
 });
 
-const dropboxUsersFileFixture = 
+const dropboxUsersFileFixture =
 `user1@domain.com
 user2@domain.com
 user3@domain.com`;
