@@ -30,7 +30,7 @@
           "access control"
         ],
         "description": "<p>This rule checks if the user's login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.</p>\n<p>Use this rule to only allow users from specific email domains to login.</p>\n<p>For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.</p>",
-        "code": " function (user, context, callback) {\n  const connectionOptions = context.connectionOptions;\n  const domainAliases = connectionOptions.domain_aliases || [];\n  const tenantDomain = connectionOptions.tenant_domain;\n\n  if (!tenantDomain && !domainAliases.length) {\n    return callback(null, user, context);\n  }\n\n  if (domainAliases.length && !tenantDomain) return callback('Access denied');\n\n  const allowedDomains = new Set([tenantDomain]);\n  domainAliases.forEach(function (alias) {\n    if (alias) allowedDomains.add(alias.toLowerCase());\n  });\n\n  const emailSplit = user.email.split('@');\n  const userEmailDomain = emailSplit[emailSplit.length - 1].toLowerCase();\n  if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);\n\n  return callback('Access denied');\n}\n"
+        "code": "function (user, context, callback) {\n  const connectionOptions = context.connectionOptions;\n  const domainAliases = connectionOptions.domain_aliases || [];\n  const tenantDomain = connectionOptions.tenant_domain;\n\n  if (!tenantDomain && !domainAliases.length) {\n    return callback(null, user, context);\n  }\n\n  if (domainAliases.length && !tenantDomain) return callback('Access denied');\n\n  const allowedDomains = new Set([tenantDomain]);\n  domainAliases.forEach(function (alias) {\n    if (alias) allowedDomains.add(alias.toLowerCase());\n  });\n\n  const emailSplit = user.email.split('@');\n  const userEmailDomain = emailSplit[emailSplit.length - 1].toLowerCase();\n  if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);\n\n  return callback('Access denied');\n}\n"
       },
       {
         "id": "check-last-password-reset",
@@ -70,7 +70,7 @@
           "access control"
         ],
         "description": "<p>This rule denies/grant access to users based on a list of emails stored in Dropbox.</p>",
-        "code": "function (user, context, callback) {\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/12345678/email_list.txt'\n  }, (err, response, body) => {\n    const whitelist = body.split('\\n');\n\n    const userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/12345678/email_list.txt'\n  }, (err, response, body) => {\n    const whitelist = body.split('\\n');\n\n    const userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}\n"
       },
       {
         "id": "email-verified",
@@ -120,7 +120,7 @@
           "access control"
         ],
         "description": "<p>This rule adds a Roles field to the user based on some pattern.</p>",
-        "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  const addRolesToUser = function(user) {\n    const endsWith = '@example.com';\n\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      return ['admin']\n    }\n    return ['user'];\n  };\n\n  const roles = addRolesToUser(user);\n\n  user.app_metadata.roles = roles;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function() {\n      context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n      callback(null, user, context);\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  user.app_metadata = user.app_metadata || {};\n  const addRolesToUser = function(user) {\n    const endsWith = '@example.com';\n\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      return ['admin']\n    }\n    return ['user'];\n  };\n\n  const roles = addRolesToUser(user);\n\n  user.app_metadata.roles = roles;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function() {\n      context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n      callback(null, user, context);\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n}\n"
       },
       {
         "id": "simple-domain-whitelist",
@@ -130,7 +130,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email domains.</p>",
-        "code": "function (user, context, callback) {\n  const whitelist = ['example.com', 'example.org']; \n  const userHasAccess = whitelist.some(\n      function (domain) {\n        const emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  return callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  const whitelist = ['example.com', 'example.org']; \n  const userHasAccess = whitelist.some(\n      function (domain) {\n        const emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  return callback(null, user, context);\n}\n"
       },
       {
         "id": "simple-user-whitelist-for-app",
@@ -140,7 +140,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email addresses on a specific app.</p>",
-        "code": "function (user, context, callback) {\n  if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n  const userHasAccess = whitelist.some(function (email) {\n    return email === user.email;\n  });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n  const userHasAccess = whitelist.some(function (email) {\n    return email === user.email;\n  });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "simple-user-whitelist",
@@ -150,7 +150,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email addresses.</p>",
-        "code": "function (user, context, callback) {\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n  const userHasAccess = whitelist.some(\n    function (email) {\n      return email === user.email;\n    });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n  const userHasAccess = whitelist.some(\n    function (email) {\n      return email === user.email;\n    });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "simple-whitelist-on-a-connection",
@@ -160,7 +160,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).</p>",
-        "code": "function (user, context, callback) {\n  if(context.connection === 'fitbit') {\n    const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n    const userHasAccess = whitelist.some(function (email) {\n      return (user.email_verified && email === user.email);\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n  }\n\n  callback(null, user, context);\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  if(context.connection === 'fitbit') {\n    const whitelist = [ 'user1@example.com', 'user2@example.com' ]; \n    const userHasAccess = whitelist.some(function (email) {\n      return (email === user.email);\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n  }\n\n  callback(null, user, context);\n}\n"
       }
     ]
   },
@@ -205,7 +205,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule will query a SQL server database on each login and add a <code>roles</code> array to the user.</p>\n<blockquote>\n  <p>Note: you can store the connection string securely on Auth0 encrypted configuration. Also make sure when you call an external endpoint to open your firewall/ports to our IP address which you can find it in the rules editor. This happens when you query SQL Azure for example.</p>\n</blockquote>",
-        "code": "function (user, context, callback) {\n  getRoles(user.email, (err, roles) => {\n    if (err) return callback(err);\n\n    context.idToken['https://example.com/roles'] = roles;\n\n    callback(null, user, context);\n  });\n\n  function getRoles(email, done) {\n    const connection = sqlserver.connect({\n      userName: configuration.SQL_DATABASE_USERNAME,\n      password: configuration.SQL_DATABASE_PASSWORD,\n      server:   configuration.SQL_DATABASE_HOSTNAME,\n      options: {\n        database: configuration.SQL_DATABASE_NAME,\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', (error) => {\n      console.log(error.message);\n    });\n\n    const query = \"SELECT Email, Role FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', (err) => {\n      if (err) return done(new Error(err));\n\n      const request = new sqlserver.Request(query, (err, rowCount, rows) => {\n        if (err) return done(new Error(err));\n\n        const roles = rows.map((row) => {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  getRoles(user.email, (err, roles) => {\n    if (err) return callback(err);\n\n    context.idToken['https://example.com/roles'] = roles;\n\n    callback(null, user, context);\n  });\n\n  function getRoles(email, done) {\n    const connection = sqlserver.connect({\n      userName: configuration.SQL_DATABASE_USERNAME,\n      password: configuration.SQL_DATABASE_PASSWORD,\n      server:   configuration.SQL_DATABASE_HOSTNAME,\n      options: {\n        database: configuration.SQL_DATABASE_NAME,\n        encrypt:  true,\n        rowCollectionOnRequestCompletion: true\n      }\n    }).on('errorMessage', (error) => {\n      console.log(error.message);\n    });\n\n    const query = \"SELECT Email, Role FROM dbo.Role WHERE Email = @email\";\n\n    connection.on('connect', (err) => {\n      if (err) return done(new Error(err));\n\n      const request = new sqlserver.Request(query, (err, rowCount, rows) => {\n        if (err) return done(new Error(err));\n\n        const roles = rows.map((row) => {\n          return row[1].value;\n        });\n\n        done(null, roles);\n      });\n\n      request.addParameter('email', sqlserver.Types.VarChar, email);\n\n      connection.execSql(request);\n    });\n  }\n}\n"
       },
       {
         "id": "default-picture-null-avatars",
@@ -255,7 +255,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule gets user information from towerdata using the e-mail (if available).\nIf the information is immediately available (signaled by a <code>statusCode=200</code>),\nit adds a new property <code>towerdata</code> to the user profile and returns. Any other conditions are ignored.\nSee http://docs.towerdata.com/#introduction-3 for full details.</p>",
-        "code": "function (user, context, callback) {\n\n  if (!user.email) {\n    return callback(null, user, context);\n  }\n\n  request.get('https://api.towerdata.com/v5/td', {\n      qs: {\n        email: user.email,\n        api_key: configuration.TOWERDATA_API_KEY\n      },\n      json: true\n    },\n    (err, response, body) => {\n      if (err) return callback(err);\n\n      if (response.statusCode === 200) {\n        context.idToken['https://example.com/towerdata'] = body;\n      }\n\n      return callback(null, user, context);\n    });\n}\n"
+        "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  request.get('https://api.towerdata.com/v5/td', {\n      qs: {\n        email: user.email,\n        api_key: configuration.TOWERDATA_API_KEY\n      },\n      json: true\n    },\n    (err, response, body) => {\n      if (err) return callback(err);\n\n      if (response.statusCode === 200) {\n        context.idToken['https://example.com/towerdata'] = body;\n      }\n\n      return callback(null, user, context);\n    });\n}\n"
       },
       {
         "id": "get-twitter-email",
