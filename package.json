@@ -4,7 +4,6 @@
   "description": "Auth0 Rules Repository",
   "main": "./rules",
   "scripts": {
-    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'",
     "build": "./build",
     "test": "jest"
   },
