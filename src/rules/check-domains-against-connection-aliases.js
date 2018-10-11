@@ -1,9 +1,8 @@
 /**
- * @overview Check if user email domain matches configured domain.
+ * @title Check if user email domain matches configured domain
+ * @overview Check user email domain matches domains configured in connection.
  * @gallery true
  * @category access control
- *
- * Check user email domain matches domains configured in connection
  *
  * This rule checks if the user's login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.
  *

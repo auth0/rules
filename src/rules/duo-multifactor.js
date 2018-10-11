@@ -1,9 +1,8 @@
 /**
+ * @title Multifactor with Duo Security
  * @overview Trigger multifactor authentication with Duo Security when a condition is met.
  * @gallery true
  * @category multifactor
- *
- * Multifactor with Duo Security
  *
  * This rule is used to trigger multifactor authentication with [Duo Security](http://duosecurity.com) when a condition is met.
  *

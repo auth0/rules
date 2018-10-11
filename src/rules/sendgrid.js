@@ -1,9 +1,8 @@
 /**
- * @overview Send an email to an administrator through SendGrind on the first login of a user
+ * @title Send emails through SendGrid
+ * @overview Send an email to an administrator through SendGrind on the first login of a user.
  * @gallery true
  * @category webhook
- *
- * Send emails through SendGrid
  *
  * This rule will send an email to an administrator on the first login of a user.
  *

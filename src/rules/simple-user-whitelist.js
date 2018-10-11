@@ -1,11 +1,11 @@
 /**
- * @overview Only allow access to users with specific whitelist email addresses
+ * @title Whitelist
+ * @overview Only allow access to users with specific whitelist email addresses.
  * @gallery true
  * @category access control
  *
- * Whitelist
- *
  * This rule will only allow access to users with specific email addresses.
+ *
  */
 
 function (user, context, callback) {

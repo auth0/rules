@@ -1,11 +1,14 @@
 /**
- * @overview This rule will add a `country` attribute to the user based on their IP address.
+ * @title Add country to the user profile
+ * @overview Add a country attribute to the user based on their IP address.
  * @gallery true
  * @category enrich profile
- * 
- * Add country to the user profile.
- * 
+ *
+ * This rule will add a `country` attribute to the user based on their ip address.
+ *
  * Example geoip object:
+ *
+ * ```
  * "geoip": {
  *     "country_code": "AR",
  *     "country_code3": "ARG",
@@ -17,7 +20,8 @@
  *     "continent_code": "SA",
  *     "time_zone": "America/Argentina/Cordoba"
  * }
- * 
+ * ```
+ *
  */
 
 function (user, context, callback) {

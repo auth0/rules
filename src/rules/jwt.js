@@ -1,9 +1,7 @@
 /**
+ * @title Generate a JSON Web Token
  * @overview Generate a signed JSON Web Token based on the `user` object.
- * @gallery true
  * @category token
- *
- * Generate a JSON Web Token
  *
  * This rule generates a signed JSON Web Token based on the `user` object. Useful when using other protocols like SAML or WS-Federation and you need to call a downstream API that accepts JSON Web Tokens. The `id_token` will be part of the user profile, which will be translated to a SAML Attribute.
  */

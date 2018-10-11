@@ -1,11 +1,11 @@
 /**
- * @overview Obtain a Pusher token for subscribing/publishing to private channels
+ * @title Obtains a Pusher token for subscribing/publishing to private channels
+ * @overview Obtain a Pusher token for subscribing/publishing to private channels.
  * @gallery true
  * @category webhook
  *
- * Obtains a Pusher token for subscribing/publishing to private channels
- *
  * This rule will generate a [pusher.com] token that can be used to send and receive messages from private channels. See [a complete example here](https://github.com/auth0/auth0-pusher).
+ *
  */
 
 function (user, context, callback) {
@@ -13,7 +13,8 @@ function (user, context, callback) {
   const pusherSecret = configuration.PUSHER_SECRET;
 
   if (context.request.query.channel && context.request.query.socket_id) {
-    context.idToken['https://example.com/pusherAuth'] = pusherKey + ":" + sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
+    const pusherSigned = sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
+    context.idToken['https://example.com/pusherAuth'] = pusherKey + ":" + pusherSigned;
   }
 
   callback(null, user, context);
@@ -23,4 +24,4 @@ function (user, context, callback) {
     const sha = crypto.createHmac('sha256', secret);
     return sha.update(string_to_sign).digest('hex');
   }
-}
+ }
