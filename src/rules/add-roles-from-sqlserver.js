@@ -11,6 +11,12 @@
  */
 
 function (user, context, callback) {
+
+  // Roles should only be set to verified users.
+  if (!user.email || !user.email_verified) {
+    return callback(null, user, context);
+  }
+
   getRoles(user.email, (err, roles) => {
     if (err) return callback(err);
 

@@ -9,6 +9,12 @@
  */
 
 function (user, context, callback) {
+
+  // Access should only be granted to verified users.
+  if (!user.email || !user.email_verified) {
+    return callback(null, user, context);
+  }
+
   // only enforce for NameOfTheAppWithWhiteList
   // bypass this rule for all other apps
   if(context.clientName !== 'NameOfTheAppWithWhiteList'){
