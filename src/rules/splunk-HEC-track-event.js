@@ -9,12 +9,14 @@
  * We use a persistent property `SignedUp` to track whether this is the first login or subsequent ones.
  * Events will show up on the Splunk console shortly after user access:
  *
- * ## Setup
+ * #### Setup
  *
  * In order to use this rule, you need to enable HTTP Event Collector (HEC) on your Splunk instance and get an HEC token. You can learn more how to do this [here](http://dev.splunk.com/view/event-collector/SP-CAAAE7F)
  *
  * Below is a screenshot showing an SingUp event sent to Splunk Cloud.
+ *
  * ![](https://cdn.auth0.com/website/rules/splunk-hec-rule.png)
+ *
  */
 
 function (user, context, callback) {

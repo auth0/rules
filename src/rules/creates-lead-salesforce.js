@@ -5,6 +5,7 @@
  * @category webhook
  *
  * This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the `resource owner` flow to obtain an `access_token`.
+ *
  * The username you use to authenticate the API will appear as the __creator__ of the lead.
  *
  * > Note: this sample implements very basic error handling.

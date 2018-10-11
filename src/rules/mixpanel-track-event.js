@@ -5,6 +5,7 @@
  * @category webhook
  *
  * This rule will send a `Sign In` event to MixPanel, and will include the application the user is signing in to as a property.
+ *
  * See [MixPanel HTTP API](https://mixpanel.com/help/reference/http) for more information.
  *
  */

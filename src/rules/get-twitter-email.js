@@ -6,15 +6,17 @@
  *
  * Get email address from Twitter
  *
- * NOTE: Further configuration is needed to enable fetching user emails through your Twitter App.
+ * > Note: Further configuration is needed to enable fetching user emails through your Twitter App.
  * Take a look at [Twitter's doc](https://dev.twitter.com/rest/reference/get/account/verify_credentials) for specifics.
  *
  * The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to configure
  * `consumerKey` and `consumerSecretKey` properly.
  *
  * This rule will not persist the returned email to the Auth0 user profile, but will return it to your application.
+ *
  * If you want to persist the email, it will need to be done with app_metadata as described here: https://auth0.com/docs/rules/metadata-in-rules#updating-app_metadata.
- * For example, you can save it under app_metadata.social_email.
+ *
+ * For example, you can save it under `app_metadata.social_email`.
  *
  */
 

@@ -6,7 +6,7 @@
  *
  * This rule shows how to post the variables sent to your Rule to [RequestBin](https://requestbin.fullcontact.com) to help troubleshoot issues with your Rules.
  *
- * > Please note: Auth0 provides [native mechanisms for debugging rules](https://auth0.com/docs/rules/current#how-to-debug-rules). Should you still desire to send internal rule variables to a third-party service, you should deactivate this rule or comment out the code once you are finished troubleshooting.
+ * > Note: Auth0 provides [native mechanisms for debugging rules](https://auth0.com/docs/rules/current#how-to-debug-rules). Should you still desire to send internal rule variables to a third-party service, you should deactivate this rule or comment out the code once you are finished troubleshooting.
  *
  * This rule shows how to post the variables sent to your Rule to https://requestbin.fullcontact.com to help troubleshoot issues with your Rules.
  *

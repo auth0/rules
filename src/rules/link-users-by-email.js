@@ -7,6 +7,7 @@
  * This rule will link any accounts that have the same email address.
  *
  * > Note: When linking accounts, only the metadata of the target user is saved. If you want to merge the metadata of the two accounts you must do that manually. See the document on [Linking Accounts](https://auth0.com/docs/link-accounts) for more details.
+ *
  */
 
 function (user, context, callback) {

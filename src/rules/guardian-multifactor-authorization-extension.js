@@ -2,7 +2,7 @@
  * @title Multifactor with Auth0 Guardian + Authorization Extension
  * @overview Guardian mfa + authorization extension working together.
  * @gallery true
- * @category multifactor, guardian
+ * @category multifactor,guardian
  *
  * This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.
  *

@@ -2,7 +2,7 @@
  * @title Multifactor with Auth0 Guardian
  * @overview Trigger multifactor authentication with Auth0 when a condition is met.
  * @gallery true
- * @category multifactor, guardian
+ * @category multifactor,guardian
  *
  * This rule is used to trigger multifactor authentication with Auth0 when a condition is met.
  *

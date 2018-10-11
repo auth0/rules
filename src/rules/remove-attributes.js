@@ -5,6 +5,7 @@
  * @category enrich profile
  *
  * Sometimes you don't need every attribute from the user. You can use a rule to delete attributes.
+ *
  */
 
 function (user, context, callback) {

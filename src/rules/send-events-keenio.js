@@ -6,10 +6,11 @@
  *
  * This rule is used to send a `signup` event to [Keen IO](http://keen.io)
  *
- * The rule checks whether the user has already signed up before or not. This is tracked by the persistent `user.signedUp` property. If the property is present, everything else is skipped.
- * If not, then we POST a new event with some information to a `signups Collection` on Keen IO.
+ * The rule checks whether the user has already signed up before or not. This is tracked by the persistent `user.signedUp` property.
+ * If the property is present, everything else is skipped. If not, then we POST a new event with some information to a `signups Collection` on Keen IO.
  *
  * Once enabled, events will be displayed on Keen IO dashboard:
+ *
  * ![](http://puu.sh/7k4qN.png)
  *
  */

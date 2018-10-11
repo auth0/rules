@@ -5,6 +5,7 @@
  * @category access control
  *
  * This rule will link any accounts that have the same email address while merging metadata.
+ *
  */
 
 function (user, context, callback) {

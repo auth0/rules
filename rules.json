@@ -79,7 +79,7 @@
         "categories": [
           "access control"
         ],
-        "description": "<p>This rule will only allow access users that have verified their emails.\nNote that it might be a better UX to make this verification from your application.</p>\n<p>If you are using <a href=\"https://auth0.com/docs/lock\">Lock</a>, the default behavior is to log in a user immediately after they have signed up.\nTo prevent this from immediately displaying an error to the user, you can pass the following option to <code>lock.show()</code> or similar: <code>loginAfterSignup: false</code>.\nIf you are using <a href=\"https://auth0.com/docs/libraries/auth0js\">auth0.js</a>, the equivalent option is <code>auto_login: false</code>.</p>",
+        "description": "<p>This rule will only allow access users that have verified their emails.</p>\n<blockquote>\n  <p>Note: It might be a better UX to make this verification from your application.</p>\n</blockquote>\n<p>If you are using <a href=\"https://auth0.com/docs/lock\">Lock</a>, the default behavior is to log in a user immediately after they have signed up.\nTo prevent this from immediately displaying an error to the user, you can pass the following option to <code>lock.show()</code> or similar: <code>loginAfterSignup: false</code>.</p>\n<p>If you are using <a href=\"https://auth0.com/docs/libraries/auth0js\">auth0.js</a>, the equivalent option is <code>auto_login: false</code>.</p>",
         "code": "function (user, context, callback) {\n  if (!user.email_verified) {\n    return callback(new UnauthorizedError('Please verify your email before logging in.'));\n  } else {\n    return callback(null, user, context);\n  }\n}\n"
       },
       {
@@ -174,7 +174,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won't be persisted to the user).\nThis is useful for cases where you want to enrich the user information for a specific application.</p>",
+        "description": "<p>This rule will add an attribute to the user only for the login transaction (i.e. they won't be persisted to the user).</p>\n<p>This is useful for cases where you want to enrich the user information for a specific application.</p>",
         "code": "function (user, context, callback) {\n  if (context.connection === 'company.com') {\n    context.idToken['https://example.com/vip'] = true;\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
@@ -234,7 +234,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available).\nIf the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user_metadata and returns. Any other conditions are ignored.</p>\n<p>See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>",
+        "description": "<p>This rule gets the user profile from FullContact using the e-mail (if available).</p>\n<p>If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>fullContactInfo</code> to the user_metadata and returns. Any other conditions are ignored.</p>\n<p>See <a href=\"http://www.fullcontact.com/developer/docs/\">FullContact docs</a> for full details.</p>",
         "code": "function (user, context, callback) {\n  const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;\n  const SLACK_HOOK = configuration.SLACK_HOOK_URL;\n\n  const slack = require('slack-notify')(SLACK_HOOK);\n\n  if (!user.email) return callback(null, user, context);\n\n  if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);\n\n  request.get('https://api.fullcontact.com/v2/person.json', {\n    qs: {\n      email:  user.email,\n      apiKey: FULLCONTACT_KEY\n    },\n    json: true\n  }, (error, response, body) => {\n    if (error || (response && response.statusCode !== 200)) {\n\n      slack.alert({\n        channel: '#slack_channel',\n        text: 'Fullcontact API Error',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n\n      return callback(null, user, context);\n    }\n\n    user.user_metadata = user.user_metadata || {};\n    user.user_metadata.fullcontact = body;\n\n    auth0.users.updateUserMetadata(user.user_id, user.user_metadata);\n    context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;\n    return callback(null, user, context);\n  });\n}\n"
       },
       {
@@ -254,7 +254,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>This rule gets user information from towerdata using the e-mail (if available).\nIf the information is immediately available (signaled by a <code>statusCode=200</code>),\nit adds a new property <code>towerdata</code> to the user profile and returns. Any other conditions are ignored.\nSee http://docs.towerdata.com/#introduction-3 for full details.</p>",
+        "description": "<p>This rule gets user information from towerdata using the e-mail (if available).</p>\n<p>If the information is immediately available (signaled by a <code>statusCode=200</code>), it adds a new property <code>towerdata</code> to the user profile and returns. Any other conditions are ignored.</p>\n<p>See http://docs.towerdata.com/#introduction-3 for full details.</p>",
         "code": "function (user, context, callback) {\n\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  request.get('https://api.towerdata.com/v5/td', {\n      qs: {\n        email: user.email,\n        api_key: configuration.TOWERDATA_API_KEY\n      },\n      json: true\n    },\n    (err, response, body) => {\n      if (err) return callback(err);\n\n      if (response.statusCode === 200) {\n        context.idToken['https://example.com/towerdata'] = body;\n      }\n\n      return callback(null, user, context);\n    });\n}\n"
       },
       {
@@ -264,7 +264,7 @@
         "categories": [
           "enrich profile"
         ],
-        "description": "<p>Get email address from Twitter</p>\n<p>NOTE: Further configuration is needed to enable fetching user emails through your Twitter App.\nTake a look at <a href=\"https://dev.twitter.com/rest/reference/get/account/verify_credentials\">Twitter's doc</a> for specifics.</p>\n<p>The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to configure\n<code>consumerKey</code> and <code>consumerSecretKey</code> properly.</p>\n<p>This rule will not persist the returned email to the Auth0 user profile, but will return it to your application.\nIf you want to persist the email, it will need to be done with app<em>metadata as described here: https://auth0.com/docs/rules/metadata-in-rules#updating-app</em>metadata.\nFor example, you can save it under app<em>metadata.social</em>email.</p>",
+        "description": "<p>Get email address from Twitter</p>\n<blockquote>\n  <p>Note: Further configuration is needed to enable fetching user emails through your Twitter App.\n  Take a look at <a href=\"https://dev.twitter.com/rest/reference/get/account/verify_credentials\">Twitter's doc</a> for specifics.</p>\n</blockquote>\n<p>The rule which makes the call to Twitter to retrieve the email is as follows. Do not forget to configure\n<code>consumerKey</code> and <code>consumerSecretKey</code> properly.</p>\n<p>This rule will not persist the returned email to the Auth0 user profile, but will return it to your application.</p>\n<p>If you want to persist the email, it will need to be done with app<em>metadata as described here: https://auth0.com/docs/rules/metadata-in-rules#updating-app</em>metadata.</p>\n<p>For example, you can save it under <code>app_metadata.social_email</code>.</p>",
         "code": "function (user, context, callback) {\n  if (context.connectionStrategy !== 'twitter') {\n    return callback(null, user, context);\n  }\n\n  const oauth = require('oauth-sign');\n  const uuid = require('uuid');\n\n  const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';\n  const consumerKey = configuration.TWITTER_CONSUMER_KEY;\n  const consumerSecretKey = configuration.TWITTER_CONSUMER_SECRET_KEY;\n\n  const twitterIdentity = _.find(user.identities, { connection: 'twitter' });\n  const oauthToken = twitterIdentity.access_token;\n  const oauthTokenSecret = twitterIdentity.access_token_secret;\n\n  const timestamp = Date.now() / 1000;\n  const nonce = uuid.v4().replace(/-/g, '');\n\n  const params = {\n    include_email: true,\n    oauth_consumer_key: consumerKey,\n    oauth_nonce: nonce,\n    oauth_signature_method: 'HMAC-SHA1',\n    oauth_timestamp: timestamp,\n    oauth_token: oauthToken,\n    oauth_version: '1.0'\n  };\n\n  params.oauth_signature = oauth.hmacsign('GET', url, params, consumerSecretKey, oauthTokenSecret);\n\n  const auth = Object.keys(params).sort().map(function (k) {\n    return k + '=\"' + oauth.rfc3986(params[k]) + '\"';\n  }).join(', ');\n\n  request.get(url + '?include_email=true', {\n    headers: {\n      'Authorization': 'OAuth ' + auth\n    },\n    json: true\n  }, (err, resp, body) => {\n    if (resp.statusCode !== 200) {\n      return callback(new Error('Error retrieving email from twitter: ' + body || err));\n    }\n    user.email = body.email;\n    return callback(err, user, context);\n  });\n}\n"
       },
       {
@@ -286,16 +286,6 @@
         ],
         "description": "<p>Sometimes you don't need every attribute from the user. You can use a rule to delete attributes.</p>",
         "code": "function (user, context, callback) {\n  const blacklist = [ 'some_attribute' ];\n\n  Object.keys(user).forEach(function(key) {\n    if (blacklist.indexOf(key) > -1) {\n      delete user[key];\n    }\n  });\n\n  callback(null, user, context);\n}\n"
-      },
-      {
-        "id": "saml-attribute-mapping",
-        "title": "SAML Attributes mapping",
-        "overview": "In a SAML application customize the mapping between the Auth0 user and the SAML attributes",
-        "categories": [
-          "enrich profile"
-        ],
-        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, see the <a href=\"https://docs.auth0.com/saml-configuration\">SAML Configuration docs</a>.</p>",
-        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "soap-webservice",
@@ -329,7 +319,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User's profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.\nIn this example, we're going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.\nWithin the snippet, the \"secretToken\" is a simple way to ensure that the communication is coming from Auth0. Just configure a random string for the Rule, and then check for that string in your WebApi request.\nIn your WebApi code, complete whatever operations are necessary, then call <code>return Json(new { customId = USERSCUSTOMID });</code> to return the required JSON to the Rule.</p>\n<blockquote>\n  <p>Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the <code>[HttpPost]</code> attribute.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>",
+        "description": "<p>This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User's profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.</p>\n<p>In this example, we're going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.</p>\n<p>Within the snippet, the \"secretToken\" is a simple way to ensure that the communication is coming from Auth0. Just configure a random string for the Rule, and then check for that string in your WebApi request.</p>\n<p>In your WebApi code, complete whatever operations are necessary, then call <code>return Json(new { customId = USERSCUSTOMID });</code> to return the required JSON to the Rule.</p>\n<blockquote>\n  <p>Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the <code>[HttpPost]</code> attribute.</p>\n</blockquote>\n<p>Contributed by Robert McLaws, AdvancedREI.com</p>",
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.customId) {\n    console.log('Found ID!');\n    return callback(null, user, context);\n  }\n\n  request.post({\n    url: 'https://yourwebsite.com/auth0',\n    json: {\n      user: user,\n      context: context,\n      secretToken: configuration.YOURWEBSITE_SECRET_TOKEN,\n    },\n    timeout: 15000\n  }, (err, response, body) => {\n    if (err) return callback(new Error(err));\n\n    user.app_metadata.customId = body.customId;\n    context.idToken['https://example.com/custom_id'] = body.customId;\n\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}\n"
       },
       {
@@ -339,7 +329,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the <code>resource owner</code> flow to obtain an <code>access_token</code>.\nThe username you use to authenticate the API will appear as the <strong>creator</strong> of the lead.</p>\n<blockquote>\n  <p>Note: this sample implements very basic error handling.</p>\n</blockquote>",
+        "description": "<p>This rule will check if this is the first user login, and in that case will call Salesforce API to record the contact as a new Lead. It is using Salesforce REST APIs and the <code>resource owner</code> flow to obtain an <code>access_token</code>.</p>\n<p>The username you use to authenticate the API will appear as the <strong>creator</strong> of the lead.</p>\n<blockquote>\n  <p>Note: this sample implements very basic error handling.</p>\n</blockquote>",
         "code": "function (user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.recordedAsLead) {\n    return callback(null,user,context);\n  }\n\n  const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';\n  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  const SFCOM_CLIENT_ID = configuration.SALESFORCE_CLIENT_ID;\n  const SFCOM_CLIENT_SECRET = configuration.SALESFORCE_CLIENT_SECRET;\n  const USERNAME = configuration.SALESFORCE_USERNAME;\n  const PASSWORD = configuration.SALESFORCE_PASSWORD;\n  getAccessToken(\n    SFCOM_CLIENT_ID,\n    SFCOM_CLIENT_SECRET,\n    USERNAME,\n    PASSWORD,\n    (response) => {\n      if (!response.instance_url || !response.access_token) {\n        slack.alert({\n          channel: '#some_channel',\n          text: 'Error Getting SALESFORCE Access Token',\n          fields: {\n            error: response\n          }\n        });\n\n        return;\n      }\n\n      createLead(\n        response.instance_url,\n        response.access_token,\n        (err, result) => {\n        if (err || !result || !result.id) {\n          slack.alert({\n            channel: '#some_channel',\n            text: 'Error Creating SALESFORCE Lead',\n            fields: {\n              error: err || result\n            }\n          });\n\n          return;\n        }\n\n        user.app_metadata.recordedAsLead = true;\n        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);\n      });\n    });\n\n  function createLead(url, access_token, callback){\n    const data = {\n      LastName: user.name,\n      Company: 'Web channel signups'\n    };\n\n    request.post({\n      url: url + \"/services/data/v20.0/sobjects/Lead\",\n      headers: {\n        \"Authorization\": \"OAuth \" + access_token\n      },\n      json: data\n      }, (err, response, body) => {\n        return callback(err, body);\n      });\n  }\n\n  function getAccessToken(client_id, client_secret, username, password, callback) {\n    request.post({\n      url: 'https://login.salesforce.com/services/oauth2/token',\n      form: {\n        grant_type: 'password',\n        client_id: client_id,\n        client_secret: client_secret,\n        username: username,\n        password: password\n      }}, (err, respose, body) => {\n        return callback(JSON.parse(body));\n      });\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
@@ -369,7 +359,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send an email to an administrator on a user's first login. We use a persistent <code>signedUp</code> property to track whether this is the case or not. This rule assumes you've stored a secure value named <code>MANDRILL_API_KEY</code>, which contains your secret API key for Mandrill. It is sent in each request.</p>\n<p>In the same way, other services such as <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a> and <a href=\"https://auth0.com/rules/sendgrid\">SendGrid</a> can be used.</p>\n<p>Make sure to change the sender and destination emails.</p>",
+        "description": "<p>This rule will send an email to an administrator on a user's first login. We use a persistent <code>signedUp</code> property to track whether this is the case or not.</p>\n<p>This rule assumes you've stored a secure value named <code>MANDRILL_API_KEY</code>, which contains your secret API key for Mandrill. It will be sent with each request.</p>\n<p>In the same way, other services such as <a href=\"http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html\">Amazon SES</a> and <a href=\"https://auth0.com/rules/sendgrid\">SendGrid</a> can be used.</p>\n<p>Make sure to change the sender and destination emails.</p>",
         "code": "function (user, context, callback) {\n  const request = require('request');\n\n  user.app_metadata = user.app_metadata || {};\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  const body = {\n    key: configuration.MANDRILL_API_KEY,\n    message: {\n      subject: 'User ' + user.name + ' signed up to ' + context.clientName,\n      text: 'Sent from an Auth0 rule',\n      from_email: 'SENDER_EMAIL@example.com',\n      from_name: 'Auth0 Rule',\n      to: [\n        {\n          email: 'DESTINATION_EMAIL@example.com',\n          type: 'to'\n        }\n      ],\n    }\n  };\n  const mandrill_send_endpoint = 'https://mandrillapp.com/api/1.0/messages/send.json';\n\n  request.post({url: mandrill_send_endpoint, form: body}, function (err, resp, body) {\n    if (err) { return callback(err); }\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n        callback(null, user, context);\n      })\n      .catch(function(err){\n        callback(err);\n      });\n  });\n}\n"
       },
       {
@@ -379,7 +369,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property.\nSee <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>",
+        "description": "<p>This rule will send a <code>Sign In</code> event to MixPanel, and will include the application the user is signing in to as a property.</p>\n<p>See <a href=\"https://mixpanel.com/help/reference/http\">MixPanel HTTP API</a> for more information.</p>",
         "code": "function (user, context, callback) {\n\n  const mpEvent = {\n    \"event\": \"Sign In\",\n    \"properties\": {\n        \"distinct_id\": user.user_id,\n        \"token\": configuration.MIXPANEL_API_TOKEN,\n        \"application\": context.clientName\n    }\n  };\n\n  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');\n\n  request.get({\n    url: 'http://api.mixpanel.com/track/',\n    qs: {\n      data: base64Event\n    }\n  }, (err, res, body) => {\n      callback(null, user, context);\n  });\n}\n"
       },
       {
@@ -399,7 +389,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule is used to send a <code>signup</code> event to <a href=\"http://keen.io\">Keen IO</a></p>\n<p>The rule checks whether the user has already signed up before or not. This is tracked by the persistent <code>user.signedUp</code> property. If the property is present, everything else is skipped.\nIf not, then we POST a new event with some information to a <code>signups Collection</code> on Keen IO.</p>\n<p>Once enabled, events will be displayed on Keen IO dashboard:\n<img src=\"http://puu.sh/7k4qN.png\" alt=\"\" /></p>",
+        "description": "<p>This rule is used to send a <code>signup</code> event to <a href=\"http://keen.io\">Keen IO</a></p>\n<p>The rule checks whether the user has already signed up before or not. This is tracked by the persistent <code>user.signedUp</code> property.\nIf the property is present, everything else is skipped. If not, then we POST a new event with some information to a <code>signups Collection</code> on Keen IO.</p>\n<p>Once enabled, events will be displayed on Keen IO dashboard:</p>\n<p><img src=\"http://puu.sh/7k4qN.png\" alt=\"\" /></p>",
         "code": "function(user, context, callback) {\n  if (context.stats.loginsCount > 1) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  const MY_SLACK_WEBHOOK_URL = configuration.SLACK_WEBHOOK_URL;\n  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);\n\n  const projectId = configuration.KEEN_PROJ_ID;\n  const writeKey  = configuration.KEEN_WRITE_KEY;\n  const eventCollection = 'signups';\n\n  const keenEvent = {\n    userId: user.user_id,\n    name: user.name,\n    ip: context.request.ip \n  };\n\n  request.post({\n    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection,\n    headers: {\n      'Content-type': 'application/json',\n      'Authorization': writeKey,\n    },\n    body: JSON.stringify(keenEvent),\n  },\n  function (error, response, body) {\n    if (error || (response && response.statusCode !== 200)) {\n      slack.alert({\n        channel: '#some_channel',\n        text: 'KEEN API ERROR',\n        fields: {\n          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')\n        }\n      });\n    }\n  });\n\n  callback(null, user, context);\n}\n"
       },
       {
@@ -429,7 +419,7 @@
         "categories": [
           "webhook"
         ],
-        "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk's HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.\nEvents will show up on the Splunk console shortly after user access:</p>\n<h2 id=\"setup\">Setup</h2>\n<p>In order to use this rule, you need to enable HTTP Event Collector (HEC) on your Splunk instance and get an HEC token. You can learn more how to do this <a href=\"http://dev.splunk.com/view/event-collector/SP-CAAAE7F\">here</a></p>\n<p>Below is a screenshot showing an SingUp event sent to Splunk Cloud.\n<img src=\"https://cdn.auth0.com/website/rules/splunk-hec-rule.png\" alt=\"\" /></p>",
+        "description": "<p>This rule will send a <code>SignUp</code> &amp; <code>Login</code> events to Splunk's HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.</p>\n<p>We use a persistent property <code>SignedUp</code> to track whether this is the first login or subsequent ones.\nEvents will show up on the Splunk console shortly after user access:</p>\n<h4 id=\"setup\">Setup</h4>\n<p>In order to use this rule, you need to enable HTTP Event Collector (HEC) on your Splunk instance and get an HEC token. You can learn more how to do this <a href=\"http://dev.splunk.com/view/event-collector/SP-CAAAE7F\">here</a></p>\n<p>Below is a screenshot showing an SingUp event sent to Splunk Cloud.</p>\n<p><img src=\"https://cdn.auth0.com/website/rules/splunk-hec-rule.png\" alt=\"\" /></p>",
         "code": "function (user, context, callback) {\n  const request = require('request');\n\n  user.app_metadata = user.app_metadata || {};\n  const endpoint = 'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; \n\n  const hec_event = {\n    event: {\n      message: user.app_metadata.signedUp ? 'Login' : 'SignUp',\n      application: context.clientName,\n      clientIP: context.request.ip,\n      protocol: context.protocol,\n      userName: user.name,\n      userId: user.user_id\n    },\n    source: 'auth0',\n    sourcetype: 'auth0_activity'\n  };\n\n  request.post({\n    url: endpoint,\n    headers: {\n      'Authorization': 'Splunk ' + configuration.SPLUNK_HEC_TOKEN\n    },\n    strictSSL: true, \n    json: hec_event\n  }, function(error, response, body) {\n    if (error) return callback(error);\n    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function () {\n        callback(null, user, context);\n      })\n      .catch(function (err) {\n        callback(err);\n      });\n  });\n\n}\n"
       },
       {
@@ -484,7 +474,7 @@
         "categories": [
           "multifactor"
         ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code.\nSubsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users,\nsearch for the specific user and click on Actions -&gt; Multifactor.</p>",
+        "description": "<p>This rule is used to trigger multifactor authentication with Google Authenticator when a condition is met.</p>\n<p>Upon first login, the user can enroll the device by scanning a QR code.\nSubsequent logins will ask for the Google Authenticator code.</p>\n<p>To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -&gt; Multifactor.</p>",
         "code": "function (user, context, callback) {\n  const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
@@ -500,7 +490,7 @@
     ]
   },
   {
-    "name": " guardian",
+    "name": "guardian",
     "templates": [
       {
         "id": "guardian-multifactor-authorization-extension",
@@ -508,7 +498,7 @@
         "overview": "Guardian mfa + authorization extension working together.",
         "categories": [
           "multifactor",
-          " guardian"
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
@@ -519,7 +509,7 @@
         "overview": "Guardian mfa + authorization extension working together.",
         "categories": [
           "multifactor",
-          " guardian"
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
@@ -530,7 +520,7 @@
         "overview": "Trigger multifactor authentication when IP is outside the expected range.",
         "categories": [
           "multifactor",
-          " guardian"
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
         "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
@@ -541,7 +531,7 @@
         "overview": "Trigger multifactor authentication when IP is outside the expected range.",
         "categories": [
           "multifactor",
-          " guardian"
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
         "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
@@ -552,7 +542,7 @@
         "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
         "categories": [
           "multifactor",
-          " guardian"
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
         "code": "function (user, context, callback) {\n      context.multifactor = {\n        provider: 'guardian',\n\n        allowRememberBrowser: false\n      };\n  callback(null, user, context);\n}\n"
@@ -563,7 +553,7 @@
         "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
         "categories": [
           "multifactor",
-          " guardian"
+          "guardian"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
         "code": "function (user, context, callback) {\n      context.multifactor = {\n        provider: 'guardian',\n\n        allowRememberBrowser: false\n      };\n  callback(null, user, context);\n}\n"
@@ -580,7 +570,7 @@
         "categories": [
           "debugging"
         ],
-        "description": "<p>This rule shows how to post the variables sent to your Rule to <a href=\"https://requestbin.fullcontact.com\">RequestBin</a> to help troubleshoot issues with your Rules.</p>\n<blockquote>\n  <p>Please note: Auth0 provides <a href=\"https://auth0.com/docs/rules/current#how-to-debug-rules\">native mechanisms for debugging rules</a>. Should you still desire to send internal rule variables to a third-party service, you should deactivate this rule or comment out the code once you are finished troubleshooting.</p>\n</blockquote>\n<p>This rule shows how to post the variables sent to your Rule to https://requestbin.fullcontact.com to help troubleshoot issues with your Rules.</p>\n<p>You can run this rule by itself, or paste it into an existing rule.</p>",
+        "description": "<p>This rule shows how to post the variables sent to your Rule to <a href=\"https://requestbin.fullcontact.com\">RequestBin</a> to help troubleshoot issues with your Rules.</p>\n<blockquote>\n  <p>Note: Auth0 provides <a href=\"https://auth0.com/docs/rules/current#how-to-debug-rules\">native mechanisms for debugging rules</a>. Should you still desire to send internal rule variables to a third-party service, you should deactivate this rule or comment out the code once you are finished troubleshooting.</p>\n</blockquote>\n<p>This rule shows how to post the variables sent to your Rule to https://requestbin.fullcontact.com to help troubleshoot issues with your Rules.</p>\n<p>You can run this rule by itself, or paste it into an existing rule.</p>",
         "code": "function (user, context, callback) {\n  const request = require('request');\n\n  const user_whitelist = ['user_id', 'email', 'email_verified'];\n  const user_filtered  = _.pick(user, user_whitelist);\n\n  const context_whitelist = ['clientID', 'connection', 'stats'];\n  const context_filtered  = _.pick(context, context_whitelist);\n\n  request.post({\n    url: 'https://requestbin.fullcontact.com/YourBinUrl',\n    json: {\n      user: user_filtered,\n      context: context_filtered,\n    },\n    timeout: 15000\n  }, function (err, response, body){\n    if (err) return callback(err);\n    return callback(null, user, context);\n  });\n}\n"
       }
     ]
@@ -589,13 +579,35 @@
     "name": "saml",
     "templates": [
       {
+        "id": "saml-attribute-mapping",
+        "title": "SAML Attributes mapping",
+        "overview": "In a SAML application customize the mapping between the Auth0 user and the SAML attributes",
+        "categories": [
+          "enrich profile",
+          "saml"
+        ],
+        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, see the <a href=\"https://docs.auth0.com/saml-configuration\">SAML Configuration docs</a>.</p>",
+        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}\n"
+      },
+      {
+        "id": "saml-attribute-mapping",
+        "title": "SAML Attributes mapping",
+        "overview": "In a SAML application customize the mapping between the Auth0 user and the SAML attributes",
+        "categories": [
+          "enrich profile",
+          "saml"
+        ],
+        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, see the <a href=\"https://docs.auth0.com/saml-configuration\">SAML Configuration docs</a>.</p>",
+        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}\n"
+      },
+      {
         "id": "saml-configuration",
         "title": "Change SAML configuration",
         "overview": "Change your SAML configuration.",
         "categories": [
           "saml"
         ],
-        "description": "<p>At some point you may want to add fields to your SAML Configuration. The way to do this is to add specific fields as done in the example code snippet below. <code>samlConfiguration</code> is an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for SAMLP and WS-Fed protocol).</p>\n<p>To know more about SAML configuration options check <a href=\"https://auth0.com/docs/saml-configuration#configuration-options\">this documentation page</a>.</p>",
+        "description": "<p>At some point you may want to add fields to your SAML Configuration. The way to do this is to add specific fields as done in the example code snippet below.\n<code>samlConfiguration</code> is an object that controls the behavior of the SAML and WS-Fed endpoints. Useful for advanced claims mapping and token enrichment (only available for SAMLP and WS-Fed protocol).</p>\n<p>To know more about SAML configuration options check <a href=\"https://auth0.com/docs/saml-configuration#configuration-options\">this documentation page</a>.</p>",
         "code": "function (user, context, callback) {\n  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);\n\n  context.samlConfiguration = context.samlConfiguration || {};\n  context.samlConfiguration.audience = \"urn:foo\";\n  context.samlConfiguration.recipient = \"http://foo\";\n  context.samlConfiguration.destination = \"http://foo\";\n  context.samlConfiguration.lifetimeInSeconds = 3600;\n  callback(null, user, context);\n}\n"
       }
     ]

@@ -9,8 +9,7 @@
  * Upon first login, the user can enroll the device by scanning a QR code.
  * Subsequent logins will ask for the Google Authenticator code.
  *
- * To reset Google Authenticator for a user, you can go to Users,
- * search for the specific user and click on Actions -> Multifactor.
+ * To reset Google Authenticator for a user, you can go to Users, search for the specific user and click on Actions -> Multifactor.
  *
  */
 

@@ -10,6 +10,7 @@
  * If the user doesn't exist, this rule will auto-provision one, with `email`, `name` or `user_id` as the handle.
  *
  * <img src="https://docs.google.com/drawings/d/1vCyhpNkW2rOktXI5bp4sogmR6p8qBqJeJY-A5vfHA8c/pub?w=1219&amp;h=558">
+ *
  */
 
 function (user, context, callback) {

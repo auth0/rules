@@ -5,6 +5,7 @@
  * @category access control
  *
  * This rule will only allow access to an app from a specific set of IP addresses
+ *
  */
 
 function (user, context, callback) {

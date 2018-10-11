@@ -5,8 +5,11 @@
  * @category webhook
  *
  * This rule shows how to post the variables sent to your Rule a custom webhook in an ASP.NET WebApi application. This is useful for situations where you want to enrich the User's profile with your internal ID before the JsonWebToken is created, or if you want to seamlessly register new users.
+ *
  * In this example, we're going to get the internal UserId for your app, then persist it to the Auth0 UserProfile so we only have to make this request the first time a new user signs in.
+ *
  * Within the snippet, the "secretToken" is a simple way to ensure that the communication is coming from Auth0. Just configure a random string for the Rule, and then check for that string in your WebApi request.
+ *
  * In your WebApi code, complete whatever operations are necessary, then call `return Json(new { customId = USERSCUSTOMID });` to return the required JSON to the Rule.
  *
  * > Note: Be sure to change the URL for the request to your website and controller, and make sure the controller is decorated with the `[HttpPost]` attribute.

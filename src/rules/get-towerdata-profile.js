@@ -5,8 +5,9 @@
  * @category enrich profile
  *
  * This rule gets user information from towerdata using the e-mail (if available).
- * If the information is immediately available (signaled by a `statusCode=200`),
- * it adds a new property `towerdata` to the user profile and returns. Any other conditions are ignored.
+ *
+ * If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `towerdata` to the user profile and returns. Any other conditions are ignored.
+ *
  * See http://docs.towerdata.com/#introduction-3 for full details.
  *
  */
