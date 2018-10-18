@@ -3,8 +3,7 @@
 const async = require('async');
 const path = require('path');
 const yargs = require('yargs');
-const comments = require('parse-comments');
-const decomment = require('decomment');
+const parseComments = require('parse-comments');
 const showdown = require('showdown');
 const fs = require('fs');
 const glob = require('glob');
@@ -31,16 +30,19 @@ async.reduce(files, [], (rules, file, callback) => {
   fs.readFile(file, 'utf8', (err, data) => {
     if (err) return callback(err);
 
-    const comment = comments(data, { trim: true })[0];
+    const parsed = parseComments(data)[0];
 
-    if (argv.allRules || comment.gallery === 'true') {
+    // strip the opening comment and remove extra newlines
+    const code = data.split('\n').slice(parsed.comment.end).join('\n').trim();
+
+    if (argv.allRules || parsed.gallery === 'true') {
       const rule = {
         id: path.basename(file).replace('.js', ''),
-        title: comment.title,
-        overview: comment.overview,
-        categories: comment.category ? comment.category.split(',') : ['default'],
-        description: converter.makeHtml(comment.example),
-        code: decomment(data, { trim: true })
+        title: parsed.title,
+        overview: parsed.overview,
+        categories: parsed.category ? parsed.category.split(',') : ['default'],
+        description: converter.makeHtml(parsed.example),
+        code
       }
       rules.push(rule);
     }
@@ -54,11 +56,11 @@ async.reduce(files, [], (rules, file, callback) => {
   }
 
   const expandedRules = _.chain(rules)
-    .flatMap(rule => _.map(rule.categories, category => _.assign(rule, { category })))
+    .flatMap(rule => _.map(rule.categories, category => _.assign(_.clone(rule), { category })))
     .groupBy(r => r.category)
-    .map((value, key) => ({
-      name: key,
-      templates: _.map(value, r => _.omit(r, 'category'))
+    .map((rules, category) => ({
+      name: category,
+      templates: _.map(rules, rule => _.omit(rule, 'category'))
     }))
     .value();
 
