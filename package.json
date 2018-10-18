@@ -19,7 +19,6 @@
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
     "async": "2.6.0",
-    "decomment": "0.9.1",
     "glob": "7.1.2",
     "ipaddr.js": "^1.8.1",
     "jest": "^21.2.1",

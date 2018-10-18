@@ -3,8 +3,7 @@
 const async = require('async');
 const path = require('path');
 const yargs = require('yargs');
-const comments = require('parse-comments');
-const decomment = require('decomment');
+const parseComments = require('parse-comments');
 const showdown = require('showdown');
 const fs = require('fs');
 const glob = require('glob');
@@ -31,16 +30,17 @@ async.reduce(files, [], (rules, file, callback) => {
   fs.readFile(file, 'utf8', (err, data) => {
     if (err) return callback(err);
 
-    const comment = comments(data, { trim: true })[0];
+    const parsed = parseComments(data, { trim: true })[0];
+    const code = data.split('\n').slice(parsed.comment.end).join('\n'); // strip the opening comment
 
-    if (argv.allRules || comment.gallery === 'true') {
+    if (argv.allRules || parsed.gallery === 'true') {
       const rule = {
         id: path.basename(file).replace('.js', ''),
-        title: comment.title,
-        overview: comment.overview,
-        categories: comment.category ? comment.category.split(',') : ['default'],
-        description: converter.makeHtml(comment.example),
-        code: decomment(data, { trim: true })
+        title: parsed.title,
+        overview: parsed.overview,
+        categories: parsed.category ? parsed.category.split(',') : ['default'],
+        description: converter.makeHtml(parsed.example),
+        code: code.trim() // remove extra newlines
       }
       rules.push(rule);
     }
