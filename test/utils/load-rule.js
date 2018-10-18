@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const decomment = require('decomment');
+const parseComments = require('parse-comments');
 
 /**
  * Loads a rule, optionally with stubs
@@ -14,12 +14,12 @@ const decomment = require('decomment');
 module.exports = function (ruleFileName, globals, stubs) {
   globals = globals || {};
   stubs = stubs || {};
-  
+
   const fileName = path.join(__dirname, '../../src/rules', ruleFileName + '.js');
+  const data = fs.readFileSync(fileName, 'utf8');
 
-  const file = fs.readFileSync(fileName, 'utf8');
-
-  const code =  decomment(file, {trim: true});
+  const parsed = parseComments(data)[0];
+  const code = data.split('\n').slice(parsed.comment.end).join('\n').trim();
 
   return compile(code, globals, stubs);
 }
