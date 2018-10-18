@@ -288,6 +288,17 @@
         "code": "function (user, context, callback) {\n  const blacklist = [ 'some_attribute' ];\n\n  Object.keys(user).forEach(function(key) {\n    if (blacklist.indexOf(key) > -1) {\n      delete user[key];\n    }\n  });\n\n  callback(null, user, context);\n}\n"
       },
       {
+        "id": "saml-attribute-mapping",
+        "title": "SAML Attributes mapping",
+        "overview": "In a SAML application customize the mapping between the Auth0 user and the SAML attributes",
+        "categories": [
+          "enrich profile",
+          "saml"
+        ],
+        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, see the <a href=\"https://docs.auth0.com/saml-configuration\">SAML Configuration docs</a>.</p>",
+        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}\n"
+      },
+      {
         "id": "soap-webservice",
         "title": "Roles from a SOAP Service",
         "overview": "Show how to query a basic profile http binding SOAP web service for roles.",
@@ -478,6 +489,39 @@
         "code": "function (user, context, callback) {\n  const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n      context.multifactor = {\n        provider: 'google-authenticator',\n\n        allowRememberBrowser: false\n      };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
+        "id": "guardian-multifactor-authorization-extension",
+        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "overview": "Guardian mfa + authorization extension working together.",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
+      },
+      {
+        "id": "guardian-multifactor-ip-range",
+        "title": "Multifactor when request comes from outside an IP range",
+        "overview": "Trigger multifactor authentication when IP is outside the expected range.",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
+        "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
+      },
+      {
+        "id": "guardian-multifactor",
+        "title": "Multifactor with Auth0 Guardian",
+        "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function (user, context, callback) {\n      context.multifactor = {\n        provider: 'guardian',\n\n        allowRememberBrowser: false\n      };\n  callback(null, user, context);\n}\n"
+      },
+      {
         "id": "mfa",
         "title": "Multifactor Authentication",
         "overview": "Trigger multifactor authentication when a condition is met.",
@@ -504,17 +548,6 @@
         "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
       },
       {
-        "id": "guardian-multifactor-authorization-extension",
-        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
-        "overview": "Guardian mfa + authorization extension working together.",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
-        "code": "function (user, context, callback) {\n  if (!user.app_metadata || !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    'admins': true\n  };\n\n  const needsMFA = !!groups.find(function(group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA){\n    context.multifactor = {\n      provider: 'guardian', \n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
-      },
-      {
         "id": "guardian-multifactor-ip-range",
         "title": "Multifactor when request comes from outside an IP range",
         "overview": "Trigger multifactor authentication when IP is outside the expected range.",
@@ -524,28 +557,6 @@
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
         "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
-      },
-      {
-        "id": "guardian-multifactor-ip-range",
-        "title": "Multifactor when request comes from outside an IP range",
-        "overview": "Trigger multifactor authentication when IP is outside the expected range.",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
-        "code": "function (user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}\n"
-      },
-      {
-        "id": "guardian-multifactor",
-        "title": "Multifactor with Auth0 Guardian",
-        "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
-        "code": "function (user, context, callback) {\n      context.multifactor = {\n        provider: 'guardian',\n\n        allowRememberBrowser: false\n      };\n  callback(null, user, context);\n}\n"
       },
       {
         "id": "guardian-multifactor",
@@ -578,17 +589,6 @@
   {
     "name": "saml",
     "templates": [
-      {
-        "id": "saml-attribute-mapping",
-        "title": "SAML Attributes mapping",
-        "overview": "In a SAML application customize the mapping between the Auth0 user and the SAML attributes",
-        "categories": [
-          "enrich profile",
-          "saml"
-        ],
-        "description": "<p>If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.\nBelow you can see that we are mapping <code>user_id</code> to the NameID, <code>email</code> to <code>http://schemas.../emailaddress</code>, etc.</p>\n<p>For more information about SAML options, see the <a href=\"https://docs.auth0.com/saml-configuration\">SAML Configuration docs</a>.</p>",
-        "code": "function (user, context, callback) {\n  context.samlConfiguration.mappings = {\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\": \"user_id\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress\":   \"email\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name\":           \"name\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food\":           \"user_metadata.favorite_food\",\n     \"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address\":        \"app_metadata.shipping_address\"\n  };\n\n  callback(null, user, context);\n}\n"
-      },
       {
         "id": "saml-attribute-mapping",
         "title": "SAML Attributes mapping",

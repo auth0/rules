@@ -54,11 +54,11 @@ async.reduce(files, [], (rules, file, callback) => {
   }
 
   const expandedRules = _.chain(rules)
-    .flatMap(rule => _.map(rule.categories, category => _.assign(rule, { category })))
+    .flatMap(rule => _.map(rule.categories, category => _.assign(_.clone(rule), { category })))
     .groupBy(r => r.category)
-    .map((value, key) => ({
-      name: key,
-      templates: _.map(value, r => _.omit(r, 'category'))
+    .map((rules, category) => ({
+      name: category,
+      templates: _.map(rules, rule => _.omit(rule, 'category'))
     }))
     .value();
 
