@@ -4,7 +4,8 @@
   "description": "Auth0 Rules Repository",
   "main": "./rules",
   "scripts": {
-    "build": "./build",
+    "validate": "node validator.js",
+    "build": "node build && npm run validate",
     "test": "jest"
   },
   "repository": {
