@@ -43,7 +43,7 @@ async.reduce(files, [], (rules, file, callback) => {
         categories: parsed.category ? parsed.category.split(',') : ['default'],
         description: converter.makeHtml(parsed.example),
         code
-      }
+      };
       rules.push(rule);
     }
 
