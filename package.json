@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
+    "ajv": "^6.5.4",
     "async": "2.6.0",
     "glob": "7.1.2",
     "ipaddr.js": "^1.8.1",
