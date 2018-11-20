@@ -6,6 +6,7 @@
   "scripts": {
     "validate": "node validator.js",
     "build": "node build && npm run validate",
+    "deploy": "node deploy.js",
     "test": "jest"
   },
   "repository": {
@@ -21,6 +22,8 @@
   "devDependencies": {
     "ajv": "^6.5.4",
     "async": "2.6.0",
+    "aws-sdk": "2.359.0",
+    "dotenv": "^6.1.0",
     "glob": "7.1.2",
     "ipaddr.js": "^1.8.1",
     "jest": "^21.2.1",
