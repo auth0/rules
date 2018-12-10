@@ -4,6 +4,8 @@ This rule and webtask will add [SMS Passwordless](https://auth0.com/passwordless
 
 ## Setup
 
+> Tenants created after *July 16, 2018* will not have access to the underlying Auth0 Webtask Sandbox via the Webtask CLI. Please contact Auth0 at sales@auth0.com to request access.
+
 1. Create the webtask
   - Follow the instructions to install the `wt-cli` tool and setup it for your [Auth0 account](https://manage.auth0.com/#/account/webtasks).
   - Capture your webtask profile:
