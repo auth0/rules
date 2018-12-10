@@ -34,6 +34,8 @@ Configure the following [Rule Settings](https://auth0.com/docs/rules/current#usi
 
 ## Webtask Setup
 
+> Tenants created after *July 16, 2018* will not have access to the underlying Auth0 Webtask Sandbox via the Webtask CLI. Please contact Auth0 at sales@auth0.com to request access.
+
 If you don't already have a [webtask.io](https://webtask.io) account, create one. Then in your webtask tenant, create the following webtasks, either via the [Webtask Editor](https://webtask.io/make) or the [CLI](https://webtask.io/docs/wt-cli):
 
 ### Update Profile Webpage
