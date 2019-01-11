@@ -61,10 +61,10 @@ This is the rules editor inside Auth0:
 
 ### Highlighted Rules
 
-* [Send events to MixPanel](https://github.com/auth0/rules/blob/master/rules/mixpanel-track-event.md)
-* [Query User Profile in FullContact](https://github.com/auth0/rules/blob/master/rules/get-FullContact-profile.md)
-* [Add a Lead in Salesforce](https://github.com/auth0/rules/blob/master/rules/creates-lead-salesforce.md)
-* [Get an Appery Session Token](https://github.com/auth0/rules/blob/master/rules/appery.md)
+* Send events to MixPanel [Docs](https://auth0.com/rules/mixpanel-track-event) | [Rule]( https://github.com/auth0/rules/blob/master/src/rules/mixpanel-track-event.js)
+* Query User Profile in FullContact [Docs](https://auth0.com/rules/get-FullContact-profile) | [Rule](https://github.com/auth0/rules/blob/master/src/rules/get-fullcontact-profile.js)
+* Add a Lead in Salesforce [Docs](https://auth0.com/rules/creates-lead-salesforce) | [Rule](https://github.com/auth0/rules/blob/master/src/rules/creates-lead-salesforce.js)
+* Get an Appery Session Token [Rule](https://github.com/auth0/rules/blob/master/src/rules/appery.js)
 
 [More information about them here](https://docs.auth0.com/rules).
 
