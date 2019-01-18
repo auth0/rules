@@ -37,18 +37,18 @@ describe(ruleName, () => {
         .build();
     });
 
-    it('should do nothing if the user has no email', (done) => {
+    it('should not authorize users without email', (done) => {
       user.email = '';
       rule(user, context, (e) => {
-        expect(e).toBeFalsy();
+        expect(e).toBeInstanceOf(globals.UnauthorizedError);
         done();
       });
     });
 
-    it('should do nothing if user`s email isn`t verified', (done) => {
+    it('should not authorize unverified users', (done) => {
       user.email_verified = false;
       rule(user, context, (e) => {
-        expect(e).toBeFalsy();
+        expect(e).toBeInstanceOf(globals.UnauthorizedError);
         done();
       });
     });
