@@ -70,7 +70,7 @@
           "access control"
         ],
         "description": "<p>This rule denies/grant access to users based on a list of emails stored in Dropbox.</p>",
-        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/12345678/email_list.txt'\n  }, (err, response, body) => {\n    const whitelist = body.split('\\n');\n\n    const userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}"
+        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  request.get({\n    url: 'https://dl.dropboxusercontent.com/u/12345678/email_list.txt'\n  }, (err, response, body) => {\n    const whitelist = body.split('\\n');\n\n    const userHasAccess = whitelist.some(function (email) {\n      return email === user.email;\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n\n    callback(null, user, context);\n  });\n}"
       },
       {
         "id": "email-verified",
@@ -130,7 +130,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email domains.</p>",
-        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  const whitelist = ['example.com', 'example.org']; //authorized domains\n  const userHasAccess = whitelist.some(\n      function (domain) {\n        const emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  return callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  const whitelist = ['example.com', 'example.org']; //authorized domains\n  const userHasAccess = whitelist.some(\n      function (domain) {\n        const emailSplit = user.email.split('@');\n        return emailSplit[emailSplit.length - 1].toLowerCase() === domain;\n      });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  return callback(null, user, context);\n}"
       },
       {
         "id": "simple-user-whitelist-for-app",
@@ -140,7 +140,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email addresses on a specific app.</p>",
-        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  // only enforce for NameOfTheAppWithWhiteList\n  // bypass this rule for all other apps\n  if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; // authorized users\n  const userHasAccess = whitelist.some(function (email) {\n    return email === user.email;\n  });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  // only enforce for NameOfTheAppWithWhiteList\n  // bypass this rule for all other apps\n  if(context.clientName !== 'NameOfTheAppWithWhiteList'){\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; // authorized users\n  const userHasAccess = whitelist.some(function (email) {\n    return email === user.email;\n  });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "id": "simple-user-whitelist",
@@ -150,7 +150,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to users with specific email addresses.</p>",
-        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n  const userHasAccess = whitelist.some(\n    function (email) {\n      return email === user.email;\n    });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users\n  const userHasAccess = whitelist.some(\n    function (email) {\n      return email === user.email;\n    });\n\n  if (!userHasAccess) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "id": "simple-whitelist-on-a-connection",
@@ -160,7 +160,7 @@
           "access control"
         ],
         "description": "<p>This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).</p>",
-        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  // We check users only authenticated with 'fitbit'\n  if(context.connection === 'fitbit') {\n    const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized user emails\n    const userHasAccess = whitelist.some(function (email) {\n      return (email === user.email);\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  // Access should only be granted to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(new UnauthorizedError('Access denied.'));\n  }\n\n  // We check users only authenticated with 'fitbit'\n  if(context.connection === 'fitbit') {\n    const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized user emails\n    const userHasAccess = whitelist.some(function (email) {\n      return (email === user.email);\n    });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n  }\n\n  callback(null, user, context);\n}"
       }
     ]
   },
