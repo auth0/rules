@@ -1,6 +1,6 @@
 /**
- * @title Skip MFA during silent authentication
- * @overview Skip multifactor authentication during silent authentication
+ * @title Require MFA once per session
+ * @overview Require multifactor authentication only once per session
  * @gallery true
  * @category multifactor
  *

@@ -5,7 +5,7 @@ const ContextBuilder = require('../utils/contextBuilder');
 const RequestBuilder = require('../utils/requestBuilder');
 const AuthenticationBuilder = require('../utils/authenticationBuilder');
 
-const ruleName = 'skip-mfa-during-silent-auth';
+const ruleName = 'require-mfa-once-per-session';
 
 describe(ruleName, () => {
   let context;
