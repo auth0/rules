@@ -120,7 +120,7 @@
           "access control"
         ],
         "description": "<p>This rule adds a Roles field to the user based on some pattern.</p>",
-        "code": "function (user, context, callback) {\n\n  // Roles should only be set to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  const addRolesToUser = function(user) {\n    const endsWith = '@example.com';\n\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      return ['admin']\n    }\n    return ['user'];\n  };\n\n  const roles = addRolesToUser(user);\n\n  user.app_metadata.roles = roles;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function() {\n      context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n      callback(null, user, context);\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n}"
+        "code": "function (user, context, callback) {\n\n  // Roles should only be set to verified users.\n  if (!user.email || !user.email_verified) {\n    return callback(null, user, context);\n  }\n\n  user.app_metadata = user.app_metadata || {};\n  // You can add a Role based on what you want\n  // In this case I check domain\n  const addRolesToUser = function (user) {\n    const endsWith = '@example.com';\n\n    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {\n      return ['admin'];\n    }\n    return ['user'];\n  };\n\n  const roles = addRolesToUser(user);\n\n  user.app_metadata.roles = roles;\n  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n    .then(function () {\n      context.idToken['https://example.com/roles'] = user.app_metadata.roles;\n      callback(null, user, context);\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n}"
       },
       {
         "id": "simple-domain-whitelist",
@@ -520,6 +520,16 @@
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when a condition is met.</p>",
         "code": "function (user, context, callback) {\n  /*\n  You can trigger MFA conditionally by checking:\n  1. Client ID:\n  context.clientID === 'REPLACE_WITH_YOUR_CLIENT_ID'\n  2. User metadata:\n  user.user_metadata.use_mfa\n  */\n\n  // if (<condition>) {\n    context.multifactor = {\n      provider: 'any',\n\n      // optional, defaults to true. Set to false to force authentication every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };\n  //}\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "require-mfa-once-per-session",
+        "title": "Require MFA once per session",
+        "overview": "Require multifactor authentication only once per session",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule can be used to avoid prompting a user for multifactor authentication if they have successfully completed MFA in their current session.</p>\n<p>This is particularly useful when performing silent authentication (<code>prompt=none</code>) to renew short-lived access tokens in a SPA (Single Page Application) during the duration of a user's session without having to rely on setting <code>allowRememberBrowser</code> to <code>true</code>.</p>",
+        "code": "function (user, context, callback) {\n  const completedMfa = !!context.authentication.methods.find(\n    (method) => method.name === 'mfa'\n  );\n \n  if (completedMfa) {\n    return callback(null, user, context);\n  }\n \n  context.multifactor = {\n    provider: 'any',\n    allowRememberBrowser: false\n  };\n \n  callback(null, user, context);\n}"
       }
     ]
   },
