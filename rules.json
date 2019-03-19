@@ -10,7 +10,7 @@
           "access control"
         ],
         "description": "<p>This rule is used to prevent access during weekends for a specific app.</p>",
-        "code": "function (user, context, callback) {\n\n  if (context.clientName === 'TheAppToCheckAccessTo') {\n    const d = Date.getDay();\n\n    if (d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function (user, context, callback) {\n\n  if (context.clientName === 'TheAppToCheckAccessTo') {\n    const date = new Date();\n    const d = date.getDay();\n\n    if (d === 0 || d === 6) {\n      return callback(new UnauthorizedError('This app is available during the week'));\n    }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "id": "active-directory-groups",
