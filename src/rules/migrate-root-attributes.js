@@ -16,7 +16,7 @@
 function (user, context, cb) {
   // Field Mapping, the property is the root attribute and the value is the field name on user_metadata.
   // You can change the value in case you don't have the same name on user_metadata.
-  const fieldMapping = {
+  var fieldMapping = {
     family_name: 'family_name',
     given_name: 'given_name',
     name: 'name',
@@ -25,8 +25,8 @@ function (user, context, cb) {
   };
 
   if (needMigration(user)) {
-    const ManagementClient = require('auth0@2.9.1').ManagementClient;
-    const management = new ManagementClient({
+    var ManagementClient = require('auth0@2.9.1').ManagementClient;
+    var management = new ManagementClient({
       domain: auth0.domain,
       token: auth0.accessToken
     });
@@ -47,7 +47,7 @@ function (user, context, cb) {
 
   function needMigration(user) {
     if (user.user_metadata) {
-      for (const key in fieldMapping) {
+      for (var key in fieldMapping) {
         if (typeof user.user_metadata[fieldMapping[key]] === 'string') {
           return true;
         }
@@ -58,10 +58,10 @@ function (user, context, cb) {
   }
 
   function generateUserPayload(user) {
-    const payload = { user_metadata: {}};
-    const userMetadata = user.user_metadata;
+    var payload = { user_metadata: {}};
+    var userMetadata = user.user_metadata;
 
-    for (const key in fieldMapping) {
+    for (var key in fieldMapping) {
       generateUserPayloadField(userMetadata, payload, key, fieldMapping[key]);
     }
 
@@ -69,7 +69,7 @@ function (user, context, cb) {
   }
 
   function updateRuleUser(user, updatedUser) {
-    for (const key in fieldMapping) {
+    for (var key in fieldMapping) {
       if (typeof user.user_metadata[fieldMapping[key]] === 'string') {
         user[key] = updatedUser[key];
         delete user.user_metadata[fieldMapping[key]];
