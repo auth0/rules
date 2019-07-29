@@ -8,15 +8,20 @@
  *
  * ![](https://cloudup.com/cgwZds8MjA7+)
  *
- * This rule will call Zapier static hook every time a new user signs up.
+ * This rule will call Zapier static hook every time a user's first successful login.
  *
  */
 
 function (user, context, callback) {
-  // short-circuit if the user signed up already
-  if (context.stats.loginsCount > 1) {
+  // short-circuit if the request already happened 
+  user.app_metadata = user.app_metadata || {};
+  
+  if (user.app_metadata.zapTriggered) {
     return callback(null, user, context);
   }
+
+  const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
+  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
   const request = require('request');
 
@@ -28,13 +33,31 @@ function (user, context, callback) {
     strategy: context.connectionStrategy
   };
 
-  const payload_to_zap = _.extend({}, user, small_context);
+  const payload_to_zap = Object.assign({}, user, small_context);
 
   request.post({
     url: configuration.ZAP_HOOK_URL,
     json: payload_to_zap
+  }, (err) => {
+
+    if (err) {
+      slack.alert({
+        channel: '#some_channel',
+        text: 'Error sending zap on first login',
+        fields: {
+          error: response
+        }
+      });
+
+      return;
+    }
+
+    // record a succesful zap so that we only do it once
+    user.app_metadata.zapTriggered = true;
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
   });
 
-  // don’t wait for the Zapier WebHook call to finish, return right away (the request will continue on the sandbox)`
+  // don’t wait for the Zapier WebHook call to finish, return right away (the request will continue on the sandbox)
   callback(null, user, context);
+
 }
