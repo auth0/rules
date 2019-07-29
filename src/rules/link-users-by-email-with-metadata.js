@@ -10,6 +10,7 @@
 
 function (user, context, callback) {
   const request = require('request');
+  const _ = require('lodash');
 
   // Check if email is verified, we shouldn't automatically
   // merge accounts if this is not the case.
@@ -50,11 +51,16 @@ function (user, context, callback) {
     const originalUser = data[0];
     const provider = user.identities[0].provider;
     const providerUserId = user.identities[0].user_id;
-
-    user.app_metadata = user.app_metadata || {};
-    user.user_metadata = user.user_metadata || {};
-    auth0.users.updateAppMetadata(originalUser.user_id, user.app_metadata)
-    .then(auth0.users.updateUserMetadata(originalUser.user_id, user.user_metadata))
+    const mergeCustomizer = function(objectValue, sourceValue){
+      if (_.isArray(objectValue)){
+        return sourceValue.concat(objectValue);
+      }
+    };
+    const mergedUserMetadata = _.merge({}, user.user_metadata, originalUser.user_metadata, mergeCustomizer);
+    const mergedAppMetadata = _.merge({}, user.app_metadata, originalUser.app_metadata, mergeCustomizer);
+    
+    auth0.users.updateAppMetadata(originalUser.user_id, mergedAppMetadata)
+    .then(auth0.users.updateUserMetadata(originalUser.user_id, mergedUserMetadata))
     .then(function() {
       request.post({
         url: userApiUrl + '/' + originalUser.user_id + '/identities',
