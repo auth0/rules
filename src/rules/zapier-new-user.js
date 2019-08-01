@@ -21,7 +21,7 @@ function (user, context, callback) {
   }
 
   const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
-  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
+  const slack = require('slack-notify@0.1.4')(MY_SLACK_WEBHOOK_URL);
 
   const request = require('request');
 
