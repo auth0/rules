@@ -1,5 +1,5 @@
 /**
- * @title Send events to Segment 
+ * @title Send events to Segment IO
  * @overview Send events to segment.io
  * @gallery false
  * @category webhook
