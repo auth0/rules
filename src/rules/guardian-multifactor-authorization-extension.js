@@ -1,5 +1,5 @@
 /**
- * @title Multifactor with Auth0 Guardian + Authorization Extension
+ * @title Multifactor with Auth0 Guardian and Authorization Extension
  * @overview Guardian mfa + authorization extension working together.
  * @gallery true
  * @category multifactor,guardian

@@ -1,5 +1,5 @@
 /**
- * @title Move user_metadata attributes to profile root attributes.
+ * @title Move user metadata attributes to profile root attributes
  * @overview Moves select data from user_metadata to profile root attributes (family_name, given_name, name, nickname and picture).
  * @gallery true
  * @category enrich profile
