@@ -1,6 +1,6 @@
 /**
- * @title Obtains a Pusher token for subscribing/publishing to private channels
- * @overview Obtain a Pusher token for subscribing/publishing to private channels.
+ * @title Obtain a Pusher token for subscribing and publishing to private channels
+ * @overview Obtains a Pusher token for subscribing/publishing to private channels.
  * @gallery true
  * @category webhook
  *
