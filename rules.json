@@ -249,7 +249,7 @@
       },
       {
         "id": "get-towerdata-profile",
-        "title": "Enrich profile with Towerdata (formerly RapLeaf)",
+        "title": "Enrich profile with Towerdata - formerly RapLeaf",
         "overview": "Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile.",
         "categories": [
           "enrich profile"
@@ -279,7 +279,7 @@
       },
       {
         "id": "migrate-root-attributes",
-        "title": "Move user_metadata attributes to profile root attributes.",
+        "title": "Move user metadata attributes to profile root attributes",
         "overview": "Moves select data from user_metadata to profile root attributes (family_name, given_name, name, nickname and picture).",
         "categories": [
           "enrich profile"
@@ -395,7 +395,7 @@
       },
       {
         "id": "pusher",
-        "title": "Obtains a Pusher token for subscribing/publishing to private channels",
+        "title": "Obtains a Pusher token for subscribing and publishing to private channels",
         "overview": "Obtain a Pusher token for subscribing/publishing to private channels.",
         "categories": [
           "webhook"
@@ -435,7 +435,7 @@
       },
       {
         "id": "splunk-HEC-track-event",
-        "title": "Tracks Logins/SignUps with Splunk HEC",
+        "title": "Tracks Logins and SignUps with Splunk HEC",
         "overview": "Send SignUp and Login events to Splunk's [HTTP Event Collector] (http://dev.splunk.com/view/event-collector/SP-CAAAE7F), including some contextual information of the user.",
         "categories": [
           "webhook"
@@ -490,7 +490,7 @@
       },
       {
         "id": "guardian-multifactor-authorization-extension",
-        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "title": "Multifactor with Auth0 Guardian and Authorization Extension",
         "overview": "Guardian mfa + authorization extension working together.",
         "categories": [
           "multifactor",
@@ -548,7 +548,7 @@
     "templates": [
       {
         "id": "guardian-multifactor-authorization-extension",
-        "title": "Multifactor with Auth0 Guardian + Authorization Extension",
+        "title": "Multifactor with Auth0 Guardian and Authorization Extension",
         "overview": "Guardian mfa + authorization extension working together.",
         "categories": [
           "multifactor",
