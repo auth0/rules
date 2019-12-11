@@ -13,6 +13,9 @@
   function activeDirectoryGroups(user, context, callback) {
   var groupAllowed = 'group1';
   if (user.groups) {
+    if(typeof user.groups === "string"){
+      user.groups = [user.groups];
+    }
     var userHasAccess = user.groups.some(
       function (group) {
         return groupAllowed === group;
