@@ -3,7 +3,7 @@ jobs:
   build_and_test:
     working_directory: ~/auth0-rules
     docker:
-      - image: circleci/node:4.9.1
+      - image: circleci/node:8.11.4
     steps:
       - checkout
       - restore_cache:
@@ -15,10 +15,37 @@ jobs:
             - node_modules
       - run:
           name: Run Jest tests
-          command: npm run test
+          command: npm run test && npm run build
+  deploy:
+    docker:
+      - image: circleci/python:3.7-stretch
+    working_directory: ~/auth0-rules
+    steps:
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: Deploy to S3
+          command: aws s3 cp ./rules.json s3://assets.us.auth0.com/extensibility/rules/rules.json
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build_and_test
+  build_test_and_deploy:
+    jobs:
+      - build_and_test:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
