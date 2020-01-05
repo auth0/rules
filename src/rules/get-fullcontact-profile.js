@@ -1,10 +1,10 @@
 /**
  * @title Enrich profile with FullContact
- * @overview Get the user profile from FullContact using the email and user nickname then add a new property to user_metadata.
+ * @overview Get the user profile from FullContact using the email then add a new property to user_metadata.
  * @gallery true
  * @category enrich profile
  *
- * This rule gets the user profile from FullContact using the e-mail and user nickname (if available).
+ * This rule gets the user profile from FullContact using the e-mail (if available).
  *
  * If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullcontact` to the user_metadata and returns. Any other conditions are ignored.
  *
@@ -32,8 +32,7 @@ function (user, context, callback) {
       'Authorization': 'Bearer ' + FULLCONTACT_KEY,
     },
     body: JSON.stringify({
-      "email": user.email,
-      "twitter": `@${user.nickname}`
+      "email": user.email
     }),
   }, (error, response, body) => {
     if (error || (response && response.statusCode !== 200)) {
