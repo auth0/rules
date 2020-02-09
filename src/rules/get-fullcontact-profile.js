@@ -13,11 +13,14 @@
  */
 
 function (user, context, callback) {
+  // The following two configuration keys could be added to the Rules configuration object at https://manage.auth0.com/#/rules/
+  // See https://auth0.com/docs/rules/guides/configuration for details
+  
   // Get FullContact API key: https://dashboard.fullcontact.com/
-  const FULLCONTACT_KEY = 'YOUR FULLCONTACT API KEY'; 
-
-  // Create a Slack app and get a hook URL: https://api.slack.com/messaging/webhooks#getting-started
-  const SLACK_HOOK = 'YOUR SLACK HOOK URL';
+  const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;
+  
+  // Create a Slack app and get a hook URL: https://api.slack.com/messaging/webhooks#getting-started  
+  const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
   const slack = require('slack-notify')(SLACK_HOOK);
 
