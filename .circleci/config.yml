@@ -1,16 +1,22 @@
-version: 2
+version: 2.1
 jobs:
   build_and_test:
     working_directory: ~/auth0-rules
+    parameters:
+      v:
+        type: string
+        default: "8"
     docker:
-      - image: circleci/node:8.11.4
+      - image: circleci/node:<< parameters.v >>
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          keys:
+            - v<< parameters.v >>-npm-deps-{{ checksum "package-lock.json" }}
+            - v<< parameters.v >>-npm-deps-
       - run: npm install
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: v<< parameters.v >>-npm-deps-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
       - run:
@@ -33,6 +39,12 @@ workflows:
   build_and_test:
     jobs:
       - build_and_test
+      - build_and_test:
+          name: build_and_test_node12
+          v: "12"
+      - build_and_test:
+          name: build_and_test_node13
+          v: "13"
   build_test_and_deploy:
     jobs:
       - build_and_test:
