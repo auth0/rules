@@ -14,7 +14,7 @@
  *
  */
 
-function (user, context, callback) {
+function requestbin(user, context, callback) {
   const request = require('request');
 
   // https://auth0.com/docs/user-profile/user-profile-structure

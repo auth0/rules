@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function sendEventsSegmentio(user, context, callback) {
   if (context.protocol === 'delegation') {
     return callback(null, user, context);
   }

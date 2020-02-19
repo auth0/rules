@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function accessOnWeekdaysOnlyForAnApp(user, context, callback) {
 
   if (context.clientName === 'TheAppToCheckAccessTo') {
     const date = new Date();

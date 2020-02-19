@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function mfa(user, context, callback) {
   /*
   You can trigger MFA conditionally by checking:
   1. Client ID:

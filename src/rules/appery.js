@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function appery(user, context, callback) {
   // run this only for the Appery.io application
   // if (context.clientID !== 'APPERYIO CLIENT ID IN AUTH0') return callback(null, user, context);
 

@@ -14,7 +14,7 @@
  *
  */
 
-function (user, context, callback) {
+function mandrill(user, context, callback) {
   const request = require('request');
 
   user.app_metadata = user.app_metadata || {};

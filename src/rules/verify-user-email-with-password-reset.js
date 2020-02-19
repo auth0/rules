@@ -7,7 +7,7 @@
  *
  */
 
-function (user, context, callback) {
+function verifyUserEmailWithPasswordReset(user, context, callback) {
   const request = require('request');
   const userApiUrl = auth0.baseUrl + '/users/';
 

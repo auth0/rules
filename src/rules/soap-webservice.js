@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function soapWebservice(user, context, callback) {
   const request = require('request');
   const xmldom = require('xmldom');
   const xpath = require('xpath');

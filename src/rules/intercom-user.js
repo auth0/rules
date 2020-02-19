@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function intercomUser(user, context, callback) {
   const request = require('request');
   const moment = require('moment-timezone');
 

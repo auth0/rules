@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function zapierNewLogin(user, context, callback) {
   const request = require('request');
 
   const small_context = {

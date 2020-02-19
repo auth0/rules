@@ -18,7 +18,7 @@
  *
  */
 
-function (user, context, callback) {
+function aspnetWebapi(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.customId) {
     console.log('Found ID!');

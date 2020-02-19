@@ -7,7 +7,7 @@
  *
  */
 
-function (user, context, callback) {
+function mongodb(user, context, callback) {
   const connection_string = configuration.MONGO_CONNECTION_STRING;
   mongo(connection_string, function (db) {
     const users = db.collection('users');

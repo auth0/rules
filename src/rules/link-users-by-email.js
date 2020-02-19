@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function linkUsersByEmail(user, context, callback) {
   const request = require('request');
   // Check if email is verified, we shouldn't automatically
   // merge accounts if this is not the case.

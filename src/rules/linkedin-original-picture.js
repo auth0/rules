@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function linkedinOriginalPicture(user, context, callback) {
   if (context.connection !== 'linkedin') {
     return callback(null, user, context);
   }

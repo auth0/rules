@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function getGetIP(user, context, callback) {
 
   user.user_metadata = user.user_metadata || {};
 

@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function simpleWhitelistOnAConnection(user, context, callback) {
 
   // Access should only be granted to verified users.
   if (!user.email || !user.email_verified) {

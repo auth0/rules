@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function defaultPictureNullAvatars(user, context, callback) {
   if (user.picture.indexOf('cdn.auth0.com') > -1) {
     const url = require('url');
     const u = url.parse(user.picture, true);

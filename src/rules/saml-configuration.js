@@ -11,7 +11,7 @@
  *
  */
 
-function (user, context, callback) {
+function samlConfiguration(user, context, callback) {
   if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);
 
   context.samlConfiguration = context.samlConfiguration || {};

@@ -7,7 +7,7 @@
  *
  */
 
-function (user, context, callback) {
+function jwt(user, context, callback) {
   const jwt = require('jsonwebtoken');
   const CLIENT_SECRET = configuration.TARGET_API_CLIENT_SECRET;
   const CLIENT_ID = configuration.TARGET_API_CLIENT_ID;

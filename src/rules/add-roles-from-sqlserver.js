@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function addRolesFromSqlserver(user, context, callback) {
 
   // Roles should only be set to verified users.
   if (!user.email || !user.email_verified) {

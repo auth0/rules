@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function fraudPreventionWithMinfraud(user, context, callback) {
   const querystring = require('querystring');
   const request = require('request');
   const crypto = require('crypto');

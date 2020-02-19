@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function addPersistenceAttribute(user, context, callback) {
   user.user_metadata = user.user_metadata || {};
   user.user_metadata.color = user.user_metadata.color || 'blue';
   context.idToken['https://example.com/favorite_color'] = user.user_metadata.color;

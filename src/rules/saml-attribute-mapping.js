@@ -11,7 +11,7 @@
  *
  */
 
-function (user, context, callback) {
+function samlAttributeMapping(user, context, callback) {
   context.samlConfiguration.mappings = {
      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "user_id",
      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress":   "email",

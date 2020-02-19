@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function pusher(user, context, callback) {
   const pusherKey = configuration.PUSHER_KEY;
   const pusherSecret = configuration.PUSHER_SECRET;
 

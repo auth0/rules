@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function updateFirebaseUser(user, context, callback) {
   const request = require('request');
 
   const baseURL = configuration.FIREBASE_URL;

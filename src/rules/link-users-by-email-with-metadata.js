@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function linkUsersByEmailWithMetadata(user, context, callback) {
   const request = require('request');
   const _ = require('lodash');
 

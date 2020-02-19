@@ -14,7 +14,7 @@
  *
  */
 
-function (user, context, callback) {
+function querystring(user, context, callback) {
   if (context.request.query.some_querystring === 'whatever') {
     context.idToken['https://example.com/new_attribute'] = 'foo';
   }
