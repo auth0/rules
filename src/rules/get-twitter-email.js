@@ -26,6 +26,7 @@ function getTwitterEmail(user, context, callback) {
     return callback(null, user, context);
   }
 
+  const _ = require('lodash');
   const request = require('request');
   const oauth = require('oauth-sign');
   const uuid = require('uuid');

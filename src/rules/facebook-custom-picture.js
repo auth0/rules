@@ -9,6 +9,8 @@
  */
 
 function facebookCustomPicture(user, context, callback) {
+  const _ = require('lodash');
+
   if (context.connection === 'facebook') {
     const fbIdentity = _.find(user.identities, { connection: 'facebook' });
     // for more sizes and types of images that can be returned, see:

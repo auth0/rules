@@ -13,6 +13,7 @@ function useOriginallinkedInProfilePicture(user, context, callback) {
     return callback(null, user, context);
   }
 
+  const _ = require('lodash');
   const request = require('request');
 
   const liIdentity = _.find(user.identities, { connection: 'linkedin' });
