@@ -1,4 +1,4 @@
-function rule (user, context, callback) {
+function redirectToUpdateProfileWebsite(user, context, callback) {
   const RULE_NAME = 'redirect-to-update-profile-website';
   const jwt = require('jsonwebtoken');
 

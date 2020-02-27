@@ -20,7 +20,7 @@
  *
  */
 
-function (user, context, callback) {
+function getTwitterEmail(user, context, callback) {
   // additional request below is specific to Twitter
   if (context.connectionStrategy !== 'twitter') {
     return callback(null, user, context);

@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function getTowerdataProfile(user, context, callback) {
 
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);

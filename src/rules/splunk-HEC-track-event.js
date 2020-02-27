@@ -19,7 +19,7 @@
  *
  */
 
-function (user, context, callback) {
+function trackEventsWithSplunkHec(user, context, callback) {
   const request = require('request');
 
   user.app_metadata = user.app_metadata || {};

@@ -1,4 +1,4 @@
-function rule (user, context, callback) {
+function continueFromUpdateProfileWebsite(user, context, callback) {
   const _ = require('lodash');
   const RULE_NAME = 'continue-from-update-profile-website';
     

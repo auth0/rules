@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function sendMailgunEmail(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
 
   if (user.app_metadata.signedUp) {

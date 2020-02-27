@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function requireMfaOncePerSession(user, context, callback) {
   const completedMfa = !!context.authentication.methods.find(
     (method) => method.name === 'mfa'
   );

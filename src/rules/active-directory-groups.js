@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+  function activeDirectoryGroups(user, context, callback) {
   var groupAllowed = 'group1';
   if (user.groups) {
     var userHasAccess = user.groups.some(

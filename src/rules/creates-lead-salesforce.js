@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function createLeadSalesforce(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.recordedAsLead) {
     return callback(null,user,context);

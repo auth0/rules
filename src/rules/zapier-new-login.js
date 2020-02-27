@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function triggerZapOnUserLogin(user, context, callback) {
   const request = require('request');
 
   const small_context = {

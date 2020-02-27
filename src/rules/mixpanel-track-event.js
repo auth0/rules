@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function trackLoginInMixPanel(user, context, callback) {
 
   const mpEvent = {
     "event": "Sign In",

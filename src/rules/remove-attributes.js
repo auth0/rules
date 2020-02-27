@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function removeUserAttribute(user, context, callback) {
   const blacklist = [ 'some_attribute' ];
 
   Object.keys(user).forEach(function(key) {

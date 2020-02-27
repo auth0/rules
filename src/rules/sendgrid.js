@@ -11,7 +11,7 @@
  * In the same way you can use other services like [Amazon SES](http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html), [Mandrill](https://auth0.com/mandrill) and few others.
  */
 
-function (user, context, callback) {
+function sendEmailWithSendgrid(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
 
   if (user.app_metadata.signedUp) {

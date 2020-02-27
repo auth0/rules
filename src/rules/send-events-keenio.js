@@ -15,7 +15,7 @@
  *
  */
 
-function(user, context, callback) {
+function sendEventsToKeen(user, context, callback) {
   if (context.stats.loginsCount > 1) {
     return callback(null, user, context);
   }

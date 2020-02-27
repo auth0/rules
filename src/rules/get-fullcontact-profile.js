@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function getFullContactProfile(user, context, callback) {
   const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 

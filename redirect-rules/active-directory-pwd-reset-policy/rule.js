@@ -1,4 +1,4 @@
-function (user, context, callback) {
+function activeDirectoryPasswordResetPolicy(user, context, callback) {
 
   if (context.connection !== 'FabrikamAD') {
     return callback(null, user, context);

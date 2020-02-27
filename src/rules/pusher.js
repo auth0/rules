@@ -8,7 +8,9 @@
  *
  */
 
-function (user, context, callback) {
+function getPusherToken(user, context, callback) {
+  const crypto = require('crypto');
+
   const pusherKey = configuration.PUSHER_KEY;
   const pusherSecret = configuration.PUSHER_SECRET;
 

@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function guardianMultifactor(user, context, callback) {
   //const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];
 
   // run only for the specified clients
