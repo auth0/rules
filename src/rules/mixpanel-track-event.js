@@ -11,6 +11,7 @@
  */
 
 function trackLoginInMixPanel(user, context, callback) {
+  const request = require('request');
 
   const mpEvent = {
     "event": "Sign In",

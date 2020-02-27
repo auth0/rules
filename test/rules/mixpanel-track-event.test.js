@@ -15,13 +15,12 @@ describe(ruleName, () => {
     };
 
     const globals = {
-      request,
       configuration: {
         MIXPANEL_API_TOKEN: '{REPLACE_WITH_YOUR_MIXPANEL_TOKEN}'
       }
     };
 
-    rule = loadRule(ruleName, globals);
+    rule = loadRule(ruleName, globals, { request });
   });
 
   it('should send mixpanel request', (done) => {

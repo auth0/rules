@@ -19,6 +19,8 @@
  */
 
 function aspnetWebApi(user, context, callback) {
+  const request = require('request');
+
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.customId) {
     console.log('Found ID!');

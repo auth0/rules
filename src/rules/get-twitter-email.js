@@ -26,12 +26,14 @@ function getTwitterEmail(user, context, callback) {
     return callback(null, user, context);
   }
 
+  const request = require('request');
   const oauth = require('oauth-sign');
   const uuid = require('uuid');
 
   const url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
   const consumerKey = configuration.TWITTER_CONSUMER_KEY;
   const consumerSecretKey = configuration.TWITTER_CONSUMER_SECRET_KEY;
+
 
   const twitterIdentity = _.find(user.identities, { connection: 'twitter' });
   const oauthToken = twitterIdentity.access_token;

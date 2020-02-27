@@ -10,22 +10,24 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
+  let request;
 
   beforeEach(() => {
     globals = {
       UnauthorizedError: function() {},
-      request: {
-        get: jest
-          .fn()
-          .mockImplementation((opt, cb) => {
-            cb(null, { statusCode: 200 }, dropboxUsersFileFixture);
-          })
-      }
+    };
+
+    request = {
+      get: jest
+        .fn()
+        .mockImplementation((opt, cb) => {
+          cb(null, { statusCode: 200 }, dropboxUsersFileFixture);
+        })
     };
 
     context = new ContextBuilder().build();
 
-    rule = loadRule(ruleName, globals);
+    rule = loadRule(ruleName, globals, { request });
   });
 
   describe('when the rule is executed', () => {

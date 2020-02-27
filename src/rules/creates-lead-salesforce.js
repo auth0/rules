@@ -18,6 +18,8 @@ function createLeadSalesforce(user, context, callback) {
     return callback(null,user,context);
   }
 
+  const request = require('request');
+
   const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
   const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
