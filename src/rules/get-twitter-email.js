@@ -35,7 +35,6 @@ function getTwitterEmail(user, context, callback) {
   const consumerKey = configuration.TWITTER_CONSUMER_KEY;
   const consumerSecretKey = configuration.TWITTER_CONSUMER_SECRET_KEY;
 
-
   const twitterIdentity = _.find(user.identities, { connection: 'twitter' });
   const oauthToken = twitterIdentity.access_token;
   const oauthTokenSecret = twitterIdentity.access_token_secret;
