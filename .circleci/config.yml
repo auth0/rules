@@ -22,14 +22,12 @@ jobs:
       - run:
           name: Run Jest tests
           command: npm run test && npm run build
-      - persist_to_workspace:
-          root: ./
-          path: rules.json
   deploy:
     docker:
       - image: circleci/python:3.7-stretch
     working_directory: ~/auth0-rules
     steps:
+      - checkout
       - run:
           name: Install awscli
           command: sudo pip install awscli
