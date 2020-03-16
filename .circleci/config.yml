@@ -22,8 +22,11 @@ jobs:
       - run:
           name: Run Jest tests
           command: npm run test && npm run build
+      - run:
+          name: ls
+          command: ls && pwd
       - persist_to_workspace:
-          root: workspace
+          root: "."
           paths:
             - rules.json
   deploy:
