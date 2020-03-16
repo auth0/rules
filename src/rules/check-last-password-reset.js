@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function checkLastPasswordReset(user, context, callback) {
   function daydiff (first, second) {
     return (second-first)/(1000*60*60*24);
   }

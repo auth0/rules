@@ -12,10 +12,11 @@
  *
  */
 
-function (user, context, callback) {
+function getFullContactProfile(user, context, callback) {
   const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
+  const request = require('request');
   const slack = require('slack-notify')(SLACK_HOOK);
 
   // skip if no email

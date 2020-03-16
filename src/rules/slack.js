@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function slackNotificationOnUserSignup(user, context, callback) {
   // short-circuit if the user signed up already or is using a refresh token
   if (context.stats.loginsCount > 1 || context.protocol === 'oauth2-refresh-token') {
     return callback(null, user, context);

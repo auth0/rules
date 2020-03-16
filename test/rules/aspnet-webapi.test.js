@@ -10,18 +10,12 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
+  let request;
 
   const expectedCustomId = 'testId';
 
   beforeEach(() => {
     globals = {
-      request: {
-        post: jest
-          .fn()
-          .mockImplementation((url, cb) => {
-            cb(null, null, { customId: expectedCustomId })
-          })
-      },
       auth0: {
         users: {
           updateAppMetadata: jest.fn()
@@ -32,20 +26,28 @@ describe(ruleName, () => {
       }
     };
 
+    request = {
+      post: jest
+        .fn()
+        .mockImplementation((url, cb) => {
+          cb(null, null, { customId: expectedCustomId });
+        })
+    };
+
     user = new UserBuilder()
       .build();
 
     context = new ContextBuilder()
       .build();
 
-    rule = loadRule(ruleName, globals);
+    rule = loadRule(ruleName, globals, { request });
   });
 
   describe('when aspnet post request is successful', () => {
     it('should update the user metadata and set idToken', (done) => {
       const updateAppMetadataMock = globals.auth0.users.updateAppMetadata;
       updateAppMetadataMock.mockReturnValue(Promise.resolve());
-      
+
       rule(user, context, (e, u, c) => {
         const call = updateAppMetadataMock.mock.calls[0];
         expect(call[0]).toBe(user.user_id);

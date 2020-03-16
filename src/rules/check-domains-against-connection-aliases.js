@@ -11,7 +11,7 @@
  * For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.
  */
 
-function (user, context, callback) {
+function checkDomainsAgainstConnectionAliases(user, context, callback) {
   const connectionOptions = context.connectionOptions;
   const domainAliases = connectionOptions.domain_aliases || [];
   const tenantDomain = connectionOptions.tenant_domain;

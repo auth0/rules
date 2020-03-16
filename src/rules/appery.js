@@ -12,7 +12,9 @@
  *
  */
 
-function (user, context, callback) {
+function generateApperySessionToken(user, context, callback) {
+  const request = require('request');
+
   // run this only for the Appery.io application
   // if (context.clientID !== 'APPERYIO CLIENT ID IN AUTH0') return callback(null, user, context);
 

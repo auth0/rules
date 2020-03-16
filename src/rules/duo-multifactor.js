@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function duoMultifactor(user, context, callback) {
 
   var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];
   // run only for the specified clients

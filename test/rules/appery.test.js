@@ -10,6 +10,7 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
+  let stubs;
 
   const expectedGetBody = {
     sessionToken: 'someToken',
@@ -35,6 +36,10 @@ describe(ruleName, () => {
     beforeEach(() => {
       globals = {
         global: {},
+      };
+      globals.configuration = configuration;
+
+      stubs = {
         request: {
           get: jest
             .fn()
@@ -43,16 +48,16 @@ describe(ruleName, () => {
             })
         },
       };
-      globals.configuration = configuration;
 
-      rule = loadRule(ruleName, globals);
+      rule = loadRule(ruleName, globals, stubs);
     });
+
     it('should set the appery data on idToken', (done) => {
       rule(user, context, (e, u, c) => {
         expect(c.idToken['https://example.com/apperyio_session_token']).toBe(expectedGetBody.sessionToken);
         expect(c.idToken['https://example.com/apperyio_user_id']).toBe(expectedGetBody._id);
 
-        const getArgs = globals.request.get.mock.calls[0][0];
+        const getArgs = stubs.request.get.mock.calls[0][0];
         expect(getArgs.qs.username).toBe(user.email);
 
         done();
@@ -63,30 +68,34 @@ describe(ruleName, () => {
   describe('when user is not found', () => {
     beforeEach(() => {
       globals = {
+        configuration,
         global: {},
+      };
+
+      stubs = {
         request: {
           get: jest
             .fn()
             .mockImplementation((url, cb) => {
-              cb(null, { statusCode: 404 }, null)
+              cb(null, { statusCode: 404 }, null);
             }),
           post: jest
             .fn()
             .mockImplementation((url, cb) => {
-              cb(null, { statusCode: 200 }, expectedGetBody)
+              cb(null, { statusCode: 200 }, expectedGetBody);
             })
         },
       };
-      globals.configuration = configuration;
 
-      rule = loadRule(ruleName, globals);
+      rule = loadRule(ruleName, globals, stubs);
     });
+
     it('should create the appery user and set the data on idToken', (done) => {
       rule(user, context, (e, u, c) => {
         expect(c.idToken['https://example.com/apperyio_session_token']).toBe(expectedGetBody.sessionToken);
         expect(c.idToken['https://example.com/apperyio_user_id']).toBe(expectedGetBody._id);
 
-        const postArgs = globals.request.post.mock.calls[0][0];
+        const postArgs = stubs.request.post.mock.calls[0][0];
         expect(postArgs.json.username).toBe(user.email);
 
         done();

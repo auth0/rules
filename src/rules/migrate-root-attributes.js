@@ -13,7 +13,7 @@
  * 2- The mapped fields from user_metadata will be removed following the update.
  * 3- This rule will be executed on each login event. For signup scenarios, you should only consider using this rule if you currently use a custom signup form or Authentication Signup API, as these signup methods do not support setting the root attributes.
  */
-function (user, context, cb) {
+function migrateRootAttributes(user, context, cb) {
   // Field Mapping, the property is the root attribute and the value is the field name on user_metadata.
   // You can change the value in case you don't have the same name on user_metadata.
   var fieldMapping = {
