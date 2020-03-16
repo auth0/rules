@@ -36,14 +36,14 @@ jobs:
       - attach_workspace:
           at: /tmp/rules
       - run:
-          name: cd
-          command: cd /tmp/rules
+          name: ls
+          command: ls /tmp/rules
       - run:
           name: Install awscli
           command: sudo pip install awscli
       - run:
           name: Deploy to S3
-          command: aws s3 cp ./rules.json s3://assets.us.auth0.com/extensibility/rules/rules.json
+          command: aws s3 cp /tmp/rules/rules.json s3://assets.us.auth0.com/extensibility/rules/rules.json
 
 workflows:
   version: 2
