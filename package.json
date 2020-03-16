@@ -1,6 +1,6 @@
 {
   "name": "rules-templates",
-  "version": "0.8.6",
+  "version": "0.9.0",
   "description": "Auth0 Rules Repository",
   "main": "./rules",
   "scripts": {
