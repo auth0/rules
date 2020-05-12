@@ -16,6 +16,8 @@ function slackNotificationOnUserSignup(user, context, callback) {
   ) {
     return callback(null, user, context);
   }
+  // check this isn't a checkSession call  
+  if (context.request.query.prompt !== 'none'){
 
   // get your slack's hook url from: https://slack.com/services/10525858050
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
@@ -32,4 +34,7 @@ function slackNotificationOnUserSignup(user, context, callback) {
 
   // don’t wait for the Slack API call to finish, return right away (the request will continue on the sandbox)`
   callback(null, user, context);
+  } else {  
+  callback(null, user, context);
+  }
 }
