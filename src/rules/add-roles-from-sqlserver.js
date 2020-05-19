@@ -11,7 +11,7 @@
  */
 
 function addRolesFromSqlServer(user, context, callback) {
-  const tedious = require('tedious');
+  const tedious = require('tedious@6.6.2');
 
   // Roles should only be set to verified users.
   if (!user.email || !user.email_verified) {
@@ -29,12 +29,17 @@ function addRolesFromSqlServer(user, context, callback) {
   // Queries a table by e-mail and returns associated 'Roles'
   function getRoles(email, done) {
     const connection = new tedious.Connection({
-      userName: configuration.SQL_DATABASE_USERNAME,
-      password: configuration.SQL_DATABASE_PASSWORD,
-      server:   configuration.SQL_DATABASE_HOSTNAME,
+      authentication: {
+        options: {
+          userName: configuration.SQL_DATABASE_USERNAME,
+          password: configuration.SQL_DATABASE_PASSWORD
+        },
+        type: "default"
+      },
+      server: configuration.SQL_DATABASE_HOSTNAME,
       options: {
         database: configuration.SQL_DATABASE_NAME,
-        encrypt:  true,
+        encrypt: true,
         rowCollectionOnRequestCompletion: true
       }
     }).on('errorMessage', (error) => {

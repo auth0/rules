@@ -48,7 +48,7 @@ describe(ruleName, () => {
       }
     };
 
-    rule = loadRule(ruleName, globals, { tedious });
+    rule = loadRule(ruleName, globals, { 'tedious@6.6.2': tedious });
   });
 
   describe('when the rule is executed', () => {
