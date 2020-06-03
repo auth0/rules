@@ -23,6 +23,16 @@
         "code": "function activeDirectoryGroups(user, context, callback) {\n  var groupAllowed = 'group1';\n  if (user.groups) {\n    var userHasAccess = user.groups.some(\n      function (group) {\n        return groupAllowed === group;\n      });\n\n    if (!userHasAccess) {\n      return callback(new UnauthorizedError('Access denied.'));\n    }\n  }\n\n  callback(null, user, context);\n}"
       },
       {
+        "id": "add-email-to-access-token",
+        "title": "Add email to access token",
+        "overview": "Add the authenticated user's email address to the access token.",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule will add the authenticated user's <code>email</code> attribute value to the access token.</p>",
+        "code": "function (user, context, callback) {\n  // This rule adds the authenticated user's email address to the access token.\n\n  var namespace = 'https://example.com/';\n\n  context.accessToken[namespace + 'email'] = user.email;\n  return callback(null, user, context);\n}"
+      },
+      {
         "id": "check-domains-against-connection-aliases",
         "title": "Check if user email domain matches configured domain",
         "overview": "Check user email domain matches domains configured in connection.",
@@ -499,6 +509,16 @@
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
         "code": "function guardianMultifactorIpRange(user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = \"192.168.1.134/26\";\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "guardian-multifactor-stepup-authentication",
+        "title": "Multifactor Stepup Authentication",
+        "overview": "Used to challenge for a second factor when requested by sending acr_values.",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule will challenge for a second authentication factor on request (step up) when\nacr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor' is sent in\nthe request. Before the challenge is made, 'context.authentication.methods' is checked\nto determine when the user has already successfully completed a challenge in the\ncurrent session.</p>",
+        "code": "function (user, context, callback) {\n\n  // This rule initiates multi-factor authenticaiton as a second factor\n  // whenever the request contains the following value:\n  // \n  // acr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor'\n  // \n  // and multi-factor authentication has not already been completed in the\n  // current session/\n  \n  if (context.request.query.acr_values === 'http://schemas.openid.net/pape/policies/2007/06/multi-factor' && !context.authentication.methods.some(method => method.name === 'mfa')) {\n  \n  \tcontext.multifactor = {\n        provider: 'any',\n        allowRememberBrowser: false,\n      };\n    }\n\n  callback(null, user, context);\n}"
       },
       {
         "id": "guardian-multifactor",
