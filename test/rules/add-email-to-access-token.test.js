@@ -15,16 +15,15 @@ describe(ruleName, () => {
     rule = loadRule(ruleName);
 
     const request = new RequestBuilder().build();
+    user = new UserBuilder()
+      .build();
     context = new ContextBuilder()
       .withRequest(request)
       .build();
   });
 
   it('should add email to outgoing accessToken', (done) => {
-    const user = {
-      email: 'duck.t@example.com'
-    };
-    const namespace = 'http://example.com/';
+    const namespace = 'https://example.com/';
     rule(user, context, (err, u, c) => {
       expect(c.accessToken[namespace + 'email']).toBe(user.email);
 
