@@ -20,7 +20,7 @@ describe(ruleName, () => {
       .build();
   });
 
-  it('should add `email` to outgoing `accessToken`, (done) => {
+  it('should add email to outgoing accessToken', (done) => {
     const user = {
       email: 'duck.t@example.com'
     }
