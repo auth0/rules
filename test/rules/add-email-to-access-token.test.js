@@ -2,7 +2,7 @@
 
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
-const RequestBuilder = require('../utils/requestBuilder');
+const UserBuilder = require('../utils/userBuilder')
 
 const ruleName = 'add-email-to-access-token';
 
@@ -14,12 +14,8 @@ describe(ruleName, () => {
   beforeEach(() => {
     rule = loadRule(ruleName);
 
-    const request = new RequestBuilder().build();
-    user = new UserBuilder()
-      .build();
-    context = new ContextBuilder()
-      .withRequest(request)
-      .build();
+    user = new UserBuilder().build();
+    context = new ContextBuilder().build();
   });
 
   it('should add email to outgoing accessToken', (done) => {
