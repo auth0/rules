@@ -20,7 +20,10 @@ describe(ruleName, () => {
       .build();
   });
 
-  it('should set multifactor provider', (done) => {
+  it('should add `email` to outgoing `accessToken`, (done) => {
+    const user = {
+      email: 'duck.t@example.com'
+    }
     rule(user, context, (err, u, c) => {
       expect(c.accessToken[namespace + 'email']).toBe(user.email);
 
