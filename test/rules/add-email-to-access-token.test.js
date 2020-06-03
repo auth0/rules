@@ -23,7 +23,8 @@ describe(ruleName, () => {
   it('should add email to outgoing accessToken', (done) => {
     const user = {
       email: 'duck.t@example.com'
-    }
+    };
+    const namespace = 'http://example.com/';
     rule(user, context, (err, u, c) => {
       expect(c.accessToken[namespace + 'email']).toBe(user.email);
 
