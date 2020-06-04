@@ -78,9 +78,10 @@ function createNewContactAndAddToContactListHubSpot(user, context, callback) {
           user.app_metadata.hubSpotContactAddedToList = true;
           console.log('[EMAIL LIST] HANDLE ANY POSSIBLE INFORMATION YOU MIGHT WANT TO STORE IN THE USERS PROFILE');
         }
+
+        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
       });
     }
-
     auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
   });
 
