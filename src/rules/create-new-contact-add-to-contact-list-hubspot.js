@@ -30,11 +30,11 @@ function createNewContactAndAddToContactListHubSpot(user, context, callback) {
       },
       {
         "property": "firstname",
-        "value": user.given_name
+        "value": user.given_name || ""
       },
       {
         "property": "lastname",
-        "value": user.family_name
+        "value": user.family_name || ""
       }
     ]
   });
@@ -80,8 +80,9 @@ function createNewContactAndAddToContactListHubSpot(user, context, callback) {
         }
       });
     }
+
+    auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
   });
 
-  auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
   return callback(null, user, context);
 }

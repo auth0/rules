@@ -42,6 +42,8 @@ describe(ruleName + ' - sunny path', () => {
       });
 
       user = new UserBuilder().build();
+      user.given_name = "Given";
+      user.family_name = "Family";
   
       context = new ContextBuilder().build();
       rule = loadRule(ruleName, globals, stubs);
