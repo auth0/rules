@@ -2,7 +2,7 @@
  * @title shopify-leads-from-login
  * @overview Add lead to Shopify at login
  * @gallery true
- * @category leads
+ * @category webhook
  *
  * This rule is used to add user accounts to Shopify as user logs in
  *
