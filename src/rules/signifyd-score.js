@@ -5,7 +5,7 @@
  * @category enrich profile
  *
  *
- * This rule gets the signifyd score and status from signifyd.com and stored it in app_metadata.
+ * This rule gets the signifyd score and status from signifyd.com and stores it in app_metadata.
  *
  */
 
@@ -34,8 +34,8 @@ function getSignifydScore(user, context, callback) {
       if (signifyd.status !== 'Ok') return callback(null, user, context);
   
       user.app_metadata = user.app_metadata || {};
-      user.app_metadata.guaranteeEligible = signifyd.data.status;
-      user.app_metadata.signifyd = signifyd.data.score;
+      user.app_metadata.signifyd_status = signifyd.data.status;
+      user.app_metadata.signifyd_score = signifyd.data.score;
       // "attributes":[
       //      "guaranteeEligible":true,
       //      "status": "open",
