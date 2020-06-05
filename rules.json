@@ -653,6 +653,21 @@
     ]
   },
   {
+    "name": "leads",
+    "templates": [
+      {
+        "id": "shopify-lead-from-login",
+        "title": "shopify-leads-from-login",
+        "overview": "Add lead to Shopify at login",
+        "categories": [
+          "leads"
+        ],
+        "description": "<p>This rule is used to add user accounts to Shopify as user logs in</p>",
+        "code": "async function addShopifyUser(user, context, callback) {\n  const fetch = require('node-fetch@2.6.0');\n  const { URL } = require('url');\n  const CONFIG = {\n    API_KEY: 'YOUR_API_KEY',\n    API_PWD: 'YOUR_API_PASSWORD',\n    API_URL: 'YOUR_STORE.myshopify.com'\n  };\n  try {\n    const url = new URL(\n      `https://${CONFIG.API_KEY}:${CONFIG.API_PWD}@${CONFIG.API_URL}/admin/api/2020-04/customers.json`\n    );\n    const res = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json'\n      },\n      body: JSON.stringify({\n        customer: {\n          first_name: 'Steve',\n          last_name: 'Lastnameson',\n          email: 'steve.lastnameson@example.com',\n          phone: '+15142546011',\n          verified_email: true,\n          addresses: [\n            {\n              address1: '123 Oak St',\n              city: 'Ottawa',\n              province: 'ON',\n              phone: '555-1212',\n              zip: '123 ABC',\n              last_name: 'Lastnameson',\n              first_name: 'Mother',\n              country: 'CA'\n            }\n          ]\n        }\n      })\n    });\n    const body = await res.text();\n    if (!res.ok) {\n      callback(new Error(body));\n      return;\n    }\n    callback(null, user, context);\n  } catch (err) {\n    callback(err);\n  }\n}"
+      }
+    ]
+  },
+  {
     "name": "default",
     "templates": [
       {
