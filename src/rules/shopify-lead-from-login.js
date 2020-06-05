@@ -16,6 +16,9 @@ async function addShopifyUser(user, context, callback) {
     API_PWD: 'YOUR_API_PASSWORD',
     API_URL: 'YOUR_STORE.myshopify.com'
   };
+
+  user.user_metadata = user.user_metadata || {};
+
   try {
     const url = new URL(
       `https://${CONFIG.API_KEY}:${CONFIG.API_PWD}@${CONFIG.API_URL}/admin/api/2020-04/customers.json`
@@ -26,25 +29,12 @@ async function addShopifyUser(user, context, callback) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        // instead of hard-coding, use Auth0 user object to dynamically build customer data
         customer: {
-          first_name: 'Steve',
-          last_name: 'Lastnameson',
-          email: 'steve.lastnameson@example.com',
-          phone: '+15142546011',
-          verified_email: true,
-          addresses: [
-            {
-              address1: '123 Oak St',
-              city: 'Ottawa',
-              province: 'ON',
-              phone: '555-1212',
-              zip: '123 ABC',
-              last_name: 'Lastnameson',
-              first_name: 'Mother',
-              country: 'CA'
-            }
-          ]
+          first_name: user.given_name,
+          last_name: user.family_name,
+          email: user.email,
+          phone: user.user_metadata.phone_number || '',
+          verified_email: user.email_verified,
         }
       })
     });
@@ -58,3 +48,4 @@ async function addShopifyUser(user, context, callback) {
     callback(err);
   }
 }
+
