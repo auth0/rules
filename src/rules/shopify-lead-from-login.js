@@ -26,6 +26,7 @@ async function addShopifyUser(user, context, callback) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        // instead of hard-coding, use Auth0 user object to dynamically build customer data
         customer: {
           first_name: 'Steve',
           last_name: 'Lastnameson',
