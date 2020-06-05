@@ -10,20 +10,9 @@
 
 async function addShopifyUser(user, context, callback) {
   const fetch = require('node-fetch@2.6.0');
-  const { URL } = require('url');
-  const CONFIG = {
-    API_KEY: 'YOUR_API_KEY',
-    API_PWD: 'YOUR_API_PASSWORD',
-    API_URL: 'YOUR_STORE.myshopify.com'
-  };
-
-  user.user_metadata = user.user_metadata || {};
 
   try {
-    const url = new URL(
-      `https://${CONFIG.API_KEY}:${CONFIG.API_PWD}@${CONFIG.API_URL}/admin/api/2020-04/customers.json`
-    );
-    const res = await fetch(url, {
+    const res = await fetch(`https://${configuration.SHOPIFY_API_KEY}:${configuration.SHOPIFY_API_PWD}@${configuration.SHOPIFY_API_URL}/admin/api/2020-04/customers.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -33,11 +22,11 @@ async function addShopifyUser(user, context, callback) {
           first_name: user.given_name,
           last_name: user.family_name,
           email: user.email,
-          phone: user.user_metadata.phone_number || '',
           verified_email: user.email_verified,
         }
       })
     });
+
     const body = await res.text();
     if (!res.ok) {
       callback(new Error(body));
@@ -48,4 +37,3 @@ async function addShopifyUser(user, context, callback) {
     callback(err);
   }
 }
-
