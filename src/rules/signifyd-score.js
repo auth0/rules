@@ -1,3 +1,14 @@
+/**
+ * @title Detect Ecommerce Fraud Users 
+ * @overview Get the signifyd score from signfyd.com and store it on app_metadata.
+ * @gallery true
+ * @category enrich profile
+ *
+ *
+ * This rule gets the signifyd score and status from signifyd.com and stored it in app_metadata.
+ *
+ */
+
 function getSignifydScore(user, context, callback) {
   
     user.app_metadata = user.app_metadata || {};
