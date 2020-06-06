@@ -336,7 +336,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule will add two attributes to the user's metadata object on when they accepted the terms and conditions.</p>\n<p>This is useful for cases where you want to track an user's consent. See https://auth0.com/docs/compliance/gdpr/features-aiding-compliance/user-consent/track-consent-with-lock for more information.</p>",
-        "code": "function (user, context, callback) {\n    user.user_metadata = user.user_metadata || {};\n    // short-circuit if the user signed up already\n    if (user.user_metadata.consentGiven) return callback(null, user, context);\n    \n    // first time login/signup\n    user.user_metadata.consentGiven = true;\n    user.user_metadata.consentTimestamp = Date.now();\n    auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function(){\n      callback(null, user, context);\n    })\n    .catch(function(err){\n      callback(err);\n    });\n  }"
+        "code": "function trackConsent(user, context, callback) {\n  user.user_metadata = user.user_metadata || {};\n  // short-circuit if the user signed up already\n  if (user.user_metadata.consentGiven) return callback(null, user, context);\n\n  // first time login/signup\n  user.user_metadata.consentGiven = true;\n  // uncomment to track consentVersion\n  // user.user_metadata.consentVersion = \"1.9\";\n\n  user.user_metadata.consentTimestamp = Date.now();\n  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)\n    .then(function () {\n      callback(null, user, context);\n    })\n    .catch(function (err) {\n      callback(err);\n    });\n}"
       }
     ]
   },
