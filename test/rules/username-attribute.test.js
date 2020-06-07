@@ -33,7 +33,7 @@ describe(ruleName, () => {
       updateAppMetadataMock.mockReturnValue(Promise.resolve());
       
       rule(user, context, (e, u, c) => {
-        expect(user.app_metadata.username).toBe(superuser);
+        expect(user.app_metadata.username).toBe('superuser');
         done();
       });
     });
