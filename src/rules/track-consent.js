@@ -10,19 +10,22 @@
  *
  */
 
-function (user, context, callback) {
-    user.user_metadata = user.user_metadata || {};
-    // short-circuit if the user signed up already
-    if (user.user_metadata.consentGiven) return callback(null, user, context);
-    
-    // first time login/signup
-    user.user_metadata.consentGiven = true;
-    user.user_metadata.consentTimestamp = Date.now();
-    auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
-    .then(function(){
+function trackConsent(user, context, callback) {
+  user.user_metadata = user.user_metadata || {};
+  // short-circuit if the user signed up already
+  if (user.user_metadata.consentGiven) return callback(null, user, context);
+
+  // first time login/signup
+  user.user_metadata.consentGiven = true;
+  // uncomment to track consentVersion
+  // user.user_metadata.consentVersion = "1.9";
+
+  user.user_metadata.consentTimestamp = Date.now();
+  auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
+    .then(function () {
       callback(null, user, context);
     })
-    .catch(function(err){
+    .catch(function (err) {
       callback(err);
     });
-  }
+}
