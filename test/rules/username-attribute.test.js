@@ -24,7 +24,7 @@ describe(ruleName, () => {
       };
   
       user = new UserBuilder()
-        .withAppMetadata({username: 'user1'})
+        .withAppMetadata({username: 'superuser'})
         .build();
       context = new ContextBuilder().build();
   
@@ -36,7 +36,7 @@ describe(ruleName, () => {
       updateUserMetadataMock.mockReturnValue(Promise.resolve());
       
       rule(user, context, (e, u, c) => {
-        expect (user.app_metadata.username).toBe(user1);
+        expect (user.app_metadata.username).toBe(superuser);
         done();
       });
     });
