@@ -1,6 +1,6 @@
 /* global configuration */
 /**
- * @title Alernate Risk Score
+ * @title Alternate Risk Score
  * @overview Send the user's IP address, user agent, email address and username to MaxMind's MinFraud API.
  * @gallery true
  * @category enrich profile
