@@ -23,7 +23,6 @@ describe(ruleName, () => {
       };
   
       user = new UserBuilder()
-        .withAppMetadata({username: 'superuser'})
         .build();
       context = new ContextBuilder().build();
   
