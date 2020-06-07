@@ -346,7 +346,7 @@
           "enrich profile"
         ],
         "description": "<p>This rule will add one attribute to the user's metadata object on when they log in or sign up</p>\n<p>This is useful for cases where you want to add the username to an email using liquid syntax.</p>",
-        "code": "function addPersistenceAttribute(user, context, callback) {\n    user.app_metadata = user.app_metadata || {};\n    // short-circuit if the user signed up already\n    if (user.app_metadata.username) return callback(null, user, context);\n    // first time login/signup\n    user.app_metadata.username = user.app_metadata.username || user.username;\n    context.idToken['https://example.com/username'] = user.app_metadata.username;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n          callback(null, user, context);\n      })\n      .catch(function(err){\n          callback(err);\n      });\n  }"
+        "code": "function (user, context, callback) {\n    user.app_metadata = user.app_metadata || {};\n    // short-circuit if the user signed up already\n    if (user.app_metadata.username) return callback(null, user, context);\n    // first time login/signup\n    user.app_metadata.username = user.app_metadata.username || user.username;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function(){\n          callback(null, user, context);\n      })\n      .catch(function(err){\n          callback(err);\n      });\n  }"
       }
     ]
   },
