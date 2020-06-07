@@ -23,22 +23,19 @@ describe(ruleName, () => {
       };
   
       user = new UserBuilder()
-        .withAppMetadata({username: 'user1'})
+        .withAppMetadata({username: 'superuser'})
         .build();
       context = new ContextBuilder().build();
   
       rule = loadRule(ruleName, globals);
     });
   
-    it('should persist the attribute to user', (done) => {
+    it('should add username to user app metada', (done) => {
       const updateUserMetadataMock = globals.auth0.users.updateUserMetadata;
       updateUserMetadataMock.mockReturnValue(Promise.resolve());
       
       rule(user, context, (e, u, c) => {
-        const call = updateUserMetadataMock.mock.calls[0];
-        expect(call[0]).toBe(user.user_id);
-        expect(c.idToken['https://example.com/username']).toBe(user.app_metadata.username);
-        expect(call[1].username).toBe(user.app_metadata.username);
+        expect(u.app_metadata.username).toBe(superuser);
         done();
       });
     });
