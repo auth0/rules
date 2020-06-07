@@ -17,7 +17,7 @@ describe(ruleName, () => {
         global: {},
         auth0: {
           users: {
-            updateUserMetadata: jest.fn()
+            updateAppMetadata: jest.fn()
           }
         }
       };
@@ -29,8 +29,8 @@ describe(ruleName, () => {
     });
   
     it('should add username attribute superuser for the user', (done) => {
-      const updateUserMetadataMock = globals.auth0.users.updateUserMetadata;
-      updateUserMetadataMock.mockReturnValue(Promise.resolve());
+      const updateAppMetadataMock = globals.auth0.users.updateAppMetadata;
+      updateAppMetadataMock.mockReturnValue(Promise.resolve());
       
       rule(user, context, (e, u, c) => {
         expect(u.app_metadata.username).toBe(superuser);
