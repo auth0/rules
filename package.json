@@ -34,6 +34,6 @@
     "parse-comments": "^1.0.0",
     "request": "^2.88.0",
     "showdown": "^1.9.1",
-    "yargs": "^15.3.1"
+    "yargs": "11.1.0"
   }
 }
