@@ -22,14 +22,13 @@ describe(ruleName, () => {
         }
       };
   
-      user = new UserBuilder()
-        .build();
+      user = new UserBuilder().build();
       context = new ContextBuilder().build();
   
       rule = loadRule(ruleName, globals);
     });
   
-    it('should add username to user app metada', (done) => {
+    it('should add username attribute superuser for the user', (done) => {
       const updateUserMetadataMock = globals.auth0.users.updateUserMetadata;
       updateUserMetadataMock.mockReturnValue(Promise.resolve());
       
