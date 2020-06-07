@@ -4,31 +4,42 @@ const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
 const RequestBuilder = require('../utils/requestBuilder');
 
-const ruleName = 'add-country';
+const ruleName = 'Add Username to App MetaData';
 
 describe(ruleName, () => {
-  let user;
-  let context;
   let rule;
+  let context;
+  let user;
+  let globals;
 
   beforeEach(() => {
-    rule = loadRule(ruleName);
+    globals = {
+      global: {},
+      auth0: {
+        users: {
+          updateAppMetadata: jest.fn()
+        }
+      }
+    };
+
+    user = new UserBuilder()
+      .withAppMetadata({username: 'user1'})
+      .build();
+    context = new ContextBuilder().build();
+
+    rule = loadRule(ruleName, globals);
   });
 
-  describe('when request has geoip', () => {
-    beforeEach(() => {
-      const request = new RequestBuilder().build();
-      context = new ContextBuilder()
-        .withRequest(request)
-        .build();
-    })
-    it('should set the idToken dictionaries with correct values', (done) => {
-      rule(user, context, (err, u, c) => {
-        expect(c.idToken['https://example.com/country']).toBe(context.request.geoip.country_name);
-        expect(c.idToken['https://example.com/timezone']).toBe(context.request.geoip.time_zone);
-
-        done();
-      });
+  it('should persist the attribute to user', (done) => {
+    const updateAppMetadataMock = globals.auth0.users.updateAppMetadata;
+    updateAppMetadataMock.mockReturnValue(Promise.resolve());
+    
+    rule(user, context, (e, u, c) => {
+      const call = updateAppMetadataMock.mock.calls[0];
+      expect(call[0]).toBe(user.user_id);
+      expect(c.idToken['https://example.com/username']).toBe(user.app_metadata.username);
+      expect(call[1].username).toBe(user.app_metadata.username);
+      done();
     });
-  })
+  });
 });
