@@ -454,6 +454,16 @@
         "code": "function sendEmailWithSendgrid(user, context, callback) {\n  user.app_metadata = user.app_metadata || {};\n\n  if (user.app_metadata.signedUp) {\n    return callback(null, user, context);\n  }\n\n  const request = require('request');\n\n  request.post({\n    url: 'https://api.sendgrid.com/api/mail.send.json',\n    headers: {\n      'Authorization': 'Bearer ' + configuration.SENDGRID_API_KEY\n    },\n    form: {\n      'to': 'admin@example.com',\n      'subject': 'NEW SIGNUP',\n      'from': 'admin@example.com',\n      'text': 'We have got a new sign up from: ' + user.email + '.'\n    }\n  }, function (error, response, body) {\n    if (error) return callback(error);\n    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));\n\n    user.app_metadata.signedUp = true;\n    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)\n      .then(function () {\n        callback(null, user, context);\n      })\n      .catch(function (err) {\n        callback(err);\n      });\n  });\n}"
       },
       {
+        "id": "shopify-lead-from-login",
+        "title": "shopify-leads-from-login",
+        "overview": "Add lead to Shopify at login",
+        "categories": [
+          "webhook"
+        ],
+        "description": "<p>This rule is used to add user accounts to Shopify as user logs in</p>",
+        "code": "async function addShopifyUser(user, context, callback) {\n  const fetch = require('node-fetch@2.6.0');\n\n  try {\n    const res = await fetch(`https://${configuration.SHOPIFY_API_KEY}:${configuration.SHOPIFY_API_PWD}@${configuration.SHOPIFY_API_URL}/admin/api/2020-04/customers.json`, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json'\n      },\n      body: JSON.stringify({\n        customer: {\n          first_name: user.given_name,\n          last_name: user.family_name,\n          email: user.email,\n          verified_email: user.email_verified,\n        }\n      })\n    });\n\n    const body = await res.text();\n    if (!res.ok) {\n      callback(new Error(body));\n      return;\n    }\n    callback(null, user, context);\n  } catch (err) {\n    callback(err);\n  }\n}"
+      },
+      {
         "id": "slack",
         "title": "Slack Notification on User Signup",
         "overview": "Slack notification on user signup.",
