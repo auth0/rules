@@ -11,6 +11,13 @@
  * > Note: You should sign up first in Auth0 Signals (https://auth0.com/signals)
  * and copy the API Key given into a setting key named AUTH0SIGNALS_API_KEY.
  *
+ * DISCLAIMER: Auth0 Signals is free for all and offered 'as is': there is no SLA 
+ * for the service and the maximum number of daily requests is 40000
+ * (https://community.auth0.com/t/how-to-obtain-an-auth0-signals-api-key/42048).
+ * You can read the latest full Terms of Service here: 
+ * (https://auth0.com/signals/terms-of-service)
+ *
+ * 
  */
 function getBadEmailDetection(user, context, callback) {
 
@@ -29,10 +36,17 @@ function getBadEmailDetection(user, context, callback) {
       },
       headers: {
         'content-type': 'application/json'
-      }
+      },
+      timeout: 1000
     }, function (err, resp, body) {
-      if (err) return callback(null, user, context);
-      if (resp.statusCode !== 200) return callback(null, user, context);
+      if (err) {
+        console.log('Error request to Signals:' + err.code + ', ' + err);
+        return callback(null, user, context);
+      }
+      if (resp.statusCode !== 200) {
+        console.log('Signals not returning 200:' + resp.statusCode);
+        return callback(null, user, context);
+      }
       const signals_response = JSON.parse(body);
   
       user.user_metadata.email = user.user_metadata.email || {};
@@ -44,7 +58,6 @@ function getBadEmailDetection(user, context, callback) {
       auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
         .then(function(){
             context.idToken['https://example.com/email'] = user.user_metadata.email;
-            console.log(user);
             callback(null, user, context);
         })
         .catch(function(err){

@@ -11,6 +11,13 @@
  * > Note: You should sign up first in Auth0 Signals (https://auth0.com/signals)
  * and copy the API Key given into a setting key named AUTH0SIGNALS_API_KEY.
  *
+ * DISCLAIMER: Auth0 Signals is free for all and offered 'as is': there is no SLA 
+ * for the service and the maximum number of daily requests is 40000
+ * (https://community.auth0.com/t/how-to-obtain-an-auth0-signals-api-key/42048).
+ * You can read the latest full Terms of Service here: 
+ * (https://auth0.com/signals/terms-of-service)
+ * 
+ *  
  */
 function getBadIPAddressDetection(user, context, callback) {
     user.user_metadata = user.user_metadata || {};
@@ -25,10 +32,17 @@ function getBadIPAddressDetection(user, context, callback) {
       },
       headers: {
         'content-type': 'application/json'
-      }
+      },
+      timeout: 1000
     }, function (err, resp, body) {
-      if (err) return callback(null, user, context);
-      if ((resp.statusCode !== 200) && (resp.statusCode !== 404)) return callback(null, user, context);
+      if (err) {
+        console.log('Error request to Signals:' + err.code + ', ' + err);
+        return callback(null, user, context);
+      }
+      if ((resp.statusCode !== 200) && (resp.statusCode !== 404)) {
+        console.log('Signals not returning 200 or 404:' + resp.statusCode);
+        return callback(null, user, context);
+      }
       let signals_response = {'response':[]};
       if (resp.statusCode === 200) {
         signals_response = JSON.parse(body);
@@ -41,11 +55,12 @@ function getBadIPAddressDetection(user, context, callback) {
       user.user_metadata.source_ip.blacklists = signals_response.response;
       user.user_metadata.source_ip.ip = context.request.ip;
     
+      console.log('Signals source_ip:' + user.user_metadata.source_ip.ip + ", blacklists:" + signals_response.response);
+
       // persist the user_metadata update
       auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
         .then(function(){
             context.idToken['https://example.com/blacklists'] = user.user_metadata.source_ip.blacklists;
-            console.log(user);
             callback(null, user, context);
         })
         .catch(function(err){
