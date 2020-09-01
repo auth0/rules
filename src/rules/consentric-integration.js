@@ -1,13 +1,12 @@
 /**
-* @title Consentric Integration
-* @overview Integration code that extends Auth0 login to incorporate a Consentric Consent Capture flow
+* @title Progressive Consent Capture
+* @overview Uses a widget to capture missing consents and preferences at login to boost engagement and support compliance
 * @gallery true
 * @category marketplace
 * 
 * Consentric provides an integration to extend Auth0's universal login to include collection of consent as part of the authentication and sign up flows.
 *
 */
-
 
 function consentric(user, context, callback) {
     const axios = require('axios');
