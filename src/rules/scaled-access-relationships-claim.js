@@ -1,5 +1,5 @@
 /**
-* @title Adds a claim based on relationships
+* @title Scaled Access rule which adds a claim based on relationships
 * @overview Adds a claim based on the relationships the subject has in Scaled Access
 * @gallery true
 * @category marketplace
@@ -29,36 +29,38 @@
 * More info can be found at https://docs.scaledaccess.com/?path=integration-with-auth0
 * 
 * A number of rule settings are required:
-* - GROUPS4AUTH0_CLIENTID: The Client ID of the machine-to-machine application.
-* - GROUPS4AUTH0_CLIENTSECRET: The Client secret of the machine-to-machine application.
-* - GROUPS4AUTH0_BASEURL: The base URL for the Relationship Management API, e.g. https://api.int.scaledaccess.com/privategroups-v2.
-* - GROUPS4AUTH0_TENANT: Your Scaled Access tenant code.
-* - GROUPS4AUTH0_CUSTOMCLAIM: A namespaced custom claim name of your choice. The name must be a URL.
-* - GROUPS4AUTH0_AUDIENCE: The audience in the machine-to-machine token.
+* - SCALED_ACCESS_CLIENTID: The Client ID of the machine-to-machine application.
+* - SCALED_ACCESS_CLIENTSECRET: The Client secret of the machine-to-machine application.
+* - SCALED_ACCESS_BASEURL: The base URL for the Relationship Management API, e.g. `https://api.int.scaledaccess.com/privategroups-v2`.
+* - SCALED_ACCESS_TENANT: Your Scaled Access tenant code.
+* - SCALED_ACCESS_CUSTOMCLAIM: A namespaced custom claim name of your choice. The name must be a URL. Defaults to `https://${auth0.domain}/relationships`.
+* - SCALED_ACCESS_TOKENURL: The URL where to request the machine-to-machine token. Defaults to `https://${auth0.domain}/oauth/token`.
+* - SCALED_ACCESS_AUDIENCE: The audience in the machine-to-machine token.
 */
-function addClaimBasedOnRelationships(user, context, callback) {
+function scaledAccessAddRelationshipsClaim(user, context, callback) {
     const fetch = require("node-fetch");
     const { URLSearchParams } = require('url');
     const jwt = require('jsonwebtoken');
 
-    const getM2MToken = () => {
-        if (global.m2mToken && global.m2mTokenExpiryInMillis > new Date().getTime() + 60000) {
-            return Promise.resolve(global.m2mToken);
+    const getM2mToken = () => {
+        if (global.scaledAccessM2mToken && global.scaledAccessM2mTokenExpiryInMillis > new Date().getTime() + 60000) {
+            return Promise.resolve(global.scaledAccessM2mToken);
         } else {
-            return fetch(`https://${auth0.domain}/oauth/token`, {
+            const tokenUrl = configuration.SCALED_ACCESS_TOKENURL || `https://${auth0.domain}/oauth/token`;
+            return fetch(tokenUrl, {
                 method: 'POST',
                 body: new URLSearchParams({
                     grant_type: 'client_credentials',
-                    client_id: configuration.GROUPS4AUTH0_CLIENTID,
-                    client_secret: configuration.GROUPS4AUTH0_CLIENTSECRET,
-                    audience: configuration.GROUPS4AUTH0_AUDIENCE,
+                    client_id: configuration.SCALED_ACCESS_CLIENTID,
+                    client_secret: configuration.SCALED_ACCESS_CLIENTSECRET,
+                    audience: configuration.SCALED_ACCESS_AUDIENCE,
                     scope: 'pg:tenant:admin'
                 })
             })
                 .then(response => {
                     if (!response.ok) {
                         return response.text().then((error) => {
-                            console.error("Failed to obtain m2m token");
+                            console.error("Failed to obtain m2m token from " + tokenUrl);
                             throw Error(error);
                         });
                     } else {
@@ -66,15 +68,15 @@ function addClaimBasedOnRelationships(user, context, callback) {
                     }
                 })
                 .then(({ access_token }) => {
-                    global.m2mToken = access_token;
-                    global.m2mTokenExpiryInMillis = jwt.decode(access_token).exp * 1000;
+                    global.scaledAccessM2mToken = access_token;
+                    global.scaledAccessM2mTokenExpiryInMillis = jwt.decode(access_token).exp * 1000;
                     return access_token;
                 });
         }
     };
 
-    const callPrivateGroups = (accessToken, path) => {
-        const url = `${configuration.GROUPS4AUTH0_BASEURL}/${configuration.GROUPS4AUTH0_TENANT}/${path}`;
+    const callRelationshipManagementApi = async (accessToken, path) => {
+        const url = `${configuration.SCALED_ACCESS_BASEURL}/${configuration.SCALED_ACCESS_TENANT}/${path}`;
         return fetch(url, {
             method: 'GET',
             headers: {
@@ -82,12 +84,12 @@ function addClaimBasedOnRelationships(user, context, callback) {
                 "Content-Type": "application/json"
             }
         })
-            .then(response => {
+            .then(async response => {
                 if (response.status === 404) {
                     return [];
                 } else if (!response.ok) {
                     return response.text().then((error) => {
-                        console.error("Failed to call private groups v2", url);
+                        console.error("Failed to call relationship management API", url);
                         throw Error(error);
                     });
                 } else {
@@ -97,17 +99,18 @@ function addClaimBasedOnRelationships(user, context, callback) {
     };
 
     const getRelationships = (accessToken) => {
-        return callPrivateGroups(accessToken, `actors/user/${user.user_id}/relationships`);
+        return callRelationshipManagementApi(accessToken, `actors/user/${user.user_id}/relationships`);
     };
 
-    const addClaimToToken = (privateGroupsResponse) => {
-        context.accessToken[configuration.GROUPS4AUTH0_CUSTOMCLAIM] = privateGroupsResponse.map(relationship => ({
+    const addClaimToToken = (apiResponse) => {
+        const claimName = configuration.SCALED_ACCESS_CUSTOMCLAIM || `https://${auth0.domain}/relationships`;
+        context.accessToken[claimName] = apiResponse.map(relationship => ({
             relationshipType: relationship.relationshipType,
             to: relationship.to
         }));
     };
 
-    getM2MToken()
+    getM2mToken()
         .then(getRelationships)
         .then(addClaimToToken)
         .then(() => {
