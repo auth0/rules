@@ -1,5 +1,5 @@
 /**
-* @title Scaled Access rule which adds a claim based on relationships
+* @title Scaled Access relationship-based claims
 * @overview Adds a claim based on the relationships the subject has in Scaled Access
 * @gallery true
 * @category marketplace
