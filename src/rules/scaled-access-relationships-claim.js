@@ -33,7 +33,7 @@
 * - SCALED_ACCESS_CLIENTSECRET: The Client secret of the machine-to-machine application.
 * - SCALED_ACCESS_BASEURL: The base URL for the Relationship Management API, e.g. `https://api.int.scaledaccess.com/privategroups-v2`.
 * - SCALED_ACCESS_TENANT: Your Scaled Access tenant code.
-* - SCALED_ACCESS_CUSTOMCLAIM: A namespaced custom claim name of your choice. The name must be a URL. Defaults to `https://${auth0.domain}/relationships`.
+* - SCALED_ACCESS_CUSTOMCLAIM: A namespaced custom claim name of your choice. The name must be a URL. Defaults to `https://scaledaccess.com/relationships`.
 * - SCALED_ACCESS_TOKENURL: The URL where to request the machine-to-machine token. Defaults to `https://${auth0.domain}/oauth/token`.
 * - SCALED_ACCESS_AUDIENCE: The audience in the machine-to-machine token.
 */
@@ -103,7 +103,7 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
     };
 
     const addClaimToToken = (apiResponse) => {
-        const claimName = configuration.SCALED_ACCESS_CUSTOMCLAIM || `https://${auth0.domain}/relationships`;
+        const claimName = configuration.SCALED_ACCESS_CUSTOMCLAIM || `https://scaledaccess.com/relationships`;
         context.accessToken[claimName] = apiResponse.map(relationship => ({
             relationshipType: relationship.relationshipType,
             to: relationship.to
