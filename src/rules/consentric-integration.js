@@ -149,7 +149,7 @@ function myLifeDigitalProgressiveConsent(user, context, callback) {
 
         const loadConsentricUserAccessToken = async ({ user, configuration, global }) => {
 
-            const metadataUserToken = await getConsentricUserTokenFromMetadata(user);
+            const metadataUserToken = getConsentricUserTokenFromMetadata(user);
 
             if ((!metadataUserToken) || moment(metadataUserToken.expires).isBefore(moment())) {
                 const apiAccessToken = await getConsentricApiAccessToken(configuration, global);
