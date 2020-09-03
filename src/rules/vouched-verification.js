@@ -170,9 +170,7 @@ async function vouchedVerification(user, context, callback) {
                                                 user);
   
             // user doesn't have a verification result, redirect to Vouched with packet
-            context.redirect = {
-                url: redirectToVerification(packetId)
-            };
+            ruleUtils.doRedirect(redirectToVerification(packetId));
             return callback(null, user, context);
         }
     } catch (e) {
