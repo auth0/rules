@@ -9,27 +9,26 @@
 */
 
 function myLifeDigitalProgressiveConsent(user, context, callback) {
-    const axios = require('axios');
-    const moment = require('moment');
+    const axios = require('axios@0.19.2');
+    const moment = require('moment@2.11.2');
 
 
     const asMilliSeconds = (seconds) => seconds * 1000;
 
+    const {
+        CONSENTRIC_AUTH_HOST,
+        CONSENTRIC_AUDIENCE,
+        CONSENTRIC_CLIENT_ID,
+        CONSENTRIC_CLIENT_SECRET,
+        CONSENTRIC_APPLICATION_ID
+    } = configuration;
 
     const initConsentricFlow = async () => {
 
         // Returns Consentric API JWT from either cache or retrieves new
-        const getConsentricApiAccessToken = async (configuration, global) => {
+        const getConsentricApiAccessToken = async () => {
 
             if ((!global.consentricApiToken) || global.consentricApiToken.expires < new Date().getTime()) {
-
-                const {
-                    CONSENTRIC_AUTH_HOST,
-                    CONSENTRIC_AUDIENCE,
-                    CONSENTRIC_CLIENT_ID,
-                    CONSENTRIC_CLIENT_SECRET,
-                    CONSENTRIC_APPLICATION_ID
-                } = configuration;
 
                 const instance = axios.create({
                     baseURL: CONSENTRIC_AUTH_HOST,
@@ -70,11 +69,10 @@ function myLifeDigitalProgressiveConsent(user, context, callback) {
 
 
         //Creates Citizen Record in Consentric with Auth0 Id
-        const createCitizen = async ({ userRef, apiAccessToken, configuration }) => {
+        const createCitizen = async ({ userRef, apiAccessToken }) => {
             try {
                 console.log(`Upserting Consentric Citizen record for ${userRef}`);
-
-                const { CONSENTRIC_APPLICATION_ID, CONSENTRIC_API_HOST } = configuration;
+                
                 const instance = axios.create({
                     baseURL: CONSENTRIC_API_HOST,
                     headers: {
@@ -112,10 +110,8 @@ function myLifeDigitalProgressiveConsent(user, context, callback) {
             user.app_metadata && user.app_metadata.consentric;
 
         // Generates On Demand Consentric User Token for given User with API Access Token
-        const generateConsentricUserAccessToken = async ({ userRef, apiAccessToken, configuration }) => {
+        const generateConsentricUserAccessToken = async ({ userRef, apiAccessToken }) => {
             try {
-                const { CONSENTRIC_APPLICATION_ID, CONSENTRIC_API_HOST } = configuration;
-
                 console.log(`Attempting to call API for ${userRef} with jwt [${apiAccessToken.substring(0, 10)}]`);
                 const instance = axios.create({
                     baseURL: CONSENTRIC_API_HOST,
@@ -147,27 +143,25 @@ function myLifeDigitalProgressiveConsent(user, context, callback) {
         };
 
 
-        const loadConsentricUserAccessToken = async ({ user, configuration, global }) => {
+        const loadConsentricUserAccessToken = async ({ user, global }) => {
 
             const metadataUserToken = getConsentricUserTokenFromMetadata(user);
 
             if ((!metadataUserToken) || moment(metadataUserToken.expires).isBefore(moment())) {
-                const apiAccessToken = await getConsentricApiAccessToken(configuration, global);
+                const apiAccessToken = await getConsentricApiAccessToken();
                 const delimIdx = user.user_id.indexOf('|');
                 const userRef = user.user_id.substring(delimIdx + 1);
 
                 await createCitizen(
                     {
                         userRef,
-                        apiAccessToken: apiAccessToken.jwt,
-                        configuration
+                        apiAccessToken: apiAccessToken.jwt,                        
                     });
 
                 const generatedToken = await generateConsentricUserAccessToken(
                     {
                         userRef,
-                        apiAccessToken: apiAccessToken.jwt,
-                        configuration,
+                        apiAccessToken: apiAccessToken.jwt,                        
                         global,
                     },
                 );
@@ -188,11 +182,11 @@ function myLifeDigitalProgressiveConsent(user, context, callback) {
         };
 
 
-        const consentricUserAccessToken = await loadConsentricUserAccessToken({ user, configuration, global });
+        const consentricUserAccessToken = await loadConsentricUserAccessToken({ user, global });
 
 
-        const urlConnector = configuration.CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
-        const redirectUrl = configuration.CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + consentricUserAccessToken.token;
+        const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
+        const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + consentricUserAccessToken.token;
 
 
         context.redirect = {
