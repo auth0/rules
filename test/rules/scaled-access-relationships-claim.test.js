@@ -14,9 +14,6 @@ const sandbox = {
     require: require,
     console: console,
     global: {},
-    auth0: {
-        domain: "some-tenant.eu.auth0.com"
-    },
     configuration: {
         SCALED_ACCESS_BASEURL: "https://api.int.scaledaccess.com/privategroups-v2",
         SCALED_ACCESS_TENANT: "tenant",
@@ -34,7 +31,7 @@ describe(ruleName, () => {
 
     beforeEach(() => {
         rule = loadRule(ruleName, sandbox, {});
-        nock(`https://${sandbox.auth0.domain}`).post("/oauth/token")
+        nock(`https://some-tenant.eu.auth0.com`).post("/oauth/token")
             .reply(200, { access_token: ACCESS_TOKEN });
     });
 
@@ -46,6 +43,7 @@ describe(ruleName, () => {
     describe("When the user already exists", async () => {
         beforeEach(() => {
             const request = new RequestBuilder().build();
+            request.hostname = "some-tenant.eu.auth0.com";
             context = new ContextBuilder()
                 .withRequest(request)
                 .build();
