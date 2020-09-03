@@ -8,7 +8,7 @@
 *
 */
 
-function consentric(user, context, callback) {
+function myLifeDigitalProgressiveConsent(user, context, callback) {
     const axios = require('axios');
     const moment = require('moment');
 
