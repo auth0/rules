@@ -19,9 +19,17 @@ async function vouchedVerification(user, context, callback) {
     /* ----------- START helpers ----------- */
     const axios = require('axios');
     const url = require('url');
+    const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
+    
+     const ruleUtils = new Auth0RedirectRuleUtilities(
+       user,
+       context,
+       configuration
+     );
      
     const defaultApiUrl = 'https://verify.vouched.id/api';
     const defaultUiUrl = 'https://console.vouched.id';
+    const idTokenClaim = 'https://vouched.id/is_verified';
   
     const getJob = async (apiKey, jobToken, apiUrl=defaultApiUrl) => {
         const response = await axios({
@@ -108,13 +116,12 @@ async function vouchedVerification(user, context, callback) {
   
     /* ----------- END helpers ----------- */
   
-    context.request.query = context.request.query || {};
     user.app_metadata = user.app_metadata || {};
     const vouchedApiUrl = configuration.VOUCHED_API_URL || undefined;
   
     try {
-        const jobToken = context.request.query.jobToken;
-        if (context.protocol === "redirect-callback" && jobToken) { 
+        const jobToken = ruleUtils.queryParams.jobToken;
+        if (ruleUtils.isRedirectCallback && jobToken) { 
             // get job from API
             const job = await getJob(configuration.VOUCHED_API_KEY, jobToken, vouchedApiUrl);
   
@@ -146,7 +153,7 @@ async function vouchedVerification(user, context, callback) {
                 } else {
                     // user failed verification check and doesn't have an override
                     if (configuration.VOUCHED_ID_TOKEN_CLAIM === 'true') {
-                        context.idToken['https://vouched.id/is_verified'] = false;
+                        context.idToken[idTokenClaim] = false;
                     }
                     if (configuration.VOUCHED_VERIFICATION_OPTIONAL === 'true') {
                         return callback(null, user, context);
@@ -173,7 +180,7 @@ async function vouchedVerification(user, context, callback) {
     }
   
     if (configuration.VOUCHED_ID_TOKEN_CLAIM === 'true') {
-        context.idToken['https://vouched.id/is_verified'] = true;
+        context.idToken[idTokenClaim] = true;
     }
   
     return callback(null, user, context);
