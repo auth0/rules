@@ -31,7 +31,7 @@ function (user, context, callback) {
      'Content-Type': 'application/x-www-form-urlencoded' },
   form: 
    { grant_type: 'authorization_code',
-     code: context.request.query.code,
+     code: ruleUtils.queryParams.code,
      redirect_uri: 'https://' + context.request.hostname + '/continue'
       } };
 
