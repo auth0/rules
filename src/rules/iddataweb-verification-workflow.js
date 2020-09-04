@@ -87,7 +87,7 @@ function (user, context, callback) {
     }, 
     configuration.IDDATAWEB_CLIENT_SECRET, { expiresIn: '1h' });
           
-          console.log(configuration.idwClientSecret);
+          console.log(configuration.IDDATAWEB_CLIENT_SECRET);
           context.redirect = {
         url: configuration.idwBaseURL + '/axn/oauth2/authorize?client_id=' + configuration.idwClientID + '&redirect_uri=https://' + context.request.hostname + '/continue&scope=openid+country.US&response_type=code&login_hint=' + prefillToken
     };
