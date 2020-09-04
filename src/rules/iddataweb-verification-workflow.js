@@ -42,7 +42,7 @@ function (user, context, callback) {
         let decodedToken = jwt.decode(jsonData.id_token);
         console.log('policy decision: ' + decodedToken.policyDecision);
         console.log('score: ' + decodedToken.idwTrustScore);
-        if (configuration.logIdwJwt === 'on'){
+        if (configuration.IDDATAWEB_LOG_JWT === 'on'){
           console.log(JSON.stringify(decodedToken)); 
         }
         
