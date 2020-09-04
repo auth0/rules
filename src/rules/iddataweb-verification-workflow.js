@@ -53,7 +53,7 @@ function (user, context, callback) {
            user.app_metadata.iddataweb.verificationResult = 'verified';
            auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
           .then(function(){
-            callback(null, user, context);
+            return callback(null, user, context);
           })
           .catch(function(err){
             callback(err);
