@@ -17,6 +17,13 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     configuration
   );
 
+  const {
+    IDDATAWEB_BASE_URL,
+    IDDATAWEB_CLIENT_ID,
+    IDDATAWEB_CLIENT_SECRET,
+    IDDATAWEB_LOG_JWT
+  } = configuration;
+
   // initialize app metadata
   user.app_metadata = user.app_metadata || {};
   user.app_metadata.iddataweb = user.app_metadata.iddataweb || {};
@@ -27,15 +34,15 @@ function iddatawebVerificationWorkflow(user, context, callback) {
 
     let options = {
       method: "POST",
-      url: configuration.IDDATAWEB_BASE_URL + "/axn/oauth2/token",
+      url: IDDATAWEB_BASE_URL + "/axn/oauth2/token",
       headers: {
         "Cache-Control": "no-cache",
         Authorization:
           "Basic " +
           Buffer.from(
-            configuration.IDDATAWEB_CLIENT_ID +
+            IDDATAWEB_CLIENT_ID +
               ":" +
-              configuration.IDDATAWEB_CLIENT_SECRET
+              IDDATAWEB_CLIENT_SECRET
           ).toString("base64"),
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -53,7 +60,7 @@ function iddatawebVerificationWorkflow(user, context, callback) {
       let decodedToken = jwt.decode(jsonData.id_token);
       console.log("policy decision: " + decodedToken.policyDecision);
       console.log("score: " + decodedToken.idwTrustScore);
-      if (configuration.IDDATAWEB_LOG_JWT === "on") {
+      if (IDDATAWEB_LOG_JWT === "on") {
         console.log(JSON.stringify(decodedToken));
       }
 
@@ -78,14 +85,14 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     //if coming in for first time - redirect to IDW for verification.
     if (
       user.app_metadata.iddataweb.verificationResult === "verified" &&
-      configuration.IDDATAWEB_ALWAYS_VERIFY === "off"
+      IDDATAWEB_ALWAYS_VERIFY === "off"
     ) {
       console.log("user " + user.user_id + " has been previously verified.");
       return callback(null, user, context);
       //if not previously verified, redirect
     } else {
       //if "prefill attributes" is on, build and sign JWT, and include in /auth request to ID DataWeb.
-      if (configuration.IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
+      if (IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
         let prefillToken = jwt.sign(
           {
             sub: user.email,
@@ -95,16 +102,15 @@ function iddatawebVerificationWorkflow(user, context, callback) {
             lname: user.family_name,
             phone: user.phone_number,
           },
-          configuration.IDDATAWEB_CLIENT_SECRET,
+          IDDATAWEB_CLIENT_SECRET,
           { expiresIn: "1h" }
         );
 
-        console.log(configuration.IDDATAWEB_CLIENT_SECRET);
         context.redirect = {
           url:
-            configuration.IDDATAWEB_BASE_URL +
+            IDDATAWEB_BASE_URL +
             "/axn/oauth2/authorize?client_id=" +
-            configuration.IDDATAWEB_CLIENT_ID +
+            IDDATAWEB_CLIENT_ID +
             "&redirect_uri=https://" +
             context.request.hostname +
             "/continue&scope=openid+country.US&response_type=code&login_hint=" +
@@ -115,9 +121,9 @@ function iddatawebVerificationWorkflow(user, context, callback) {
       } else {
         context.redirect = {
           url:
-            configuration.IDDATAWEB_BASE_URL +
+            IDDATAWEB_BASE_URL +
             "/axn/oauth2/authorize?client_id=" +
-            configuration.IDDATAWEB_CLIENT_ID +
+            IDDATAWEB_CLIENT_ID +
             "&redirect_uri=https://" +
             context.request.hostname +
             "/continue&scope=openid+country.US&response_type=code",
