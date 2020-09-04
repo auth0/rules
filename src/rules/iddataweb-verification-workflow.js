@@ -27,7 +27,7 @@ function (user, context, callback) {
   url: configuration.IDDATAWEB_BASE_URL + '/axn/oauth2/token',
   headers: 
    { 'Cache-Control': 'no-cache',
-     Authorization: 'Basic ' + Buffer.from(configuration.idwClientID + ':' + configuration.idwClientSecret).toString('base64'),
+     Authorization: 'Basic ' + Buffer.from(configuration. IDDATAWEB_CLIENT_ID + ':' + configuration.IDDATAWEB_CLIENT_SECRET).toString('base64'),
      'Content-Type': 'application/x-www-form-urlencoded' },
   form: 
    { grant_type: 'authorization_code',
