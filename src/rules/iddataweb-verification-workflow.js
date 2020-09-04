@@ -72,7 +72,7 @@ function (user, context, callback) {
         //if not previously verified, redirect
       } else {
         //if "prefill attributes" is on, build and sign JWT, and include in /auth request to ID DataWeb.
-        if (configuration.prefillAttributes === 'on') {
+        if (configuration.IDDATAWEB_PREFILL_ATTRIBUTES === 'on') {
           
           let prefillToken = jwt.sign(
     {
