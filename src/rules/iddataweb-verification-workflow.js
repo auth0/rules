@@ -66,7 +66,7 @@ function (user, context, callback) {
     } else {
       
       //if coming in for first time - redirect to IDW for verification.
-      if ((user.app_metadata.iddataweb.verificationResult === 'verified') && (configuration.alwaysVerify === 'off')){
+      if ((user.app_metadata.iddataweb.verificationResult === 'verified') && (configuration.IDDATAWEB_ALWAYS_VERIFY === 'off')){
         console.log('user ' + user.user_id + ' has been previously verified.');
         return callback(null, user, context);
         //if not previously verified, redirect
