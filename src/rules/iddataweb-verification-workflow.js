@@ -14,14 +14,20 @@
 //contact solutions@iddataweb.com with any questions. 
 
 function (user, context, callback) {
-  
+  const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
+
+  const ruleUtils = new Auth0RedirectRuleUtilities(
+    user,
+    context,
+    configuration
+  );
 //initialize app metadata
   user.app_metadata = user.app_metadata || {};
   user.app_metadata.iddataweb = user.app_metadata.iddataweb || {};
   
 //if coming back from redirect - get token, make policy decision, and update user metadata.
-    if (context.protocol === "redirect-callback") {
-        console.log("code from IDW: " + context.request.query.code);	
+    if (ruleUtils.isRedirectCallback) {
+        console.log("code from IDW: " + ruleUtils.queryParams.code);	
       
       let options = { method: 'POST',
   url: configuration.IDDATAWEB_BASE_URL + '/axn/oauth2/token',
@@ -36,7 +42,7 @@ function (user, context, callback) {
       } };
 
       request(options, function (error, response, body) {
-        if (error) throw new Error(error);
+        if (error) return callback(err);
 
         let jsonData = JSON.parse(body);
         let decodedToken = jwt.decode(jsonData.id_token);
@@ -89,14 +95,14 @@ function (user, context, callback) {
           
           console.log(configuration.IDDATAWEB_CLIENT_SECRET);
           context.redirect = {
-        url: configuration.idwBaseURL + '/axn/oauth2/authorize?client_id=' + configuration.idwClientID + '&redirect_uri=https://' + context.request.hostname + '/continue&scope=openid+country.US&response_type=code&login_hint=' + prefillToken
+        url: configuration.IDDATAWEB_BASE_URL + '/axn/oauth2/authorize?client_id=' + configuration.IDDATAWEB_CLIENT_ID + '&redirect_uri=https://' + context.request.hostname + '/continue&scope=openid+country.US&response_type=code&login_hint=' + prefillToken
     };
        return callback(null, user, context);    
         //if "prefill attributes" is not on, redirect without Auth0 prefill.  
         } else {
 
         context.redirect = {
-          url: configuration.idwBaseURL + '/axn/oauth2/authorize?client_id=' + configuration.idwClientID + '&redirect_uri=https://' + context.request.hostname + '/continue&scope=openid+country.US&response_type=code'
+          url: configuration.IDDATAWEB_BASE_URL + '/axn/oauth2/authorize?client_id=' + configuration.IDDATAWEB_CLIENT_ID + '&redirect_uri=https://' + context.request.hostname + '/continue&scope=openid+country.US&response_type=code'
       };
          return callback(null, user, context);
   
