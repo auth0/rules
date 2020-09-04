@@ -23,7 +23,7 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     IDDATAWEB_CLIENT_SECRET,
     IDDATAWEB_LOG_JWT,
     IDDATAWEB_ALWAYS_VERIFY,
-    IDDATAWEB_PREFILL_ATTRIBUTES
+    IDDATAWEB_PREFILL_ATTRIBUTES,
   } = configuration;
 
   const idwTokenEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/token`;
@@ -33,6 +33,15 @@ function iddatawebVerificationWorkflow(user, context, callback) {
   // initialize app metadata
   user.app_metadata = user.app_metadata || {};
   user.app_metadata.iddataweb = user.app_metadata.iddataweb || {};
+
+  // if the user is already verified and we don't need to check, exit
+  if (
+    user.app_metadata.iddataweb.verificationResult === "verified" &&
+    IDDATAWEB_ALWAYS_VERIFY === "off"
+  ) {
+    console.log("user " + user.user_id + " has been previously verified.");
+    return callback(null, user, context);
+  }
 
   // if coming back from redirect - get token, make policy decision, and update user metadata.
   if (ruleUtils.isRedirectCallback) {
@@ -46,9 +55,7 @@ function iddatawebVerificationWorkflow(user, context, callback) {
         Authorization:
           "Basic " +
           Buffer.from(
-            IDDATAWEB_CLIENT_ID +
-              ":" +
-              IDDATAWEB_CLIENT_SECRET
+            IDDATAWEB_CLIENT_ID + ":" + IDDATAWEB_CLIENT_SECRET
           ).toString("base64"),
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -87,50 +94,41 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     });
 
     return callback(null, user, context);
-  } else {
-
-    if (
-      //if coming in for first time - redirect to IDW for verification.
-      user.app_metadata.iddataweb.verificationResult === "verified" &&
-      IDDATAWEB_ALWAYS_VERIFY === "off"
-    ) {
-      console.log("user " + user.user_id + " has been previously verified.");
-      return callback(null, user, context);
-    } else {
-      //if not previously verified, redirect
-
-      let idwRedirectUrl = idwAuthorizeEndpoint +
-        "?client_id=" +
-        IDDATAWEB_CLIENT_ID +
-        "&redirect_uri=" +
-        auth0ContinueUrl +
-        "&scope=openid+country.US&response_type=code"
-
-      //build and sign JWT and include in /auth request to ID DataWeb.
-      if (IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
-        const prefillToken = jwt.sign(
-          {
-            sub: user.email,
-            credential: user.email,
-            email: user.email,
-            fname: user.given_name,
-            lname: user.family_name,
-            phone: user.phone_number,
-          },
-          IDDATAWEB_CLIENT_SECRET,
-          { expiresIn: "1h" }
-        );
-
-        idwRedirectUrl += `&login_hint=${prefillToken}`;
-      }
-
-      if (ruleUtils.canRedirect) {
-        context.redirect = {
-          url: idwRedirectUrl
-        };
-      }
-
-      return callback(null, user, context);
-    }
   }
+
+  // ... otherwise, redirect for verification.
+
+  let idwRedirectUrl =
+    idwAuthorizeEndpoint +
+    "?client_id=" +
+    IDDATAWEB_CLIENT_ID +
+    "&redirect_uri=" +
+    auth0ContinueUrl +
+    "&scope=openid+country.US&response_type=code";
+
+  // build and sign JWT and include in /auth request to ID DataWeb.
+  if (IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
+    const prefillToken = jwt.sign(
+      {
+        sub: user.email,
+        credential: user.email,
+        email: user.email,
+        fname: user.given_name,
+        lname: user.family_name,
+        phone: user.phone_number,
+      },
+      IDDATAWEB_CLIENT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    idwRedirectUrl += `&login_hint=${prefillToken}`;
+  }
+
+  if (ruleUtils.canRedirect) {
+    context.redirect = {
+      url: idwRedirectUrl,
+    };
+  }
+
+  return callback(null, user, context);
 }
