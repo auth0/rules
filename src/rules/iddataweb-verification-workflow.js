@@ -26,8 +26,8 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     IDDATAWEB_PREFILL_ATTRIBUTES
   } = configuration;
 
-  const idwTokenUrl = `${IDDATAWEB_BASE_URL}/axn/oauth2/token`;
-  const idwAuthorizeUrl = `${IDDATAWEB_BASE_URL}/axn/oauth2/authorize`;
+  const idwTokenEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/token`;
+  const idwAuthorizeEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/authorize`;
   const auth0ContinueUrl = `https://${context.request.hostname}/continue`;
 
   // initialize app metadata
@@ -40,7 +40,7 @@ function iddatawebVerificationWorkflow(user, context, callback) {
 
     let options = {
       method: "POST",
-      url: idwTokenUrl,
+      url: idwTokenEndpoint,
       headers: {
         "Cache-Control": "no-cache",
         Authorization:
@@ -88,18 +88,27 @@ function iddatawebVerificationWorkflow(user, context, callback) {
 
     return callback(null, user, context);
   } else {
-    //if coming in for first time - redirect to IDW for verification.
+
     if (
+      //if coming in for first time - redirect to IDW for verification.
       user.app_metadata.iddataweb.verificationResult === "verified" &&
       IDDATAWEB_ALWAYS_VERIFY === "off"
     ) {
       console.log("user " + user.user_id + " has been previously verified.");
       return callback(null, user, context);
-      //if not previously verified, redirect
     } else {
-      //if "prefill attributes" is on, build and sign JWT, and include in /auth request to ID DataWeb.
+      //if not previously verified, redirect
+
+      let idwRedirectUrl = idwAuthorizeEndpoint +
+        "?client_id=" +
+        IDDATAWEB_CLIENT_ID +
+        "&redirect_uri=" +
+        auth0ContinueUrl +
+        "&scope=openid+country.US&response_type=code"
+
+      //build and sign JWT and include in /auth request to ID DataWeb.
       if (IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
-        let prefillToken = jwt.sign(
+        const prefillToken = jwt.sign(
           {
             sub: user.email,
             credential: user.email,
@@ -112,30 +121,16 @@ function iddatawebVerificationWorkflow(user, context, callback) {
           { expiresIn: "1h" }
         );
 
-        context.redirect = {
-          url:
-            idwAuthorizeUrl +
-            "?client_id=" +
-            IDDATAWEB_CLIENT_ID +
-            "&redirect_uri=" +
-            auth0ContinueUrl +
-            "&scope=openid+country.US&response_type=code&login_hint=" +
-            prefillToken,
-        };
-        return callback(null, user, context);
-        //if "prefill attributes" is not on, redirect without Auth0 prefill.
-      } else {
-        context.redirect = {
-          url:
-          idwAuthorizeUrl +
-            "?client_id=" +
-            IDDATAWEB_CLIENT_ID +
-            "&redirect_uri=" +
-            auth0ContinueUrl +
-            "&scope=openid+country.US&response_type=code",
-        };
-        return callback(null, user, context);
+        idwRedirectUrl += `&login_hint=${prefillToken}`;
       }
+
+      if (ruleUtils.canRedirect) {
+        context.redirect = {
+          url: idwRedirectUrl
+        };
+      }
+
+      return callback(null, user, context);
     }
   }
 }
