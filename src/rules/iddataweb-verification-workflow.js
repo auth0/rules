@@ -24,7 +24,7 @@ function (user, context, callback) {
         console.log("code from IDW: " + context.request.query.code);	
       
       let options = { method: 'POST',
-  url: configuration.idwBaseURL + '/axn/oauth2/token',
+  url: configuration.IDDATAWEB_BASE_URL + '/axn/oauth2/token',
   headers: 
    { 'Cache-Control': 'no-cache',
      Authorization: 'Basic ' + Buffer.from(configuration.idwClientID + ':' + configuration.idwClientSecret).toString('base64'),
