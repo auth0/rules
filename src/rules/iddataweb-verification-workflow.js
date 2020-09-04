@@ -56,7 +56,7 @@ function (user, context, callback) {
             return callback(null, user, context);
           })
           .catch(function(err){
-            callback(err);
+            return callback(err);
           });
         } 
       });
