@@ -21,8 +21,14 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     IDDATAWEB_BASE_URL,
     IDDATAWEB_CLIENT_ID,
     IDDATAWEB_CLIENT_SECRET,
-    IDDATAWEB_LOG_JWT
+    IDDATAWEB_LOG_JWT,
+    IDDATAWEB_ALWAYS_VERIFY,
+    IDDATAWEB_PREFILL_ATTRIBUTES
   } = configuration;
+
+  const idwTokenUrl = `${IDDATAWEB_BASE_URL}/axn/oauth2/token`;
+  const idwAuthorizeUrl = `${IDDATAWEB_BASE_URL}/axn/oauth2/authorize`;
+  const auth0ContinueUrl = `https://${context.request.hostname}/continue`;
 
   // initialize app metadata
   user.app_metadata = user.app_metadata || {};
@@ -34,7 +40,7 @@ function iddatawebVerificationWorkflow(user, context, callback) {
 
     let options = {
       method: "POST",
-      url: IDDATAWEB_BASE_URL + "/axn/oauth2/token",
+      url: idwTokenUrl,
       headers: {
         "Cache-Control": "no-cache",
         Authorization:
@@ -49,7 +55,7 @@ function iddatawebVerificationWorkflow(user, context, callback) {
       form: {
         grant_type: "authorization_code",
         code: ruleUtils.queryParams.code,
-        redirect_uri: "https://" + context.request.hostname + "/continue",
+        redirect_uri: auth0ContinueUrl,
       },
     };
 
@@ -108,12 +114,12 @@ function iddatawebVerificationWorkflow(user, context, callback) {
 
         context.redirect = {
           url:
-            IDDATAWEB_BASE_URL +
-            "/axn/oauth2/authorize?client_id=" +
+            idwAuthorizeUrl +
+            "?client_id=" +
             IDDATAWEB_CLIENT_ID +
-            "&redirect_uri=https://" +
-            context.request.hostname +
-            "/continue&scope=openid+country.US&response_type=code&login_hint=" +
+            "&redirect_uri=" +
+            auth0ContinueUrl +
+            "&scope=openid+country.US&response_type=code&login_hint=" +
             prefillToken,
         };
         return callback(null, user, context);
@@ -121,12 +127,12 @@ function iddatawebVerificationWorkflow(user, context, callback) {
       } else {
         context.redirect = {
           url:
-            IDDATAWEB_BASE_URL +
-            "/axn/oauth2/authorize?client_id=" +
+          idwAuthorizeUrl +
+            "?client_id=" +
             IDDATAWEB_CLIENT_ID +
-            "&redirect_uri=https://" +
-            context.request.hostname +
-            "/continue&scope=openid+country.US&response_type=code",
+            "&redirect_uri=" +
+            auth0ContinueUrl +
+            "&scope=openid+country.US&response_type=code",
         };
         return callback(null, user, context);
       }
