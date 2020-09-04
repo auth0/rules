@@ -85,7 +85,7 @@ function (user, context, callback) {
         "phone": user.phone_number
 
     }, 
-    configuration.idwClientSecret, { expiresIn: '1h' });
+    configuration.IDDATAWEB_CLIENT_SECRET, { expiresIn: '1h' });
           
           console.log(configuration.idwClientSecret);
           context.redirect = {
