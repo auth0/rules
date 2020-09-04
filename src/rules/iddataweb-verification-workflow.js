@@ -67,17 +67,25 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     };
 
     request(options, function (error, response, body) {
-      if (error) return callback(err);
+      if (error) {
+        return callback(err);
+      }
 
-      let jsonData = JSON.parse(body);
-      let decodedToken = jwt.decode(jsonData.id_token);
+      let decodedToken;
+      try {
+        decodedToken = jwt.decode(JSON.parse(body).id_token);
+      } catch (tokenError) {
+        return callback(tokenError);
+      }
+
       console.log("policy decision: " + decodedToken.policyDecision);
       console.log("score: " + decodedToken.idwTrustScore);
+
       if (IDDATAWEB_LOG_JWT === "on") {
         console.log(JSON.stringify(decodedToken));
       }
 
-      //if IDW verification was successful - update user's metadata in Auth0.
+      // if IDW verification was successful - update user's metadata in Auth0.
       //this could be used for downstream application authorization,
       //or mapping access to levels of assurance.
       if (decodedToken.policyDecision === "approve") {
@@ -92,8 +100,6 @@ function iddatawebVerificationWorkflow(user, context, callback) {
           });
       }
     });
-
-    return callback(null, user, context);
   }
 
   // ... otherwise, redirect for verification.
