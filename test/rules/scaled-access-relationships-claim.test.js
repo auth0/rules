@@ -21,9 +21,6 @@ const sandbox = {
     }
 };
 
-const ACCESS_TOKEN_EXPIRY = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24;
-const ACCESS_TOKEN = jwt.sign({ exp: ACCESS_TOKEN_EXPIRY }, 'shhhhh');
-
 describe(ruleName, () => {
     let context;
     let rule;
@@ -32,7 +29,10 @@ describe(ruleName, () => {
     beforeEach(() => {
         rule = loadRule(ruleName, sandbox, {});
         nock(`https://some-tenant.eu.auth0.com`).post("/oauth/token")
-            .reply(200, { access_token: ACCESS_TOKEN });
+            .reply(200, { 
+                access_token: "some access token",
+                expires_in: 86400
+            });
     });
 
     afterEach(() => {

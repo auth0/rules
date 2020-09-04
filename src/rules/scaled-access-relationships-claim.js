@@ -39,7 +39,6 @@
 function scaledAccessAddRelationshipsClaim(user, context, callback) {
     const fetch = require("node-fetch");
     const { URLSearchParams } = require('url');
-    const jwt = require('jsonwebtoken');
 
     const getM2mToken = () => {
         if (global.scaledAccessM2mToken && global.scaledAccessM2mTokenExpiryInMillis > new Date().getTime() + 60000) {
@@ -66,9 +65,9 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
                         return response.json();
                     }
                 })
-                .then(({ access_token }) => {
+                .then(({ access_token, expires_in }) => {
                     global.scaledAccessM2mToken = access_token;
-                    global.scaledAccessM2mTokenExpiryInMillis = jwt.decode(access_token).exp * 1000;
+                    global.scaledAccessM2mTokenExpiryInMillis = new Date().getTime() + expires_in * 1000;
                     return access_token;
                 });
         }
