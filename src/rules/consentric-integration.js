@@ -3,12 +3,11 @@
 * @overview Uses a widget to capture missing consents and preferences at login to boost engagement and support compliance
 * @gallery true
 * @category marketplace
-* 
+*
 * Consentric provides an integration to extend Auth0's universal login to include collection of consent as part of the authentication and sign up flows.
 *
 */
-
-function myLifeDigitalProgressiveConsent(user, context, callback) {
+function consentricIntegration(user, context, callback) {
     const axios = require('axios@0.19.2');
     const moment = require('moment@2.11.2');
 
@@ -17,182 +16,150 @@ function myLifeDigitalProgressiveConsent(user, context, callback) {
 
     const {
         CONSENTRIC_AUTH_HOST,
+        CONSENTRIC_API_HOST,
         CONSENTRIC_AUDIENCE,
         CONSENTRIC_CLIENT_ID,
         CONSENTRIC_CLIENT_SECRET,
-        CONSENTRIC_APPLICATION_ID
+        CONSENTRIC_APPLICATION_ID,
+        CONSENTRIC_REDIRECT_URL
     } = configuration;
 
-    const initConsentricFlow = async () => {
+    const consentricAuth = axios.create({
+        baseURL: CONSENTRIC_AUTH_HOST,
+        timeout: 1000,
+    });
 
-        // Returns Consentric API JWT from either cache or retrieves new
-        const getConsentricApiAccessToken = async () => {
+    const consentricApi = axios.create({
+        baseURL: CONSENTRIC_API_HOST,
+        timeout: 1000,
+    });
 
-            if ((!global.consentricApiToken) || global.consentricApiToken.expires < new Date().getTime()) {
+    // Returns Consentric API Access Token (JWT) from either the global cache or generates it anew from clientId and secret
+    const getConsentricApiAccessToken = async () => {
+        const consentricApiTokenExists = (!global.consentricApiToken) ||
+            global.consentricApiToken.expires < new Date().getTime();
 
-                const instance = axios.create({
-                    baseURL: CONSENTRIC_AUTH_HOST,
-                    timeout: 1000,
-                });
-
-
-                const resp = await instance
+        if (consentricApiTokenExists) {
+            try {
+                // Exchange Credentials for Consentric Api Access token
+                const { data: { expires_in, access_token } } = await consentricAuth
                     .post('/oauth/token', {
                         grant_type: 'client_credentials',
                         client_id: CONSENTRIC_CLIENT_ID,
                         client_secret: CONSENTRIC_CLIENT_SECRET,
                         audience: CONSENTRIC_AUDIENCE,
                         applicationId: CONSENTRIC_APPLICATION_ID,
-                    })
-                    .then(response => {
-                        return response.data;
-                    })
-                    .catch(err => console.log(err));
+                    });
 
-                const expiryInMS = new Date().getTime() + asMilliSeconds(resp.expires_in);
-
+                const expiryInMs = new Date().getTime() + asMilliSeconds(expires_in);
                 const auth = {
-                    jwt: resp.access_token,
-                    exp: expiryInMS
+                    jwt: access_token,
+                    exp: expiryInMs
                 };
 
-
+                //Persist API Access token in global properties
                 global.consentricApiToken = auth;
 
-                console.log(`Generated Api Token: [${auth.jwt.substring(0, 10)}...] expires [${auth.exp}]`);
-
-                return auth;
+            } catch (error) {
+                console.error(error);
             }
+        }
 
-            return global.consentricApiToken;
+        return global.consentricApiToken;
+    };
+
+    //Creates Citizen Record in Consentric with Auth0 Id
+    const createCitizen = ({ userRef, apiAccessToken }) => {
+        console.log(`Upserting Consentric Citizen record for ${userRef}`);
+        const data = {
+            applicationId: CONSENTRIC_APPLICATION_ID,
+            externalRef: userRef,
         };
 
+        return consentricApi
+            .post('/v1/citizens', data, {
+                headers: {
+                    Authorization: 'Bearer ' + apiAccessToken
+                },
+            })
+            .catch(err => {
+                if (err.response.status !== 409) { // 409 indicates Citizen with given reference already exists in Consentric
+                    console.error(err);
+                }
+            });
+    };
 
-        //Creates Citizen Record in Consentric with Auth0 Id
-        const createCitizen = async ({ userRef, apiAccessToken }) => {
-            try {
-                console.log(`Upserting Consentric Citizen record for ${userRef}`);
-                
-                const instance = axios.create({
-                    baseURL: CONSENTRIC_API_HOST,
-                    headers: {
-                        Authorization: 'Bearer ' + apiAccessToken
+    // Function to retrieve Consentric User Token from User Metadata
+    const getConsentricUserTokenFromMetadata = user => user.app_metadata && user.app_metadata.consentric;
+
+    // Generates On Demand Consentric User Token for the given User using the API Access Token
+    const generateConsentricUserAccessToken = async ({ userRef, apiAccessToken }) => {
+        try {
+            console.log(`Attempting to generate access token API for ${userRef} with jwt [${apiAccessToken.substring(0, 10)}]`);
+
+            const { data: { token, expiryDate: exp } } = await consentricApi
+                .post('/v1/access-tokens/tokens',
+                    {
+                        applicationId: CONSENTRIC_APPLICATION_ID,
+                        externalRef: userRef,
+                        expiryDate: moment().add(3, 'months').toISOString()
                     },
-                    timeout: 1000,
-                });
-
-
-                return await instance
-                    .post('/v1/citizens',
-                        {
-                            applicationId: CONSENTRIC_APPLICATION_ID,
-                            externalRef: userRef,
-                        })
-                    .then(({ data }) => {
-                        return {
-                            citizenId: data.citizenId,
-                            externalRef: data.externalRef
-                        };
-                    })
-                    .catch(err => {
-                        if (err.response.status !== 409) {
-                            console.error(err);
+                    {
+                        headers: {
+                            Authorization: 'Bearer ' + apiAccessToken
                         }
-                    });
-            } catch (err) {
-                console.log(err);
-            }
-        };
-
-
-        // Retrieves Consentric User Token from User Metadata
-        const getConsentricUserTokenFromMetadata = user =>
-            user.app_metadata && user.app_metadata.consentric;
-
-        // Generates On Demand Consentric User Token for given User with API Access Token
-        const generateConsentricUserAccessToken = async ({ userRef, apiAccessToken }) => {
-            try {
-                console.log(`Attempting to call API for ${userRef} with jwt [${apiAccessToken.substring(0, 10)}]`);
-                const instance = axios.create({
-                    baseURL: CONSENTRIC_API_HOST,
-                    headers: {
-                        Authorization: 'Bearer ' + apiAccessToken
-                    },
-                    timeout: 1000,
-                });
-
-
-                return await instance
-                    .post('/v1/access-tokens/tokens',
-                        {
-                            applicationId: CONSENTRIC_APPLICATION_ID,
-                            externalRef: userRef,
-                            expiryDate: moment().add(3, 'months').toISOString()
-                        })
-                    .then(({ data }) => {
-                        return {
-                            token: data.token,
-                            exp: data.expiryDate
-                        };
-                    })
-                    .catch(err => console.error(err));
-
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-
-        const loadConsentricUserAccessToken = async ({ user, global }) => {
-
-            const metadataUserToken = getConsentricUserTokenFromMetadata(user);
-
-            if ((!metadataUserToken) || moment(metadataUserToken.expires).isBefore(moment())) {
-                const apiAccessToken = await getConsentricApiAccessToken();
-                const delimIdx = user.user_id.indexOf('|');
-                const userRef = user.user_id.substring(delimIdx + 1);
-
-                await createCitizen(
-                    {
-                        userRef,
-                        apiAccessToken: apiAccessToken.jwt,                        
-                    });
-
-                const generatedToken = await generateConsentricUserAccessToken(
-                    {
-                        userRef,
-                        apiAccessToken: apiAccessToken.jwt,                        
-                        global,
-                    },
+                    }
                 );
 
-                // persist the app_metadata update
-                try {
-                    await auth0.users.updateAppMetadata(user.user_id, { ...user.app_metadata, consentric: generatedToken });
-                } catch (err) {
-                    console.error(`Issue Updating Auth0 app_metadata for user ${user.user_id} - ${err}`);
-                }
+            return {
+                token,
+                exp
+            };
 
-                return generatedToken;
-            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-            return metadataUserToken;
+    const loadConsentricUserAccessToken = async ({ user }) => {
+        try {
+            const metadataUserToken = getConsentricUserTokenFromMetadata(user);            
+            if ((metadataUserToken) && moment(metadataUserToken.expires).isAfter(moment())) return metadataUserToken;
+        
+            const { jwt: apiAccessToken } = await getConsentricApiAccessToken();
+            const delimIdx = user.user_id.indexOf('|');
+            const userRef = user.user_id.substring(delimIdx + 1);
 
+            const apiCredentials = {
+                userRef,
+                apiAccessToken,
+            };
 
-        };
+            //Create Citizen with Auth0 UserId
+            await createCitizen(apiCredentials);
 
+            //Generate an On Demand Access Token for the created citizen
+            const generatedToken = await generateConsentricUserAccessToken(apiCredentials);
 
-        const consentricUserAccessToken = await loadConsentricUserAccessToken({ user, global });
+            // Persist the app_metadata update            
+            await auth0.users.updateAppMetadata(user.user_id, { ...user.app_metadata, consentric: generatedToken });
 
+            return generatedToken;
 
+        } catch (err) {
+            console.error(`Issue Loading Consentric User Access Token for user ${user.user_id} - ${err}`);
+        }
+    };
+
+    const initConsentricFlow = async () => {
+
+        const { token } = await loadConsentricUserAccessToken({ user });
         const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
-        const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + consentricUserAccessToken.token;
-
+        const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
 
         context.redirect = {
             url: redirectUrl
         };
-
 
         return callback(null, user, context);
     };
