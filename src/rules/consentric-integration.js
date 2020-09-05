@@ -10,7 +10,13 @@
 function consentricIntegration(user, context, callback) {
     const axios = require('axios@0.19.2');
     const moment = require('moment@2.11.2');
+    const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
 
+    const ruleUtils = new Auth0RedirectRuleUtilities(
+        user,
+        context,
+        configuration
+    );
 
     const asMilliSeconds = (seconds) => seconds * 1000;
 
@@ -165,10 +171,10 @@ function consentricIntegration(user, context, callback) {
     };
 
 
-    if (context.protocol !== "redirect-callback" && context.request.query.prompt !== 'none') {
+    if (ruleUtils.canRedirect) {
         return initConsentricFlow();
     } else {
-        // Run after Redirect
+        // Run after Redirect or Silent Auth
         return callback(null, user, context);
     }
 }
