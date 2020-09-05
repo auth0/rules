@@ -165,7 +165,7 @@ function consentricIntegration(user, context, callback) {
     };
 
 
-    if (context.protocol !== "redirect-callback") {
+    if (context.protocol !== "redirect-callback" && context.request.query.prompt !== 'none') {
         return initConsentricFlow();
     } else {
         // Run after Redirect
