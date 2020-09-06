@@ -68,6 +68,7 @@ function consentricIntegration(user, context, callback) {
 
             } catch (error) {
                 console.error(error);
+                throw error;
             }
         }
 
@@ -101,7 +102,7 @@ function consentricIntegration(user, context, callback) {
     // Generates On Demand Consentric User Token for the given User using the API Access Token
     const generateConsentricUserAccessToken = async ({ userRef, apiAccessToken }) => {
         try {
-            console.log(`Attempting to generate access token API for ${userRef} with jwt [${apiAccessToken.substring(0, 10)}]`);
+            console.log(`Attempting to generate access token API for ${userRef}`);
 
             const { data: { token, expiryDate: exp } } = await consentricApi
                 .post('/v1/access-tokens/tokens',
@@ -124,6 +125,7 @@ function consentricIntegration(user, context, callback) {
 
         } catch (err) {
             console.error(err);
+            throw err;
         }
     };
 
@@ -154,20 +156,27 @@ function consentricIntegration(user, context, callback) {
 
         } catch (err) {
             console.error(`Issue Loading Consentric User Access Token for user ${user.user_id} - ${err}`);
+            throw err;
         }
     };
 
     const initConsentricFlow = async () => {
+        try {
+            const { token } = await loadConsentricUserAccessToken({ user });
+            const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
+            const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
+    
+            context.redirect = {
+                url: redirectUrl
+            };
+    
+            return callback(null, user, context);
 
-        const { token } = await loadConsentricUserAccessToken({ user });
-        const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
-        const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
+        } catch (err) {
+            console.error(`CONSENTRIC RULE ABORTED: ${err}`);
+            return callback(null, user, context);
+        }
 
-        context.redirect = {
-            url: redirectUrl
-        };
-
-        return callback(null, user, context);
     };
 
 
