@@ -25,14 +25,7 @@ async function caissonIDCheck(user, context, callback) {
         ? true
         : false,
     idCheckFlags: {
-      on_registration:
-        caissonConf.CAISSON_ON_REGISTRATION &&
-        caissonConf.CAISSON_ON_REGISTRATION.toLowerCase() === "true"
-          ? true
-          : false,
-      login_frequency_days: caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS
-        ? parseInt(caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS)
-        : 0,
+      login_frequency_days: parseInt(caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS),
     },
     caissonHosts: {
       idcheck: "https://id.caisson.com",
@@ -231,29 +224,19 @@ async function caissonIDCheck(user, context, callback) {
     user.app_metadata.caisson = user.app_metadata.caisson || {};
 
     try {
-      //registration
-      if (
-        manager.idCheckFlags.on_registration &&
-        context.stats.loginsCount === 0
-      ) {
+      if (isNaN(manager.idCheckFlags.login_frequency_days)) {
+        //Do nothing.  Skip if no preference is set.
+      } else if (!user.app_metadata.caisson.last_check) {
+        //Always perform the first ID Check.
         setIDCheckRedirect();
-      }
-
-      //all logins
-      else if (manager.idCheckFlags.login_frequency_days === -1) {
-        setIDCheckRedirect();
-      }
-
-      //login after period of days since last successful ID Check
-      else if (
-        manager.idCheckFlags.login_frequency_days > 0 &&
-        (!user.app_metadata.caisson.last_check ||
+      } else if (
+        (manager.idCheckFlags.login_frequency_days >= 0 &&
           millisToDays(Date.now() - user.app_metadata.caisson.last_check)) >=
-          manager.idCheckFlags.login_frequency_days
+        manager.idCheckFlags.login_frequency_days
       ) {
+        //ID Check if the requisite number of days have passed since the last check.
+        //Skip if we're only supposed to check once (login_frequency_days < -1).
         setIDCheckRedirect();
-      } else {
-        //otherwise, don't perform an ID Check
       }
     } catch (err) {
       dLog(err);
