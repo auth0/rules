@@ -43,7 +43,7 @@ function consentricIntegration(user, context, callback) {
     // Returns Consentric API Access Token (JWT) from either the global cache or generates it anew from clientId and secret
     const getConsentricApiAccessToken = async () => {
         const consentricApiTokenExists = (!global.consentricApiToken) ||
-            global.consentricApiToken.expires < new Date().getTime();
+            global.consentricApiToken.exp < new Date().getTime();
 
         if (consentricApiTokenExists) {
             try {
@@ -63,7 +63,7 @@ function consentricIntegration(user, context, callback) {
                     exp: expiryInMs
                 };
 
-                //Persist API Access token in global properties
+                // Persist API Access token in global properties
                 global.consentricApiToken = auth;
 
             } catch (error) {
@@ -75,7 +75,7 @@ function consentricIntegration(user, context, callback) {
         return global.consentricApiToken;
     };
 
-    //Creates Citizen Record in Consentric with Auth0 Id
+    // Creates Citizen Record in Consentric with Auth0 Id
     const createCitizen = ({ userRef, apiAccessToken }) => {
         console.log(`Upserting Consentric Citizen record for ${userRef}`);
         const data = {
@@ -92,6 +92,7 @@ function consentricIntegration(user, context, callback) {
             .catch(err => {
                 if (err.response.status !== 409) { // 409 indicates Citizen with given reference already exists in Consentric
                     console.error(err);
+                    throw err;
                 }
             });
     };
@@ -132,28 +133,24 @@ function consentricIntegration(user, context, callback) {
     const loadConsentricUserAccessToken = async ({ user }) => {
         try {
             const metadataUserToken = getConsentricUserTokenFromMetadata(user);            
-            if ((metadataUserToken) && moment(metadataUserToken.expires).isAfter(moment())) return metadataUserToken;
+            if ((metadataUserToken) && moment(metadataUserToken.exp).isAfter(moment())) return metadataUserToken;
         
-            const { jwt: apiAccessToken } = await getConsentricApiAccessToken();
-            const delimIdx = user.user_id.indexOf('|');
-            const userRef = user.user_id.substring(delimIdx + 1);
-
+            const { jwt: apiAccessToken } = await getConsentricApiAccessToken();            
             const apiCredentials = {
-                userRef,
+                userRef: user.user_id,
                 apiAccessToken,
             };
 
-            //Create Citizen with Auth0 UserId
+            // Create Citizen with Auth0 UserId
             await createCitizen(apiCredentials);
 
-            //Generate an On Demand Access Token for the created citizen
+            // Generate an On Demand Access Token for the created citizen
             const generatedToken = await generateConsentricUserAccessToken(apiCredentials);
 
             // Persist the app_metadata update            
             await auth0.users.updateAppMetadata(user.user_id, { ...user.app_metadata, consentric: generatedToken });
 
             return generatedToken;
-
         } catch (err) {
             console.error(`Issue Loading Consentric User Access Token for user ${user.user_id} - ${err}`);
             throw err;
@@ -171,14 +168,11 @@ function consentricIntegration(user, context, callback) {
             };
     
             return callback(null, user, context);
-
         } catch (err) {
             console.error(`CONSENTRIC RULE ABORTED: ${err}`);
             return callback(null, user, context);
         }
-
     };
-
 
     if (ruleUtils.canRedirect) {
         return initConsentricFlow();
