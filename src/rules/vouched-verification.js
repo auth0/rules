@@ -166,7 +166,7 @@ async function vouchedVerification(user, context, callback) {
             // create Auth0 packet to securely pass info to Vouched
             const packetId = await createPacket(configuration.VOUCHED_API_KEY, 
                                                 configuration.VOUCHED_PUBLIC_KEY,
-                                                configuration.VOUCHED_CONTINUE_URL,
+                                                `https://${context.request.hostname}/continue`
                                                 user);
   
             // user doesn't have a verification result, redirect to Vouched with packet
