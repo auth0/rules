@@ -19,20 +19,20 @@ async function caissonIDCheck(user, context, callback) {
       public_key: caissonConf.CAISSON_PUBLIC_KEY,
       private_key: caissonConf.CAISSON_PRIVATE_KEY,
     },
-    debug:
-      caissonConf.CAISSON_DEBUG &&
-      caissonConf.CAISSON_DEBUG.toLowerCase() === "true"
-        ? true
-        : false,
+    /* prettier-ignore */
+    debug: caissonConf.CAISSON_DEBUG && caissonConf.CAISSON_DEBUG.toLowerCase() === "true" ? true : false,
     idCheckFlags: {
-      login_frequency_days: parseInt(caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS),
+      login_frequency_days: parseInt(
+        caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS,
+        10
+      ),
     },
     caissonHosts: {
       idcheck: "https://id.caisson.com",
       api: "https://api.caisson.com",
       dashboard: "https://www.caisson.com",
     },
-    axios: require("axios"),
+    axios: require("axios@0.19.2"),
     util: new Auth0RedirectRuleUtilities(user, context, caissonConf),
   };
 
@@ -62,7 +62,6 @@ async function caissonIDCheck(user, context, callback) {
     const token = manager.util.createSessionToken({
       public_key: manager.creds.public_key,
       host: context.request.hostname,
-      user_id: user.user_id,
     });
 
     //throws if redirects aren't allowed here.
@@ -74,7 +73,7 @@ async function caissonIDCheck(user, context, callback) {
    * https://www.caisson.com/docs/reference/api/#exchange-check-token-for-check-id
    * @param {string} t
    */
-  async function exchangeToken(t) {
+  async function exchangeToken() {
     try {
       let resp = await manager.axios.post(
         manager.caissonHosts.api + "/v1/idcheck/exchangetoken",
@@ -90,7 +89,7 @@ async function caissonIDCheck(user, context, callback) {
     } catch (error) {
       let err = error;
       if (err.response && err.response.status === 401) {
-        err = new Error(
+        err = new UnauthorizedError(
           "Invalid private key.  See your API credentials at https://www.caisson.com/developer ."
         );
       }
@@ -117,7 +116,7 @@ async function caissonIDCheck(user, context, callback) {
 
       if (resp.data.error) {
         throw new Error(
-          "error in Caisson ID Check: " + JSON.stringify(resp.data)
+          "Error in Caisson ID Check: " + JSON.stringify(resp.data)
         );
       }
 
@@ -125,11 +124,8 @@ async function caissonIDCheck(user, context, callback) {
         check_id: resp.data.check_id,
         auth0_id: resp.data.customer_id,
         timestamp: resp.data.checked_on,
-        status:
-          resp.data.confidence.document === "high" &&
-          resp.data.confidence.face === "high"
-            ? "passed"
-            : "flagged",
+        /* prettier-ignore */
+        status: resp.data.confidence.document === "high" && resp.data.confidence.face === "high" ? "passed" : "flagged",
       };
 
       validateIDCheck(results); //throws if invalid
@@ -138,7 +134,7 @@ async function caissonIDCheck(user, context, callback) {
     } catch (error) {
       let err = error;
       if (err.response && err.response.status === 401) {
-        err = new Error(
+        err = new UnauthorizedError(
           "Invalid private key.  See your API credentials at https://www.caisson.com/developer ."
         );
       }
@@ -164,8 +160,6 @@ async function caissonIDCheck(user, context, callback) {
       );
     } else if (Date.now() - Date.parse(results.timestamp) > IDCheckTTL) {
       throw new UnauthorizedError("ID Check too old.");
-    } else if (results.status === "flagged") {
-      throw new UnauthorizedError("ID Check flagged.");
     }
   }
 
@@ -175,8 +169,8 @@ async function caissonIDCheck(user, context, callback) {
    */
   async function updateUser(results) {
     user.app_metadata = user.app_metadata || {};
-
     let caisson = user.app_metadata.caisson || {};
+
     caisson.idcheck_url =
       manager.caissonHosts.dashboard + "/request/" + results.check_id;
     caisson.status = results.status;
@@ -207,36 +201,13 @@ async function caissonIDCheck(user, context, callback) {
         throw new Error("Missing Caisson exchange key");
       }
 
-      const check_id = await exchangeToken(manager.util.queryParams.t);
+      const check_id = await exchangeToken();
       const results = await idCheckResults(check_id);
       await updateUser(results);
-    } catch (err) {
-      dLog(err);
-      return callback(err);
-    }
 
-    return callback(null, user, context);
-  } else {
-    /**
-     * Perform ID Checks when appropriate
-     */
-    user.app_metadata = user.app_metadata || {};
-    user.app_metadata.caisson = user.app_metadata.caisson || {};
-
-    try {
-      if (isNaN(manager.idCheckFlags.login_frequency_days)) {
-        //Do nothing.  Skip if no preference is set.
-      } else if (!user.app_metadata.caisson.last_check) {
-        //Always perform the first ID Check.
-        setIDCheckRedirect();
-      } else if (
-        (manager.idCheckFlags.login_frequency_days >= 0 &&
-          millisToDays(Date.now() - user.app_metadata.caisson.last_check)) >=
-        manager.idCheckFlags.login_frequency_days
-      ) {
-        //ID Check if the requisite number of days have passed since the last check.
-        //Skip if we're only supposed to check once (login_frequency_days < -1).
-        setIDCheckRedirect();
+      //deny the login if the ID Check is flagged
+      if (results.status === "flagged") {
+        throw new UnauthorizedError("ID Check flagged.");
       }
     } catch (err) {
       dLog(err);
@@ -245,4 +216,35 @@ async function caissonIDCheck(user, context, callback) {
 
     return callback(null, user, context);
   }
+
+  /**
+   * Else we're in the initial auth flow.
+   * Perform ID Checks when appropriate.
+   */
+
+  try {
+    if (isNaN(manager.idCheckFlags.login_frequency_days)) {
+      //Do nothing.  Skip if no preference is set.
+    } else if (
+      !user.app_metadata.caisson.last_check ||
+      user.app_metadata.caisson.status !== "passed"
+    ) {
+      //Always perform the first ID Check or if the
+      //last ID Check didn't pass.
+      setIDCheckRedirect();
+    } else if (
+      manager.idCheckFlags.login_frequency_days >= 0 &&
+      millisToDays(Date.now() - user.app_metadata.caisson.last_check) >=
+        manager.idCheckFlags.login_frequency_days
+    ) {
+      //ID Check if the requisite number of days have passed since the last check.
+      //Skip if we're only supposed to check once (login_frequency_days < -1).
+      setIDCheckRedirect();
+    }
+  } catch (err) {
+    dLog(err);
+    return callback(err);
+  }
+
+  return callback(null, user, context);
 }
