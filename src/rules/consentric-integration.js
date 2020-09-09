@@ -150,7 +150,7 @@ function consentricIntegration(user, context, callback) {
             const generatedToken = await generateConsentricUserAccessToken(apiCredentials);
 
             // Persist the app_metadata update            
-            await auth0.users.updateAppMetadata(user.user_id, { ...user.app_metadata, consentric: generatedToken });
+            await auth0.users.updateAppMetadata(user.user_id, { consentric: generatedToken });
 
             return generatedToken;
         } catch (err) {
