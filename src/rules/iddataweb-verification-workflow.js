@@ -73,9 +73,18 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
         formParams.toString(),
         { headers }
       );
-      decodedToken = jwt.decode(JSON.parse(tokenResponse.data).id_token);
+
+      if (tokenResponse.data.error) {
+        throw new Error(tokenResponse.data.error_description);
+      }
+
+      decodedToken = jwt.decode(tokenResponse.data.id_token);
     } catch (error) {
       return callback(error);
+    }
+
+    if (IDDATAWEB_LOG_JWT === "on") {
+      console.log(JSON.stringify(decodedToken));
     }
 
     //check issuer, audience and experiation of ID DataWeb Token
@@ -83,17 +92,12 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
       decodedToken.iss !== IDDATAWEB_BASE_URL ||
       decodedToken.aud !== IDDATAWEB_CLIENT_ID
     ) {
-      console.log("ID token invalid.");
-      return callback(error);
+      return callback(new Error("ID token invalid."));
     }
 
     console.log("policy decision: " + decodedToken.policyDecision);
     console.log("score: " + decodedToken.idwTrustScore);
     console.log("IDW transaction ID: " + decodedToken.jti);
-
-    if (IDDATAWEB_LOG_JWT === "on") {
-      console.log(JSON.stringify(decodedToken));
-    }
 
     // once verification is complete, update user's metadata in Auth0.
     //this could be used for downstream application authorization,
@@ -107,7 +111,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     try {
       auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
     } catch (error) {
-      return callback(err);
+      return callback(error);
     }
 
     //include ID DataWeb results in Auth0 ID Token
