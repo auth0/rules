@@ -135,7 +135,7 @@ function consentricIntegration(user, context, callback) {
     const loadConsentricUserAccessToken = async ({ user }) => {
         try {
             const metadataUserToken = getConsentricUserTokenFromMetadata(user);            
-            if ((metadataUserToken) && moment(metadataUserToken.exp).isAfter(moment())) return metadataUserToken;
+            if ((metadataUserToken) && moment(metadataUserToken.exp).subtract(1, "days").isAfter(moment())) return metadataUserToken;
         
             const { jwt: apiAccessToken } = await getConsentricApiAccessToken();            
             const apiCredentials = {
