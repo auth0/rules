@@ -42,13 +42,13 @@ function consentricIntegration(user, context, callback) {
 
     // Returns Consentric API Access Token (JWT) from either the global cache or generates it anew from clientId and secret
     const getConsentricApiAccessToken = async () => {
-        const consentricApiTokenExists = (!global.consentricApiToken) ||
+        const consentricApiTokenNotValid = (!global.consentricApiToken) ||
             global.consentricApiToken.exp < new Date().getTime();
 
-        if (consentricApiTokenExists) {
+        if (consentricApiTokenNotValid) {
             try {
                 // Exchange Credentials for Consentric Api Access token
-                const { data: { expires_in, access_token } } = await consentricAuth
+                const { data: { expires_in, access_token } } = await consentricAuth                
                     .post('/oauth/token', {
                         grant_type: 'client_credentials',
                         client_id: CONSENTRIC_CLIENT_ID,
@@ -56,6 +56,8 @@ function consentricIntegration(user, context, callback) {
                         audience: CONSENTRIC_AUDIENCE,
                         applicationId: CONSENTRIC_APPLICATION_ID,
                     });
+                
+                
 
                 const expiryInMs = new Date().getTime() + asMilliSeconds(expires_in);
                 const auth = {
@@ -166,12 +168,11 @@ function consentricIntegration(user, context, callback) {
             context.redirect = {
                 url: redirectUrl
             };
-    
-            return callback(null, user, context);
+            
         } catch (err) {
             console.error(`CONSENTRIC RULE ABORTED: ${err}`);
-            return callback(null, user, context);
         }
+        return callback(null, user, context);
     };
 
     if (ruleUtils.canRedirect) {
