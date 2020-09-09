@@ -69,7 +69,7 @@ function consentricIntegration(user, context, callback) {
                 global.consentricApiToken = auth;
 
             } catch (error) {
-                console.error(error);
+                console.error('Unable to retrieve API Access token for Consentric. Please check that your credentials (CONSENTRIC_CLIENT_ID and CONSENTRIC_CLIENT_SECRET) are correct.');
                 throw error;
             }
         }
