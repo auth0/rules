@@ -8,8 +8,10 @@
  *
  */
 
-function iddatawebVerificationWorkflow(user, context, callback) {
+async function iddatawebVerificationWorkflow(user, context, callback) {
   const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
+  const axiosClient = require("axios@0.19.2");
+  const url = require("url");
 
   const ruleUtils = new Auth0RedirectRuleUtilities(
     user,
@@ -26,6 +28,11 @@ function iddatawebVerificationWorkflow(user, context, callback) {
     IDDATAWEB_PREFILL_ATTRIBUTES,
   } = configuration;
 
+  const idwBasicAuth = Buffer.from(
+    IDDATAWEB_CLIENT_ID + ":" + IDDATAWEB_CLIENT_SECRET
+  ).toString("base64");
+
+  const idwTokenNamepsace = "https://iddataweb.com/";
   const idwTokenEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/token`;
   const idwAuthorizeEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/authorize`;
   const auth0ContinueUrl = `https://${context.request.hostname}/continue`;
@@ -47,77 +54,69 @@ function iddatawebVerificationWorkflow(user, context, callback) {
   if (ruleUtils.isRedirectCallback) {
     console.log("code from IDW: " + ruleUtils.queryParams.code);
 
-    let options = {
-      method: "POST",
-      url: idwTokenEndpoint,
-      headers: {
-        "Cache-Control": "no-cache",
-        Authorization:
-          "Basic " +
-          Buffer.from(
-            IDDATAWEB_CLIENT_ID + ":" + IDDATAWEB_CLIENT_SECRET
-          ).toString("base64"),
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      form: {
-        grant_type: "authorization_code",
-        code: ruleUtils.queryParams.code,
-        redirect_uri: auth0ContinueUrl,
-      },
+    const formParams = new url.URLSearchParams({
+      grant_type: "authorization_code",
+      code: ruleUtils.queryParams.code,
+      redirect_uri: auth0ContinueUrl,
+    });
+
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Cache-Control": "no-cache",
+      Authorization: `Basic ${idwBasicAuth}`,
     };
 
-    request(options, function (error, response, body) {
-      if (error) {
-        return callback(error);
-      }
+    let decodedToken;
+    try {
+      const tokenResponse = await axiosClient.post(
+        idwTokenEndpoint,
+        formParams.toString(),
+        { headers }
+      );
+      decodedToken = jwt.decode(JSON.parse(tokenResponse.data).id_token);
+    } catch (error) {
+      return callback(error);
+    }
 
-      let decodedToken;
-      try {
-        decodedToken = jwt.decode(JSON.parse(body).id_token);
-      } catch (tokenError) {
-        return callback(tokenError);
-      }
+    //check issuer, audience and experiation of ID DataWeb Token
+    if (
+      decodedToken.iss !== IDDATAWEB_BASE_URL ||
+      decodedToken.aud !== IDDATAWEB_CLIENT_ID
+    ) {
+      console.log("ID token invalid.");
+      return callback(error);
+    }
 
-      //check issuer, audience and experiation of ID DataWeb Token
-      if (
-        decodedToken.iss !== IDDATAWEB_BASE_URL ||
-        decodedToken.aud !== IDDATAWEB_CLIENT_ID
-      ) {
-        console.log("issue with JWT validation.");
-        return callback(error);
-      }
+    console.log("policy decision: " + decodedToken.policyDecision);
+    console.log("score: " + decodedToken.idwTrustScore);
+    console.log("IDW transaction ID: " + decodedToken.jti);
 
-      console.log("policy decision: " + decodedToken.policyDecision);
-      console.log("score: " + decodedToken.idwTrustScore);
-      console.log("IDW transaction ID: " + decodedToken.jti);
+    if (IDDATAWEB_LOG_JWT === "on") {
+      console.log(JSON.stringify(decodedToken));
+    }
 
-      if (IDDATAWEB_LOG_JWT === "on") {
-        console.log(JSON.stringify(decodedToken));
-      }
+    // once verification is complete, update user's metadata in Auth0.
+    //this could be used for downstream application authorization,
+    //or mapping access to levels of assurance.
+    user.app_metadata.iddataweb.verificationResult = {
+      policyDecision: decodedToken.policyDecision,
+      transactionid: decodedToken.jti,
+      iat: decodedToken.iat,
+    };
 
-      // once verification is complete, update user's metadata in Auth0.
-      //this could be used for downstream application authorization,
-      //or mapping access to levels of assurance.
-      user.app_metadata.iddataweb.verificationResult = {
-        policyDecision: decodedToken.policyDecision,
-        transactionid: decodedToken.jti,
-        iat: decodedToken.iat,
-      };
-      auth0.users
-        .updateAppMetadata(user.user_id, user.app_metadata)
-        .then(function () {
-          //include ID DataWeb results in Auth0 ID Token
-          const namespace = "https://iddataweb.com/";
-          context.idToken[namespace + "policyDecision"] =
-            decodedToken.policyDecision;
-          context.idToken[namespace + "transactionId"] = decodedToken.jti;
-          context.idToken[namespace + "iat"] = decodedToken.iat;
-          return callback(null, user, context);
-        })
-        .catch(function (err) {
-          return callback(err);
-        });
-    });
+    try {
+      auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
+    } catch (error) {
+      return callback(err);
+    }
+
+    //include ID DataWeb results in Auth0 ID Token
+    context.idToken[idwTokenNamepsace + "policyDecision"] =
+      decodedToken.policyDecision;
+    context.idToken[idwTokenNamepsace + "transactionId"] = decodedToken.jti;
+    context.idToken[idwTokenNamepsace + "iat"] = decodedToken.iat;
+
+    return callback(null, user, context);
   }
 
   // ... otherwise, redirect for verification.
