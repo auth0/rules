@@ -48,7 +48,7 @@ function consentricIntegration(user, context, callback) {
         if (consentricApiTokenNotValid) {
             try {
                 // Exchange Credentials for Consentric Api Access token
-                const { data: { expires_in, access_token } } = await consentricAuth                
+                const { data: { expires_in, access_token } } = await consentricAuth
                     .post('/oauth/token', {
                         grant_type: 'client_credentials',
                         client_id: CONSENTRIC_CLIENT_ID,
@@ -56,8 +56,6 @@ function consentricIntegration(user, context, callback) {
                         audience: CONSENTRIC_AUDIENCE,
                         applicationId: CONSENTRIC_APPLICATION_ID,
                     });
-                
-                
 
                 const expiryInMs = new Date().getTime() + asMilliSeconds(expires_in);
                 const auth = {
@@ -134,10 +132,10 @@ function consentricIntegration(user, context, callback) {
 
     const loadConsentricUserAccessToken = async ({ user }) => {
         try {
-            const metadataUserToken = getConsentricUserTokenFromMetadata(user);            
+            const metadataUserToken = getConsentricUserTokenFromMetadata(user);
             if ((metadataUserToken) && moment(metadataUserToken.exp).subtract(1, "days").isAfter(moment())) return metadataUserToken;
-        
-            const { jwt: apiAccessToken } = await getConsentricApiAccessToken();            
+
+            const { jwt: apiAccessToken } = await getConsentricApiAccessToken();
             const apiCredentials = {
                 userRef: user.user_id,
                 apiAccessToken,
@@ -154,7 +152,7 @@ function consentricIntegration(user, context, callback) {
 
             return generatedToken;
         } catch (err) {
-            console.error(`Issue Loading Consentric User Access Token for user ${user.user_id} - ${err}`);
+            console.error(`Issue loading Consentric User Access Token for user ${user.user_id} - ${err}`);
             throw err;
         }
     };
@@ -164,11 +162,11 @@ function consentricIntegration(user, context, callback) {
             const { token } = await loadConsentricUserAccessToken({ user });
             const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
             const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
-    
+
             context.redirect = {
                 url: redirectUrl
             };
-            
+
         } catch (err) {
             console.error(`CONSENTRIC RULE ABORTED: ${err}`);
         }
