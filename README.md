@@ -100,34 +100,38 @@ This is the rules editor inside Auth0:
 * [Additional modules](https://auth0.com/docs/appliance/modules)
 
 ---
-### Release Notes
+## Contributing
 
-1. Update the markdown files to update the rule and commit your changes
-2. Update the version by executing:
+### Project Structure
 
+Important files/directories:
+
+#### rules.json
+
+This is the data store that contains the templates that is shown on the rules template dashboard.
+It is stored on the CDN and pulled in by the dashboard to display the list.
+
+#### src/rules/*.js
+
+All js files here are scanned during the build. It's JSDocs are read and the attributes such as `@gallery boolean` is used to determine whether or not to add it to the `rules.json` file. Other attributes are used to build the metadata used in `rules.json`.
+
+#### redirect-rules/
+
+These are here for examples and references, not used in the dashboard.
+
+### Developing
+
+1. Update the `src/rules/*.js` files.
+2. Ensure tests are passing in `test/` directory. Tests may run on multiple node versions as specified in the circleci build matrix.
+3. Bump the version
  ```bash
- npm version [patch|minor|major]
+ npm version [patch|minor|major] --no-git-tag-version
  ```
-
- > There is a `preversion` script in the `package.json` file that executes the following command:  `./build && git add rules.json && git commit -m 'update rules.json`
-
-3. Push your changes to master including the tags
-
- ```bash
- git push origin master --tags
- ```
-
+4. Push the changes to a branch/PR
+5. To deploy the change, create a git tag with the format of `v*`. This will trigger a build and release of the `rules.json` to the CDN.
+6. To verify, check the [circleci build](https://circleci.com/gh/auth0/rules). Give the CDN some time to propagate and this should be available in all regions.
 
 ---
-
-### Highlighted Rules
-
-* Send events to MixPanel [Docs](https://auth0.com/rules/mixpanel-track-event) | [Rule]( https://github.com/auth0/rules/blob/master/src/rules/mixpanel-track-event.js)
-* Query User Profile in FullContact [Docs](https://auth0.com/rules/get-FullContact-profile) | [Rule](https://github.com/auth0/rules/blob/master/src/rules/get-fullcontact-profile.js)
-* Add a Lead in Salesforce [Docs](https://auth0.com/rules/creates-lead-salesforce) | [Rule](https://github.com/auth0/rules/blob/master/src/rules/creates-lead-salesforce.js)
-* Get an Appery Session Token [Rule](https://github.com/auth0/rules/blob/master/src/rules/appery.js)
-
-[More information about them here](https://docs.auth0.com/rules).
 
 ## Issue Reporting
 
