@@ -23,7 +23,6 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     IDDATAWEB_BASE_URL,
     IDDATAWEB_CLIENT_ID,
     IDDATAWEB_CLIENT_SECRET,
-    IDDATAWEB_LOG_JWT,
     IDDATAWEB_ALWAYS_VERIFY,
   } = configuration;
 
@@ -81,10 +80,6 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
       decodedToken = jwt.decode(tokenResponse.data.id_token);
     } catch (error) {
       return callback(error);
-    }
-
-    if (IDDATAWEB_LOG_JWT === "on") {
-      console.log(JSON.stringify(decodedToken));
     }
 
     //check issuer, audience and experiation of ID DataWeb Token
