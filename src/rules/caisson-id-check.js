@@ -191,7 +191,11 @@ async function caissonIDCheck(user, context, callback) {
    */
   if (manager.util.isRedirectCallback) {
     //is it our redirect?
-    if (!manager.util.queryParams.caisson_flow) {
+
+    if (
+      !manager.util.queryParams.caisson_flow ||
+      parseInt(manager.util.queryParams.caisson_flow, 10) !== 1
+    ) {
       //no, end it.
       return callback(null, user, context);
     }
