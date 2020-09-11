@@ -37,12 +37,12 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
 
   // initialize app metadata
   user.app_metadata = user.app_metadata || {};
-  user.app_metadata.iddataweb = user.app_metadata.iddataweb || {};
+  const iddataweb = user.app_metadata.iddataweb || {};
+  iddataweb = iddataweb.verificationResult || {};
 
   // if the user is already verified and we don't need to check, exit
   if (
-    user.app_metadata.iddataweb.verificationResult.policyDecision ===
-      "approve" &&
+    iddataweb.verificationResult.policyDecision === "approve" &&
     IDDATAWEB_ALWAYS_VERIFY === "off"
   ) {
     console.log("user " + user.user_id + " has been previously verified.");
@@ -97,14 +97,14 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     // once verification is complete, update user's metadata in Auth0.
     //this could be used for downstream application authorization,
     //or mapping access to levels of assurance.
-    user.app_metadata.iddataweb.verificationResult = {
+    iddataweb.verificationResult = {
       policyDecision: decodedToken.policyDecision,
       transactionid: decodedToken.jti,
       iat: decodedToken.iat,
     };
 
     try {
-      auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
+      auth0.users.updateAppMetadata(user.user_id, { iddataweb });
     } catch (error) {
       return callback(error);
     }
