@@ -35,10 +35,8 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
   const idwAuthorizeEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/authorize`;
   const auth0ContinueUrl = `https://${context.request.hostname}/continue`;
 
-  // initialize app metadata
-  user.app_metadata = user.app_metadata || {};
-  const iddataweb = user.app_metadata.iddataweb || {};
-  iddataweb = iddataweb.verificationResult || {};
+  let iddataweb = (user.app_metadata && user.app_metadata.iddataweb) || {};
+  iddataweb.verificationResult = iddataweb.verificationResult || {};
 
   // if the user is already verified and we don't need to check, exit
   if (
