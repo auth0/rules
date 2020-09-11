@@ -41,7 +41,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
   // if the user is already verified and we don't need to check, exit
   if (
     iddataweb.verificationResult.policyDecision === "approve" &&
-    IDDATAWEB_ALWAYS_VERIFY === "off"
+    IDDATAWEB_ALWAYS_VERIFY !== "true"
   ) {
     console.log("user " + user.user_id + " has been previously verified.");
     return callback(null, user, context);
