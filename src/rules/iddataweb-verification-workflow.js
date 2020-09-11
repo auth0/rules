@@ -25,7 +25,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     IDDATAWEB_CLIENT_SECRET,
     IDDATAWEB_LOG_JWT,
     IDDATAWEB_ALWAYS_VERIFY,
-    IDDATAWEB_PREFILL_ATTRIBUTES,
+    //IDDATAWEB_PREFILL_ATTRIBUTES,
   } = configuration;
 
   const idwBasicAuth = Buffer.from(
@@ -43,7 +43,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
 
   // if the user is already verified and we don't need to check, exit
   if (
-    user.app_metadata.iddataweb.verificationResult === "verified" &&
+    user.app_metadata.iddataweb.verificationResult.policyDecision === "approve" &&
     IDDATAWEB_ALWAYS_VERIFY === "off"
   ) {
     console.log("user " + user.user_id + " has been previously verified.");
@@ -134,22 +134,22 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     "&scope=openid+country.US&response_type=code";
 
   // build and sign JWT and include in /auth request to ID DataWeb.
-  if (IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
-    const prefillToken = jwt.sign(
-      {
-        sub: user.email,
-        credential: user.email,
-        email: user.email,
-        fname: user.given_name,
-        lname: user.family_name,
-        phone: user.phone_number,
-      },
-      IDDATAWEB_CLIENT_SECRET,
-      { expiresIn: "1h" }
-    );
+//   if (IDDATAWEB_PREFILL_ATTRIBUTES === "on") {
+//     const prefillToken = jwt.sign(
+//       {
+//         sub: user.email,
+//         credential: user.email,
+//         email: user.email,
+//         fname: user.given_name,
+//         lname: user.family_name,
+//         phone: user.phone_number,
+//       },
+//       IDDATAWEB_CLIENT_SECRET,
+//       { expiresIn: "1h" }
+//     );
 
-    idwRedirectUrl += `&login_hint=${prefillToken}`;
-  }
+//     idwRedirectUrl += `&login_hint=${prefillToken}`;
+//   }
 
   if (ruleUtils.canRedirect) {
     context.redirect = {
