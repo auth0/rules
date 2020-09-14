@@ -78,7 +78,6 @@ async function onfidoIdentityVerification(user, context, callback) {
     // if the user has not already been redirected and check_status is empty, we will create the applicant and redirect to the Onfido implementation.
     let email;
     if (user.email && user.email_verified ) {
-      // simple email validation. This can be replaced with assigning the email variable to a fake value (such as anon@example.com).
       email = user.email;
     }
     let applicant;
