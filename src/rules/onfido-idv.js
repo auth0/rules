@@ -64,7 +64,7 @@ async function onfidoIdentityVerification(user, context, callback) {
       callback(error);
     }
 
-    user.app_metadata.onfido = idv;
+    user.app_metadata.onfido = onfido;
 
     context.idToken[claimNamespace + 'check_result'] = payload.checkResult;
     context.idToken[claimNamespace + 'check_status'] = payload.checkStatus;
