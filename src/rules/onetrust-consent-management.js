@@ -20,17 +20,34 @@ async function oneTrustConsentManagement(user, context, callback) {
   const idTokenLinkClaim = "https://onetrust.com/magic-link";
 
   user.app_metadata = user.app_metadata || {};
-  user.app_metadata.onetrust = user.app_metadata.onetrust || {};
+  let onetrust = user.app_metadata.onetrust || {};
 
   if (context.stats.loginsCount > 1) {
     return callback(null, user, context);
   }
 
-  const response = await axios.post(ONETRUST_CONSENT_API_URL, {
-    identifier: user.email,
-    requestInformation: ONETRUST_REQUEST_INFORMATION,
-    purposes: [{ Id: ONETRUST_PURPOSE_ID }],
-  });
+  try {
+    await axios.post(ONETRUST_CONSENT_API_URL, {
+      identifier: user.email,
+      requestInformation: ONETRUST_REQUEST_INFORMATION,
+      purposes: [{ Id: ONETRUST_PURPOSE_ID }],
+    });
+  } catch (error) {
+    return callback(error);
+  }
+
+  onetrust.status = "submitted";
+
+  // https://developer.onetrust.com/api-reference/consent-manager/email-link-token-endpoints/getlinktokensusingget
+  try {
+    await auth0(ONETRUST_CONSENT_API_URL, {
+      identifier: user.email,
+      requestInformation: ONETRUST_REQUEST_INFORMATION,
+      purposes: [{ Id: ONETRUST_PURPOSE_ID }],
+    });
+  } catch (error) {
+    return callback(error);
+  }
 
   return callback(null, user, context);
 }
