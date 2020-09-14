@@ -18,6 +18,7 @@
  * @param {object} context
  * @param {function} callback
  */
+ /* global configuration */
 async function redirectOnfidoRule(user, context, callback) {
   // using auth0 rule-utilities to make sure our rule is efficient in the pipeline
   const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
