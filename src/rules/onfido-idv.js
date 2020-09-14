@@ -1,5 +1,3 @@
-/* global configuration */
-
 /**
  * @title Onfido Identity Verification
  * @overview Redirect to your Onfido IDV Application for Identity Verification during login.
