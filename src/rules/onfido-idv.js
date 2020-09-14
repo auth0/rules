@@ -33,8 +33,7 @@ async function onfidoIdentityVerification(user, context, callback) {
   // creating a new Onfido client, the region here is where your Onfido instance is located. Possible values are EU for Europe, US for United States, and CA for Canada.
   const onfidoClient = new Onfido({
     apiToken: configuration.ONFIDO_API_TOKEN,
-    region:
-      configuration.ONFIDO_REGION === 'EU' ? Region.EU : configuration.ONFIDO_REGION === 'US' ? Region.US : configuration.ONFIDO_REGION === 'CA' ? Region.CA : Region.EU,
+    region: Region[configuration.ONFIDO_REGION] || Region.EU,
   });
 
   user.app_metadata = user.app_metadata || {};
