@@ -37,8 +37,9 @@ async function onfidoIdentityVerification(user, context, callback) {
   });
 
   user.app_metadata = user.app_metadata || {};
+  user.app_metadata.onfido = user.app_metadata.onfido || {}
 
-  if (ruleUtils.isRedirectCallback && ruleUtils.queryParams.session_token) {
+  if (ruleUtils.isRedirectCallback && ruleUtils.queryParams.session_token && ruleUtils.queryParams.onfido_idv) {
     // User is back from the Onfido experience and has a session token to validate and assign to user meta
 
     // Validating session token and extracting payload for check results
@@ -73,26 +74,18 @@ async function onfidoIdentityVerification(user, context, callback) {
     return callback(null, user, context);
   }
 
-  if (ruleUtils.canRedirect && (user.app_metadata.onfido === undefined || user.app_metadata.onfido.check_status === '')) {
+  if (ruleUtils.canRedirect && !user.app_metadata.onfido.check_status) {
     // if the user has not already been redirected and check_status is empty, we will create the applicant and redirect to the Onfido implementation.
-    let email;
-    if (user.email && user.email_verified ) {
-      // simple email validation. This can be replaced with assigning the email variable to a fake value (such as anon@example.com).
-      email = user.email;
-    }
     let applicant;
     try {
       applicant = await onfidoClient.applicant.create({
         // these values do not need to match what is on the document for IDV, but if Data Comparison on Onfido's side is tuned on, these values will flag
         // if Auth0 contains these values in the app_metadata or on the user object you can map them here as needed. You could also pass them in as query_string variables
-        firstName: user.given_name === '' ? 'anon' : user.given_name,
-        lastName: user.family_name=== '' ? 'anon' : user.family_name,
-        email: email === '' ? 'anon@example.com' : email,
+        firstName: !user.given_name ? 'anon' : user.given_name,
+        lastName: !user.family_name ? 'anon' : user.family_name,
+        email: !user.email ? 'anon@example.com' : user.email,
       });
-    } catch (error) {
-      return callback(error);
-    }
-    try {
+
       // create the session token with the applicant id as a custom claim
       const sessionToken = ruleUtils.createSessionToken({ applicant: applicant.id });
       // redirect to Onfido implementation with sessionToken
