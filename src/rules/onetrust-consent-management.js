@@ -3,10 +3,17 @@
  * @overview Enhance Auth0 user profiles with consent, opt-ins and communication preferences data.
  * @gallery true
  * @category marketplace
+ *
+ * Required configuration (Rule will be skipped without a value here):
+ * - `ONETRUST_REQUEST_INFORMATION` - Your OneTrust Collection Point API token
+ * - `ONETRUST_CONSENT_API_URL` - Your OneTrust Collection Point API URL
+ * - `ONETRUST_PURPOSE_ID` - Your OneTrust Collection Point Purpose ID\
+ *
+ * Optional configuration:
+ * - `ONETRUST_SKIP_IF_NO_EMAIL` - If set to "true" then the Rule will skip if there is no email address. Otherwise the Rule will fail with an error.
  */
 /* global configuration */
 async function oneTrustConsentManagement(user, context, callback) {
-  const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
   const axios = require("axios@0.19.2");
 
   const {
@@ -15,37 +22,49 @@ async function oneTrustConsentManagement(user, context, callback) {
     ONETRUST_PURPOSE_ID,
   } = configuration;
 
-  const addIdTokenClaim = configuration.ONETRUST_ADD_ID_TOKEN_CLAIM === "true";
-  const idTokenStatusClaim = "https://onetrust.com/status";
-  const idTokenLinkClaim = "https://onetrust.com/magic-link";
+  if (
+    !ONETRUST_REQUEST_INFORMATION ||
+    !ONETRUST_CONSENT_API_URL ||
+    !ONETRUST_PURPOSE_ID
+  ) {
+    console.log("Missing required configuration. Skipping.");
+    return callback(null, user, context);
+  }
+
+  const skipIfNoEmail = configuration.ONETRUST_SKIP_IF_NO_EMAIL === "true";
 
   user.app_metadata = user.app_metadata || {};
   let onetrust = user.app_metadata.onetrust || {};
 
-  if (context.stats.loginsCount > 1) {
+  if (onetrust.receipt) {
+    console.log("User has a Collection Point receipt. Skipping.");
     return callback(null, user, context);
   }
 
+  if (!user.email) {
+    if (skipIfNoEmail) {
+      console.log("User has no email address. Skipping.");
+      return callback(null, user, context);
+    }
+    return callback(new Error("An email address is required."));
+  }
+
   try {
-    await axios.post(ONETRUST_CONSENT_API_URL, {
+    const response = await axios.post(ONETRUST_CONSENT_API_URL, {
       identifier: user.email,
       requestInformation: ONETRUST_REQUEST_INFORMATION,
       purposes: [{ Id: ONETRUST_PURPOSE_ID }],
     });
+    onetrust.receipt = response.data.receipt;
   } catch (error) {
+    console.log("Error calling the Collection Point.");
     return callback(error);
   }
 
-  onetrust.status = "submitted";
-
-  // https://developer.onetrust.com/api-reference/consent-manager/email-link-token-endpoints/getlinktokensusingget
   try {
-    await auth0(ONETRUST_CONSENT_API_URL, {
-      identifier: user.email,
-      requestInformation: ONETRUST_REQUEST_INFORMATION,
-      purposes: [{ Id: ONETRUST_PURPOSE_ID }],
-    });
+    await auth0.users.updateAppMetadata(user.user_id, { onetrust });
   } catch (error) {
+    console.log("Error updating user app_metadata.");
     return callback(error);
   }
 
