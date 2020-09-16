@@ -24,6 +24,14 @@
 
 async function vouchedVerification(user, context, callback) {
 
+    if (
+        !configuration.VOUCHED_API_KEY ||
+        !configuration.VOUCHED_PUBLIC_KEY
+    ) {
+        console.log("Missing required configuration. Skipping.");
+        return callback(null, user, context);
+    }
+
     /* ----------- START helpers ----------- */
     const axios = require('axios');
     const url = require('url');
@@ -39,7 +47,7 @@ async function vouchedVerification(user, context, callback) {
     const defaultUiUrl = 'https://i.vouched.id';
     const idTokenClaim = 'https://vouched.id/is_verified';
 
-    const getJob = async (apiKey, jobToken, apiUrl=defaultApiUrl) => {
+    const getJob = async (apiKey, jobToken, apiUrl) => {
         const response = await axios({
             headers: {
                 'X-Api-Key': apiKey,
@@ -125,7 +133,7 @@ async function vouchedVerification(user, context, callback) {
     /* ----------- END helpers ----------- */
 
     user.app_metadata = user.app_metadata || {};
-    const vouchedApiUrl = configuration.VOUCHED_API_URL || undefined;
+    const vouchedApiUrl = configuration.VOUCHED_API_URL || defaultApiUrl;
 
     try {
         const jobToken = ruleUtils.queryParams.jobToken;

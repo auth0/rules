@@ -22,12 +22,6 @@
  */
  /* global configuration */
 async function onfidoIdentityVerification(user, context, callback) {
-  // using auth0 rule-utilities to make sure our rule is efficient in the pipeline
-  const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
-  // requiring Onfido's node SDK for making the calls easier to Onfido's service.
-  const { Onfido, Region } = require('@onfido/api@1.5.1');
-
-  const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
 
   if (
     !configuration.SESSION_TOKEN_SECRET ||
@@ -38,6 +32,13 @@ async function onfidoIdentityVerification(user, context, callback) {
     console.log("Missing required configuration. Skipping.");
     return callback(null, user, context);
   }
+
+  // using auth0 rule-utilities to make sure our rule is efficient in the pipeline
+  const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
+  // requiring Onfido's node SDK for making the calls easier to Onfido's service.
+  const { Onfido, Region } = require('@onfido/api@1.5.1');
+
+  const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
 
   // creating a claim namespace for adding the Onfido IDV check results back to the ID Token
   const claimNamespace = 'https://claims.onfido.com/';
