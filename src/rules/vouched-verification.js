@@ -28,7 +28,7 @@ async function vouchedVerification(user, context, callback) {
      );
      
     const defaultApiUrl = 'https://verify.vouched.id/api';
-    const defaultUiUrl = 'https://console.vouched.id';
+    const defaultUiUrl = 'https://i.vouched.id';
     const idTokenClaim = 'https://vouched.id/is_verified';
   
     const getJob = async (apiKey, jobToken, apiUrl=defaultApiUrl) => {
@@ -170,7 +170,9 @@ async function vouchedVerification(user, context, callback) {
                                                 user);
   
             // user doesn't have a verification result, redirect to Vouched with packet
-            ruleUtils.doRedirect(redirectToVerification(packetId));
+            if (ruleUtils.canRedirect) {
+                context.redirect = { url: redirectToVerification(packetId) }
+            }
             return callback(null, user, context);
         }
     } catch (e) {
