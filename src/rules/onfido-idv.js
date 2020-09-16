@@ -3,16 +3,18 @@
  * @overview Redirect to your Onfido IDV Application for Identity Verification during login.
  * @gallery true
  * @category marketplace
- * 
- * Onfido digitally prove people’s real identities using a photo ID and facial biometrics. So your users can verify themselves anywhere, anytime. 
+ *
+ * Onfido digitally prove people’s real identities using a photo ID and facial biometrics. So your users can verify themselves anywhere, anytime.
+ *
  * By leveraging Onfido with Auth0, we enable organizations to know who their digital user are, tied to a real identity, during authentication, onboarding, other high-risk actions.
+ *
  * This rule will redirect to a custom application you build implementing one of the Onfido Input Capture SDKs. More info: https://developers.onfido.com/
- * 
- * Use Rules configuration to define:
- *    - SESSION_TOKEN_SECRET: Long, random string, should match on Onfido app side.
- *    - ONFIDO_ID_VERIFICATION_URL: URL to receive the redirect
- *    - ONFIDO_API_TOKEN: Your Onfido API Token
- *    - ONFIDO_REGION: The supported Onfido region your tenant is operating in
+ *
+ * Required configuration (this Rule will be skipped if any of the below are not defined):
+ *    - `SESSION_TOKEN_SECRET`: Long, random string, should match on Onfido app side.
+ *    - `ONFIDO_API_TOKEN`: Your Onfido API Token
+ *    - `ONFIDO_REGION`: The supported Onfido region your tenant is operating in
+ *    - `ONFIDO_ID_VERIFICATION_URL`: URL to receive the redirect
  *
  * @param {object} user
  * @param {object} context
@@ -22,10 +24,20 @@
 async function onfidoIdentityVerification(user, context, callback) {
   // using auth0 rule-utilities to make sure our rule is efficient in the pipeline
   const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
-  // requiring Onfido's node SDK for making the calls easier to Onfido's service. 
+  // requiring Onfido's node SDK for making the calls easier to Onfido's service.
   const { Onfido, Region } = require('@onfido/api@1.5.1');
 
   const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
+
+  if (
+    !configuration.SESSION_TOKEN_SECRET ||
+    !configuration.ONFIDO_API_TOKEN ||
+    !configuration.ONFIDO_REGION ||
+    !configuration.ONFIDO_ID_VERIFICATION_URL
+  ) {
+    console.log("Missing required configuration. Skipping.");
+    return callback(null, user, context);
+  }
 
   // creating a claim namespace for adding the Onfido IDV check results back to the ID Token
   const claimNamespace = 'https://claims.onfido.com/';
@@ -51,7 +63,7 @@ async function onfidoIdentityVerification(user, context, callback) {
     }
 
     // assigning check status and result to the app_metadata so the downstream application can decided what to do next
-    // note, in the example integration, the Onfido app returns after 30 seconds even if the check is still in progress 
+    // note, in the example integration, the Onfido app returns after 30 seconds even if the check is still in progress
     // If this claim status is still in_progress it is recommended the downstream application recheck for completion or implement the Onfido Webhook: https://documentation.onfido.com/#webhooks
     // Additionally, you can place these items into the idToken claim with custom claims as needed as shown
     const onfido = {
