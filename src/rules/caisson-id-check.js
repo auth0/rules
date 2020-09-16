@@ -4,10 +4,26 @@
  * @gallery true
  * @category marketplace
  *
- * [Caisson Integration guide](https://www.caisson.com/docs/integration/auth0/)
+ * Required configuration (this Rule will be skipped if any of the below are not defined):
+ *    - `CAISSON_PUBLIC_KEY`: found on the Caisson Developer tab above
+ *    - `CAISSON_PRIVATE_KEY`: found on the Caisson Developer tab above
+ *    - `CAISSON_LOGIN_FREQUENCY_DAYS`: set to "-1" to check ID on registration only, "0" to check on all logins, and another positive integer for a minimum number of days between ID checks
+ *
+ * Optional configuration:
+ *    - `CAISSON_DEBUG`: set to "true" to log errors in the console
  */
 
 async function caissonIDCheck(user, context, callback) {
+
+  if (
+    !configuration.CAISSON_PUBLIC_KEY ||
+    !configuration.CAISSON_PRIVATE_KEY ||
+    !configuration.CAISSON_LOGIN_FREQUENCY_DAYS
+  ) {
+    console.log("Missing required configuration. Skipping.");
+    return callback(null, user, context);
+  }
+
   const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
 
   //copy off the config obj so we can use our own private key for session token signing.
