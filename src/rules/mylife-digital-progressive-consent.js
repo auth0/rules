@@ -64,8 +64,7 @@ function consentricIntegration(user, context, callback) {
 
     // Returns Consentric API Access Token (JWT) from either the global cache or generates it anew from clientId and secret
     const getConsentricApiAccessToken = async () => {
-        const consentricApiTokenNotValid = (!global.consentricApiToken) ||
-            global.consentricApiToken.exp < new Date().getTime();
+        const consentricApiTokenNotValid = !global.consentricApiToken || global.consentricApiToken.exp < Date.now();
 
         if (consentricApiTokenNotValid) {
             try {
