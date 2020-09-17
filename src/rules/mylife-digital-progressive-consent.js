@@ -1,5 +1,5 @@
 /**
-* @title Progressive Consent Capture
+* @title Consentric Progressive Consent
 * @overview Uses a widget to capture missing consents and preferences at login to boost engagement and support compliance
 * @gallery true
 * @category marketplace
@@ -16,7 +16,7 @@
 *    - `CONSENTRIC_REDIRECT_URL`: The URL of the page containing the Progressive widget built above
 *
 */
-function consentricIntegration(user, context, callback) {
+function consentricProgressiveConsent(user, context, callback) {
     const axios = require('axios@0.19.2');
     const moment = require('moment@2.11.2');
     const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
