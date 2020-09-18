@@ -4,22 +4,18 @@
  * @gallery true
  * @category marketplace
  *
- * [Vouched](https://vouched.id)
+ * Vouched powers secure, real-time visual ID verification and end-to-end fraud detection to securely convert new users instantly.
  *
- * **ID Verification Process**
- * ![](https://static.vouched.id/auth0/images/verification_diagram.png)
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
- * **Rule Logic**
- * ![](https://static.vouched.id/auth0/images/rule_diagram.png)
+ *    - `VOUCHED_API_KEY` Your Private Key located in Vouched Dashboard
+ *    - `VOUCHED_PUBLIC_KEY` Your Public Key located in Vouched Dashboard
  *
- * Required configuration (this Rule will be skipped if any of the below are not defined):
- *    - `VOUCHED_API_KEY`: Your Private Key located in Vouched Dashboard
- *    - `VOUCHED_PUBLIC_KEY`: Your Public Key located in Vouched Dashboard
+ * **Optional configuration:**
  *
- * Optional configuration:
- *    - `VOUCHED_API_URL`: Your Vouched API URL; leave blank unless instructed by your Vouched rep
- *    - `VOUCHED_ID_TOKEN_CLAIM`: Set a `https://vouchedid/is_verified` claim in the ID token with results
- *    - `VOUCHED_VERIFICATION_OPTIONAL`: Set to "true" to succeed ever if verification fails
+ *    - `VOUCHED_API_URL` Your Vouched API URL; leave blank unless instructed by your Vouched rep
+ *    - `VOUCHED_ID_TOKEN_CLAIM` Set a `https://vouchedid/is_verified` claim in the ID token with results
+ *    - `VOUCHED_VERIFICATION_OPTIONAL` Set to "true" to succeed ever if verification fails
  */
 
 async function vouchedVerification(user, context, callback) {

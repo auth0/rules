@@ -4,17 +4,16 @@
  * @gallery true
  * @category marketplace
  *
- * Onfido digitally prove people’s real identities using a photo ID and facial biometrics. So your users can verify themselves anywhere, anytime.
- *
- * By leveraging Onfido with Auth0, we enable organizations to know who their digital user are, tied to a real identity, during authentication, onboarding, other high-risk actions.
+ * Onfido digitally prove people’s real identities using a photo ID and facial biometrics. So your users can verify themselves anywhere, anytime. By leveraging Onfido with Auth0, we enable organizations to know who their digital user are, tied to a real identity, during authentication, onboarding, other high-risk actions.
  *
  * This rule will redirect to a custom application you build implementing one of the Onfido Input Capture SDKs. More info: https://developers.onfido.com/
  *
- * Required configuration (this Rule will be skipped if any of the below are not defined):
- *    - `SESSION_TOKEN_SECRET`: Long, random string, should match on Onfido app side.
- *    - `ONFIDO_API_TOKEN`: Your Onfido API Token
- *    - `ONFIDO_REGION`: The supported Onfido region your tenant is operating in
- *    - `ONFIDO_ID_VERIFICATION_URL`: URL to receive the redirect
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
+ *
+ *    - `SESSION_TOKEN_SECRET` Long, random string, should match on Onfido app side.
+ *    - `ONFIDO_API_TOKEN` Your Onfido API Token
+ *    - `ONFIDO_REGION` The supported Onfido region your tenant is operating in
+ *    - `ONFIDO_ID_VERIFICATION_URL` URL to receive the redirect
  *
  * @param {object} user
  * @param {object} context

@@ -4,13 +4,17 @@
  * @gallery true
  * @category marketplace
  *
- * Required configuration (this Rule will be skipped if any of the below are not defined):
- *    - `CAISSON_PUBLIC_KEY`: found on the Caisson Developer tab above
- *    - `CAISSON_PRIVATE_KEY`: found on the Caisson Developer tab above
- *    - `CAISSON_LOGIN_FREQUENCY_DAYS`: set to "-1" to check ID on registration only, "0" to check on all logins, and another positive integer for a minimum number of days between ID checks
+ * Pairing Auth0 with Caisson ID Check adds real time and seamless ID validation, letting you reliably know who your customers are as they register or login to your apps.
  *
- * Optional configuration:
- *    - `CAISSON_DEBUG`: set to "true" to log errors in the console
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
+ *
+ *    - `CAISSON_PUBLIC_KEY` Found on the Caisson Developer tab above
+ *    - `CAISSON_PRIVATE_KEY` Found on the Caisson Developer tab above
+ *    - `CAISSON_LOGIN_FREQUENCY_DAYS` Set to "-1" to check ID on registration only, "0" to check on all logins, and another positive integer for a minimum number of days between ID checks
+ *
+ * **Optional configuration:**
+ *
+ *    - `CAISSON_DEBUG` Set to "true" to log errors in the console
  */
 
 async function caissonIDCheck(user, context, callback) {

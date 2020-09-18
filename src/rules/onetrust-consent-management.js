@@ -4,13 +4,17 @@
  * @gallery true
  * @category marketplace
  *
- * Required configuration (this Rule will be skipped if any of the below are not defined):
- *    - `ONETRUST_REQUEST_INFORMATION`: Your OneTrust Collection Point API token
- *    - `ONETRUST_CONSENT_API_URL`: Your OneTrust Collection Point API URL
- *    - `ONETRUST_PURPOSE_ID`: Your OneTrust Collection Point Purpose ID
+ * Enhance Auth0 user profiles with consent, opt-ins and communication preferences data.
  *
- * Optional configuration:
- *    - `ONETRUST_SKIP_IF_NO_EMAIL`: If set to "true" then the Rule will skip if there is no email address. Otherwise the Rule will fail with an error.
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
+ *
+ *    - `ONETRUST_REQUEST_INFORMATION` Your OneTrust Collection Point API token
+ *    - `ONETRUST_CONSENT_API_URL` Your OneTrust Collection Point API URL
+ *    - `ONETRUST_PURPOSE_ID` Your OneTrust Collection Point Purpose ID
+ *
+ * **Optional configuration:**
+ *
+ *    - `ONETRUST_SKIP_IF_NO_EMAIL` If set to "true" then the Rule will be skipped if there is no email address. Otherwise the Rule will fail with an error.
  */
 /* global configuration */
 async function oneTrustConsentManagement(user, context, callback) {
