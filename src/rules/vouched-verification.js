@@ -183,7 +183,7 @@ async function vouchedVerification(user, context, callback) {
 
             // user doesn't have a verification result, redirect to Vouched with packet
             if (ruleUtils.canRedirect) {
-                context.redirect = { url: redirectToVerification(packetId) }
+                context.redirect = { url: redirectToVerification(packetId) };
             }
             return callback(null, user, context);
         }
