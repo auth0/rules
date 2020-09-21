@@ -15,7 +15,7 @@
  *
  *    - `VOUCHED_API_URL` Your Vouched API URL; leave blank unless instructed by your Vouched rep
  *    - `VOUCHED_ID_TOKEN_CLAIM` Set a `https://vouchedid/is_verified` claim in the ID token with results
- *    - `VOUCHED_VERIFICATION_OPTIONAL` Set to "true" to succeed ever if verification fails
+ *    - `VOUCHED_VERIFICATION_OPTIONAL` Set to "true" to succeed even if verification fails
  */
 
 async function vouchedVerification(user, context, callback) {
