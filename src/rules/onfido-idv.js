@@ -49,7 +49,7 @@ async function onfidoIdentityVerification(user, context, callback) {
   });
 
   user.app_metadata = user.app_metadata || {};
-  user.app_metadata.onfido = user.app_metadata.onfido || {}
+  user.app_metadata.onfido = user.app_metadata.onfido || {};
 
   if (ruleUtils.isRedirectCallback && ruleUtils.queryParams.session_token && "true" === ruleUtils.queryParams.onfido_idv) {
     // User is back from the Onfido experience and has a session token to validate and assign to user meta
