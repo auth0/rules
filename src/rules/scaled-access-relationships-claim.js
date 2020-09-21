@@ -28,15 +28,17 @@
 * This is done through an API call to Scaled Access' Relationship Management API using a machine-to-machine token.
 * More info can be found at https://docs.scaledaccess.com/?path=integration-with-auth0
 *
-* Required configuration (this Rule will be skipped if any of the below are not defined):
-*    - `SCALED_ACCESS_AUDIENCE` The identifier of the Auth0 API
-*    - `SCALED_ACCESS_CLIENTID`: The Client ID of the Auth0 machine-to-machine application.
-*    - `SCALED_ACCESS_CLIENTSECRET`: The Client secret of the Auth0 machine-to-machine application.
-*    - `SCALED_ACCESS_BASEURL`: The base URL for the Relationship Management API.
-*    - `SCALED_ACCESS_TENANT`: Your tenant code provided by Scaled Access.
+* **Required configuration** (this Rule will be skipped if any of the below are not defined):
 *
-* Optional configuration:
-*    - `SCALED_ACCESS_CUSTOMCLAIM`: A namespaced ID token claim (defaults to `https://scaledaccess.com/relationships`)
+*    - `SCALED_ACCESS_AUDIENCE` The identifier of the Auth0 API
+*    - `SCALED_ACCESS_CLIENTID` The Client ID of the Auth0 machine-to-machine application.
+*    - `SCALED_ACCESS_CLIENTSECRET` The Client secret of the Auth0 machine-to-machine application.
+*    - `SCALED_ACCESS_BASEURL` The base URL for the Relationship Management API.
+*    - `SCALED_ACCESS_TENANT` Your tenant code provided by Scaled Access.
+*
+* **Optional configuration:**
+*
+*    - `SCALED_ACCESS_CUSTOMCLAIM` A namespaced ID token claim (defaults to `https://scaledaccess.com/relationships`)
 */
 function scaledAccessAddRelationshipsClaim(user, context, callback) {
 
