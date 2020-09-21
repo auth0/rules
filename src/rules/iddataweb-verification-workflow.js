@@ -6,9 +6,34 @@
  *
  * This configuration allows you to add an ID DataWeb verification workflow to the user’s first time login experience. This will allow your organization to ensure the user is really who they claim to be, aligning with KYC/AML requirements, and mitigating fraud attempts.
  *
+ * Required configuration (this Rule will be skipped if any of the below are not defined):
+ *    - `IDDATAWEB_BASE_URL`: Indicates the ID DataWeb environment. The default value is Pre-production (`https://prod2.iddataweb.com/prod-axn`), where all testing and POCs take place. To switch to production, change the URL tp `https://prod2.iddataweb.com/prod-axn`
+ *    - `IDDATAWEB_CLIENT_ID`: Identifies your specific verification workflow and user experience. Get this from ID DataWeb’s AXN Admin console.
+ *    - `IDDATAWEB_CLIENT_SECRET`: Authenticates your specific verification workflow and user experience. Get this from ID DataWeb’s AXN Admin console.
+ *
+ * Optional configuration:
+ *    - `IDDATAWEB_ALWAYS_VERIFY`: controls if users are verified each time they login, or just initially. Recommended "true" (verify the user on every login) for testing, not set (verify once, then not again) for production.
+ *
  */
 
 async function iddatawebVerificationWorkflow(user, context, callback) {
+
+  const {
+    IDDATAWEB_BASE_URL,
+    IDDATAWEB_CLIENT_ID,
+    IDDATAWEB_CLIENT_SECRET,
+    IDDATAWEB_ALWAYS_VERIFY,
+  } = configuration;
+
+  if (
+    !IDDATAWEB_BASE_URL ||
+    !IDDATAWEB_CLIENT_ID ||
+    !IDDATAWEB_CLIENT_SECRET
+  ) {
+    console.log("Missing required configuration. Skipping.");
+    return callback(null, user, context);
+  }
+
   const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
   const axiosClient = require("axios@0.19.2");
   const url = require("url");
@@ -18,13 +43,6 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     context,
     configuration
   );
-
-  const {
-    IDDATAWEB_BASE_URL,
-    IDDATAWEB_CLIENT_ID,
-    IDDATAWEB_CLIENT_SECRET,
-    IDDATAWEB_ALWAYS_VERIFY,
-  } = configuration;
 
   const idwBasicAuth = Buffer.from(
     IDDATAWEB_CLIENT_ID + ":" + IDDATAWEB_CLIENT_SECRET

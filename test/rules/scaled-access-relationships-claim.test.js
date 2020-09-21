@@ -1,7 +1,6 @@
 
 'use strict';
 
-const jwt = require('jsonwebtoken');
 const nock = require('nock');
 const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
@@ -18,6 +17,9 @@ const sandbox = {
         SCALED_ACCESS_BASEURL: "https://api.int.scaledaccess.com/privategroups-v2",
         SCALED_ACCESS_TENANT: "tenant",
         SCALED_ACCESS_CUSTOMCLAIM: "https://tenant.com/relationships",
+        SCALED_ACCESS_AUDIENCE: "https://tenant.com/relationships",
+        SCALED_ACCESS_CLIENTID: "__test_clientid__",
+        SCALED_ACCESS_CLIENTSECRET: "__test_clientsecret__",
     }
 };
 
@@ -29,7 +31,7 @@ describe(ruleName, () => {
     beforeEach(() => {
         rule = loadRule(ruleName, sandbox, {});
         nock(`https://some-tenant.eu.auth0.com`).post("/oauth/token")
-            .reply(200, { 
+            .reply(200, {
                 access_token: "some access token",
                 expires_in: 86400
             });

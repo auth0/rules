@@ -5,7 +5,7 @@
 * @category marketplace
 *
 * This rule adds a claim to the access token based on relationships the subject has in Scaled Access.
-* 
+*
 * Example of a resulting claim:
 * ```
 * "https://example.com/relationships": [
@@ -27,16 +27,30 @@
 * ```
 * This is done through an API call to Scaled Access' Relationship Management API using a machine-to-machine token.
 * More info can be found at https://docs.scaledaccess.com/?path=integration-with-auth0
-* 
-* A number of rule settings are required:
-* - SCALED_ACCESS_CLIENTID: The Client ID of the machine-to-machine application.
-* - SCALED_ACCESS_CLIENTSECRET: The Client secret of the machine-to-machine application.
-* - SCALED_ACCESS_BASEURL: The base URL for the Relationship Management API, e.g. `https://api.int.scaledaccess.com/privategroups-v2`.
-* - SCALED_ACCESS_TENANT: Your Scaled Access tenant code.
-* - SCALED_ACCESS_CUSTOMCLAIM: A namespaced custom claim name of your choice. The name must be a URL. Defaults to `https://scaledaccess.com/relationships`.
-* - SCALED_ACCESS_AUDIENCE: The audience in the machine-to-machine token.
+*
+* Required configuration (this Rule will be skipped if any of the below are not defined):
+*    - `SCALED_ACCESS_AUDIENCE` The identifier of the Auth0 API
+*    - `SCALED_ACCESS_CLIENTID`: The Client ID of the Auth0 machine-to-machine application.
+*    - `SCALED_ACCESS_CLIENTSECRET`: The Client secret of the Auth0 machine-to-machine application.
+*    - `SCALED_ACCESS_BASEURL`: The base URL for the Relationship Management API.
+*    - `SCALED_ACCESS_TENANT`: Your tenant code provided by Scaled Access.
+*
+* Optional configuration:
+*    - `SCALED_ACCESS_CUSTOMCLAIM`: A namespaced ID token claim (defaults to `https://scaledaccess.com/relationships`)
 */
 function scaledAccessAddRelationshipsClaim(user, context, callback) {
+
+    if (
+        !configuration.SCALED_ACCESS_AUDIENCE ||
+        !configuration.SCALED_ACCESS_CLIENTID ||
+        !configuration.SCALED_ACCESS_CLIENTSECRET ||
+        !configuration.SCALED_ACCESS_BASEURL ||
+        !configuration.SCALED_ACCESS_TENANT
+    ) {
+        console.log("Missing required configuration. Skipping.");
+        return callback(null, user, context);
+    }
+
     const fetch = require("node-fetch");
     const { URLSearchParams } = require('url');
 
