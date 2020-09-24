@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function disableSocialSignups(user, context, callback) {
 
   const CLIENTS_ENABLED = ['REPLACE_WITH_YOUR_CLIENT_ID'];
   // run only for the specified clients

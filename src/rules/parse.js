@@ -13,7 +13,7 @@
  *
  */
 
-function (user, context, callback) {
+function generateParseSessionToken(user, context, callback) {
   // run this only for the Parse application
   // if (context.clientID !== 'PARSE CLIENT ID IN AUTH0') return callback(null, user, context);
 

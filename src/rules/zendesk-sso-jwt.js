@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function zendeskSsoWithJwt(user, context, callback) {
   const jwt = require('jsonwebtoken');
   const uuid = require('uuid');
 

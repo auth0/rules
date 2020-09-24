@@ -12,7 +12,8 @@
  *
  */
 
-function (user, context, callback) {
+function getTowerdataProfile(user, context, callback) {
+  const request = require('request');
 
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);

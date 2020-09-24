@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function guardianMultifactorAuthorization(user, context, callback) {
   if (!user.app_metadata || !user.app_metadata.authorization ||
     !Array.isArray(user.app_metadata.authorization.groups)) {
     return callback(null, user, context);

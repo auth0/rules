@@ -12,7 +12,8 @@
  *
  */
 
-function (user, context, callback) {
+function triggerZapOnUserLogin(user, context, callback) {
+  const _ = require('lodash');
   const request = require('request');
 
   const small_context = {

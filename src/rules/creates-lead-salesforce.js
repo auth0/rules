@@ -12,11 +12,13 @@
  *
  */
 
-function (user, context, callback) {
+function createLeadSalesforce(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.recordedAsLead) {
     return callback(null,user,context);
   }
+
+  const request = require('request');
 
   const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
   const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);

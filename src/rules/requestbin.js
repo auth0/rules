@@ -14,7 +14,8 @@
  *
  */
 
-function (user, context, callback) {
+function sendVariablesToRequestBin(user, context, callback) {
+  const _ = require('lodash');
   const request = require('request');
 
   // https://auth0.com/docs/user-profile/user-profile-structure

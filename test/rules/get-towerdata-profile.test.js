@@ -10,26 +10,28 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
+  let request;
 
   beforeEach(() => {
     globals = {
       global: {},
-      request: {
-        get: jest
-          .fn()
-          .mockImplementationOnce((url, obj, cb) => {
-            cb(null, { statusCode: 200 }, towerdataBody)
-          })
-      },
       configuration: {
         TOWERDATA_API_KEY: 'YOUR towerdata API KEY'
       }
     };
 
+    request = {
+      get: jest
+        .fn()
+        .mockImplementationOnce((url, obj, cb) => {
+          cb(null, { statusCode: 200 }, towerdataBody);
+        })
+    };
+
     user = new UserBuilder().build();
     context = new ContextBuilder().build();
 
-    rule = loadRule(ruleName, globals);
+    rule = loadRule(ruleName, globals, { request });
   });
 
   describe('when the rule is executed', () => {
