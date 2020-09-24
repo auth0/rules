@@ -1,5 +1,5 @@
 /**
- * @title Send events to segment.io
+ * @title Send events to Segment IO
  * @overview Send events to segment.io
  * @gallery false
  * @category webhook
@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function sendEventsToSegmentIo(user, context, callback) {
   if (context.protocol === 'delegation') {
     return callback(null, user, context);
   }

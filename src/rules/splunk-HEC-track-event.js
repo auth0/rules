@@ -1,5 +1,5 @@
 /**
- * @title Tracks Logins/SignUps with Splunk HEC
+ * @title Tracks Logins and Signups with Splunk HEC
  * @overview Send SignUp and Login events to Splunk's [HTTP Event Collector] (http://dev.splunk.com/view/event-collector/SP-CAAAE7F), including some contextual information of the user.
  * @gallery true
  * @category webhook
@@ -19,7 +19,7 @@
  *
  */
 
-function (user, context, callback) {
+function trackEventsWithSplunkHec(user, context, callback) {
   const request = require('request');
 
   user.app_metadata = user.app_metadata || {};

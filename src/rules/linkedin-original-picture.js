@@ -8,11 +8,12 @@
  *
  */
 
-function (user, context, callback) {
+function useOriginallinkedInProfilePicture(user, context, callback) {
   if (context.connection !== 'linkedin') {
     return callback(null, user, context);
   }
 
+  const _ = require('lodash');
   const request = require('request');
 
   const liIdentity = _.find(user.identities, { connection: 'linkedin' });

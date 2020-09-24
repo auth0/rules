@@ -8,11 +8,11 @@
  *
  */
 
-function (user, context, callback) {
+function userWhitelist(user, context, callback) {
 
   // Access should only be granted to verified users.
   if (!user.email || !user.email_verified) {
-    return callback(null, user, context);
+    return callback(new UnauthorizedError('Access denied.'));
   }
 
   const whitelist = [ 'user1@example.com', 'user2@example.com' ]; //authorized users

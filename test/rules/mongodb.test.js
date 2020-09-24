@@ -12,36 +12,42 @@ describe(ruleName, () => {
 
   const configuration = {
     MONGO_CONNECTION_STRING: 'mongodb://user:password@server:port/db'
-  }
+  };
 
-  const mongo = (connString, callback) => {
-    expect(connString).toEqual(configuration.MONGO_CONNECTION_STRING);
-
-    const users = {
-      findOne: (options, cb) => {
-        if (options.email === 'broken@example.com') {
-          return cb(new Error('db error'));
-        }
-
-        if (options.email === 'empty@example.com') {
-          return cb();
-        }
-
-        expect(options.email).toEqual('duck.t@example.com');
-        return cb(null, { foo: 'bar' });
+  const users = {
+    findOne: (options, cb) => {
+      if (options.email === 'broken@example.com') {
+        return cb(new Error('db error'));
       }
-    };
 
-    const collection = (collName) => {
-      expect(collName).toEqual('users');
-      return users;
-    };
+      if (options.email === 'empty@example.com') {
+        return cb();
+      }
 
-    callback({ collection });
+      expect(options.email).toEqual('duck.t@example.com');
+      return cb(null, { foo: 'bar' });
+    }
+  };
+
+  const mongo = {
+    MongoClient: {
+      connect: (connString, options, callback) => {
+        expect(connString).toEqual(configuration.MONGO_CONNECTION_STRING);
+
+        callback(null, {
+          db: (name) => ({
+            collection: (colName) => {
+              expect(colName).toEqual('users');
+              return users;
+            }
+          })
+        });
+      }
+    }
   };
 
   beforeEach(() => {
-    rule = loadRule(ruleName, { configuration, mongo });
+    rule = loadRule(ruleName, { configuration }, { 'mongodb@3.1.4': mongo });
 
     const request = new RequestBuilder().build();
     context = new ContextBuilder()

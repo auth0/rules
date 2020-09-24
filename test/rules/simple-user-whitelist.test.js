@@ -24,22 +24,20 @@ describe(ruleName, () => {
       .build();
   });
 
-  it('should do nothing if the user has no email', (done) => {
+  it('should not authorize users without email', (done) => {
     user.email = '';
-    rule(user, context, (e, u, c) => {
-      expect(e).toBeFalsy();
-      expect(u).toEqual(user);
-      expect(c).toEqual(context);
+    rule(user, context, (e) => {
+      expect(e).toBeInstanceOf(Error);
+      expect(e.message).toEqual('Access denied.');
       done();
     });
   });
 
-  it('should do nothing if user`s email isn`t verified', (done) => {
+  it('should not authorize unverified users', (done) => {
     user.email_verified = false;
-    rule(user, context, (e, u, c) => {
-      expect(e).toBeFalsy();
-      expect(u).toEqual(user);
-      expect(c).toEqual(context);
+    rule(user, context, (e) => {
+      expect(e).toBeInstanceOf(Error);
+      expect(e.message).toEqual('Access denied.');
       done();
     });
   });

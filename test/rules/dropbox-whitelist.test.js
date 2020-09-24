@@ -10,22 +10,24 @@ describe(ruleName, () => {
   let context;
   let user;
   let globals;
+  let request;
 
   beforeEach(() => {
     globals = {
       UnauthorizedError: function() {},
-      request: {
-        get: jest
-          .fn()
-          .mockImplementation((opt, cb) => {
-            cb(null, { statusCode: 200 }, dropboxUsersFileFixture);
-          })
-      }
+    };
+
+    request = {
+      get: jest
+        .fn()
+        .mockImplementation((opt, cb) => {
+          cb(null, { statusCode: 200 }, dropboxUsersFileFixture);
+        })
     };
 
     context = new ContextBuilder().build();
 
-    rule = loadRule(ruleName, globals);
+    rule = loadRule(ruleName, globals, { request });
   });
 
   describe('when the rule is executed', () => {
@@ -37,18 +39,18 @@ describe(ruleName, () => {
         .build();
     });
 
-    it('should do nothing if the user has no email', (done) => {
+    it('should not authorize users without email', (done) => {
       user.email = '';
       rule(user, context, (e) => {
-        expect(e).toBeFalsy();
+        expect(e).toBeInstanceOf(globals.UnauthorizedError);
         done();
       });
     });
 
-    it('should do nothing if user`s email isn`t verified', (done) => {
+    it('should not authorize unverified users', (done) => {
       user.email_verified = false;
       rule(user, context, (e) => {
-        expect(e).toBeFalsy();
+        expect(e).toBeInstanceOf(globals.UnauthorizedError);
         done();
       });
     });

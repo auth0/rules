@@ -1,6 +1,6 @@
 /**
- * @title Obtains a Pusher token for subscribing/publishing to private channels
- * @overview Obtain a Pusher token for subscribing/publishing to private channels.
+ * @title Obtain a Pusher token for subscribing and publishing to private channels
+ * @overview Obtains a Pusher token for subscribing/publishing to private channels.
  * @gallery true
  * @category webhook
  *
@@ -8,7 +8,9 @@
  *
  */
 
-function (user, context, callback) {
+function getPusherToken(user, context, callback) {
+  const crypto = require('crypto');
+
   const pusherKey = configuration.PUSHER_KEY;
   const pusherSecret = configuration.PUSHER_SECRET;
 

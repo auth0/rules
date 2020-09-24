@@ -1,5 +1,5 @@
 /**
- * @title Multifactor with Auth0 Guardian + Authorization Extension
+ * @title Multifactor with Auth0 Guardian and Authorization Extension
  * @overview Guardian mfa + authorization extension working together.
  * @gallery true
  * @category multifactor,guardian
@@ -10,7 +10,7 @@
  *
  */
 
-function (user, context, callback) {
+function guardianMultifactorAuthorization(user, context, callback) {
   if (!user.app_metadata || !user.app_metadata.authorization ||
     !Array.isArray(user.app_metadata.authorization.groups)) {
     return callback(null, user, context);

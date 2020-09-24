@@ -23,7 +23,8 @@ class ContextBuilder {
       accessToken: {},
       idToken: {},
       sessionID: 'jYA5wG...BNT5Bak',
-      request: {}
+      request: {},
+      authentication: {}
     };
     this.context.request = new RequestBuilder().build();
   }
@@ -65,6 +66,10 @@ class ContextBuilder {
   }
   withStats(stats) {
     this.context.stats = stats;
+    return this;
+  }
+  withAuthentication(authentication) {
+    this.context.authentication = authentication;
     return this;
   }
   build() {

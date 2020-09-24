@@ -9,7 +9,7 @@
  *
  */
 
-function (user, context, callback) {
+function getSocureFraudScore(user, context, callback) {
   // score fraudscore once (if it's already set, skip this)
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.socure_fraudscore) return callback(null, user, context);

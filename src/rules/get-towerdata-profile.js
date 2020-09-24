@@ -1,5 +1,5 @@
 /**
- * @title Enrich profile with Towerdata (formerly RapLeaf)
+ * @title Enrich profile with Towerdata - formerly RapLeaf
  * @overview Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile.
  * @gallery true
  * @category enrich profile
@@ -12,7 +12,8 @@
  *
  */
 
-function (user, context, callback) {
+function getTowerdataProfile(user, context, callback) {
+  const request = require('request');
 
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);

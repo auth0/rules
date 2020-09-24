@@ -8,11 +8,12 @@
  *
  */
 
-function (user, context, callback) {
+function dropboxWhitelist(user, context, callback) {
+  const request = require('request');
 
   // Access should only be granted to verified users.
   if (!user.email || !user.email_verified) {
-    return callback(null, user, context);
+    return callback(new UnauthorizedError('Access denied.'));
   }
 
   request.get({
