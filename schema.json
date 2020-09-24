@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "templates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "code": { "type": "string" },
+          "categories": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": [ "id", "title", "code" ]
+      }
+    }
+  }
+}

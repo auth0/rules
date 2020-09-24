@@ -6,3 +6,5 @@ The Auth0 `redirect` protocol enables many advanced authentication scenarios, sp
 * Allowing remote Active Directory users to change their password ([see example](active-directory-pwd-reset-policy))
 
 This directory contains examples of using the `redirect` protocol in various ways, including MFA. And if you'd just like a simple example that you can easily run within your Auth0 account, check out the [Simple Example with a Webtask](simple) rule.
+
+> Please note that the setup for some Redirect Rules instruct you to create a Webtask in your Auth0 Webtask Sandbox. Tenants created after *July 16, 2018* will not have access to the underlying Auth0 Webtask Sandbox via the Webtask CLI. Please contact Auth0 at sales@auth0.com to request access.

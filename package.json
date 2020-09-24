@@ -1,10 +1,13 @@
 {
   "name": "rules-templates",
-  "version": "0.4.3",
-  "description": "Auth0 Rules Repository =====",
+  "version": "0.13.2",
+  "description": "Auth0 Rules Repository",
   "main": "./rules",
   "scripts": {
-    "preversion": "./build && git add rules.json && git commit -m 'update rules.json'"
+    "validate": "node validator.js",
+    "build": "node build && npm run validate",
+    "deploy": "node deploy.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -17,8 +20,21 @@
   },
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
-    "marked": "^0.3.2",
-    "js-yaml": "^3.0.2",
-    "async": "^0.7.0"
+    "ajv": "^6.5.4",
+    "async": "2.6.0",
+    "aws-sdk": "2.359.0",
+    "dotenv": "^6.1.0",
+    "glob": "7.1.2",
+    "ipaddr.js": "^1.8.1",
+    "jest": "^21.2.1",
+    "jsonwebtoken": "^8.3.0",
+    "lodash": "^4.17.15",
+    "moment-timezone": "^0.5.21",
+    "nock": "10.0.0",
+    "node-fetch": "^2.6.0",
+    "parse-comments": "0.4.3",
+    "request": "^2.88.0",
+    "showdown": "^1.9.1",
+    "yargs": "11.1.0"
   }
 }

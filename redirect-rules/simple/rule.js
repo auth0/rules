@@ -1,4 +1,4 @@
-function redirectToConsentForm (user, context, callback) {
+function redirectToConsentForm(user, context, callback) {
   var hasConsented = user.app_metadata && user.app_metadata.has_consented;
 
   // redirect to consent form if user has not yet consented
