@@ -4,7 +4,7 @@
  * @gallery true
  * @category marketplace
  *
- * This configuration allows you to add an ID DataWeb verification workflow to the user’s first time login experience. This will allow your organization to ensure the user is really who they claim to be, aligning with KYC/AML requirements, and mitigating fraud attempts.
+ * Please see the [ID DataWeb integration](https://marketplace.auth0.com/integrations/iddataweb-identity-verification) for more information and detailed installation instructions.
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *

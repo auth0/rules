@@ -4,7 +4,7 @@
  * @gallery true
  * @category marketplace
  *
- * Vouched powers secure, real-time visual ID verification and end-to-end fraud detection to securely convert new users instantly.
+ * Please see the [Vouched integration](https://marketplace.auth0.com/integrations/vouched-id-verification) for more information and detailed installation instructions.
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *

@@ -4,9 +4,7 @@
  * @gallery true
  * @category marketplace
  *
- * Onfido digitally prove people’s real identities using a photo ID and facial biometrics. So your users can verify themselves anywhere, anytime. By leveraging Onfido with Auth0, we enable organizations to know who their digital user are, tied to a real identity, during authentication, onboarding, other high-risk actions.
- *
- * This rule will redirect to a custom application you build implementing one of the Onfido Input Capture SDKs. More info: https://developers.onfido.com/
+ * Please see the [Onfido integration](https://marketplace.auth0.com/integrations/onfido-identity-verification) for more information and detailed installation instructions.
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *

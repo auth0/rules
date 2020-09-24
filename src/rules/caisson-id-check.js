@@ -4,7 +4,7 @@
  * @gallery true
  * @category marketplace
  *
- * Pairing Auth0 with Caisson ID Check adds real time and seamless ID validation, letting you reliably know who your customers are as they register or login to your apps.
+ * Please see the [Caisson integration](https://marketplace.auth0.com/integrations/caisson-id-check) for more information and detailed installation instructions.
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
