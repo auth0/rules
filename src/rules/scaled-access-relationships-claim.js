@@ -4,29 +4,7 @@
 * @gallery true
 * @category marketplace
 *
-* This rule adds a claim to the access token based on relationships the subject has in Scaled Access.
-*
-* Example of a resulting claim:
-* ```
-* "https://example.com/relationships": [
-*    {
-*      "relationshipType": "is_admin_of",
-*      "to": {
-*        "id": "c7b134f9-28a2-4dcc-b345-affa18977ddf",
-*        "type": "subscription"
-*      }
-*    },
-*    {
-*      "relationshipType": "is_sports_member_of",
-*      "to": {
-*        "id": "affa18977ddf-4dcc-b345-c7b134f9-28a2",
-*        "type": "subscription"
-*      }
-*    }
-* ]
-* ```
-* This is done through an API call to Scaled Access' Relationship Management API using a machine-to-machine token.
-* More info can be found at https://docs.scaledaccess.com/?path=integration-with-auth0
+* Please see the [Scaled Access integration](https://marketplace.auth0.com/integrations/scaled-access) for more information and detailed installation instructions.
 *
 * **Required configuration** (this Rule will be skipped if any of the below are not defined):
 *

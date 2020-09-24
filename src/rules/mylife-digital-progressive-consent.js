@@ -4,7 +4,7 @@
 * @gallery true
 * @category marketplace
 *
-* Consentric provides an integration with Auth0 to include collection of consent as part of the login flow.
+* Please see the [MyLife Digital integration](https://marketplace.auth0.com/integrations/mylife-digital-progressive-consent) for more information and detailed installation instructions.
 
 * **Required configuration** (this Rule will be skipped if any of the below are not defined):
 *
