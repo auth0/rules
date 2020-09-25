@@ -12,23 +12,25 @@
  *
  */
 
-function (user, context, callback) {
-
+function guardianMultifactorStepUpAuthentication(user, context, callback) {
   // This rule initiates multi-factor authenticaiton as a second factor
   // whenever the request contains the following value:
-  // 
+  //
   // acr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor'
-  // 
+  //
   // and multi-factor authentication has not already been completed in the
   // current session/
-  
-  if (context.request.query.acr_values === 'http://schemas.openid.net/pape/policies/2007/06/multi-factor' && !context.authentication.methods.some(method => method.name === 'mfa')) {
-  
-  	context.multifactor = {
-        provider: 'any',
-        allowRememberBrowser: false,
-      };
-    }
+
+  if (
+    context.request.query.acr_values ===
+      "http://schemas.openid.net/pape/policies/2007/06/multi-factor" &&
+    !context.authentication.methods.some((method) => method.name === "mfa")
+  ) {
+    context.multifactor = {
+      provider: "any",
+      allowRememberBrowser: false,
+    };
+  }
 
   callback(null, user, context);
 }
