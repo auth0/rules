@@ -33,10 +33,11 @@ We appreciate feedback and contribution to this repo! Before you get started, pl
 - [Auth0's general contribution guidelines](https://github.com/auth0/.github/blob/master/CONTRIBUTING.md)
 - [Auth0's code of conduct guidelines](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
 
-If you're considering developing a new Rule template, please submit an [Issue](https://github.com/auth0/rules/issues) to discuss with our team. If you'd like to write an integration for the [Auth0 Marketplace](https://marketplace.auth0.com/), [see our Partners page](https://auth0.com/partners) to get started.
+If you're considering developing a new Rule template, please submit an [Issue](https://github.com/auth0/rules/issues) to discuss with our team. If you'd like to write an integration for the [Auth0 Marketplace](https://marketplace.auth0.com/), please see our [Partners page](https://auth0.com/partners) to get started.
 
-0. Read the [Contributing guidelines above](#contributing) before getting started
-1. Make your changes in the the `src/rules/*.js` files, including the metadata at the top:
+0. Read the **Contributing** guidelines above
+1. Make your changes in `src/rules` by changing an existing template or by adding a new file for a new template
+2. If you're adding a new Rule, include the following metadata at the top:
   - `@title` 3-5 word title of the rule
   - `@overview` brief, one-sentence description of the rule.
   - `@gallery` set to `true`
@@ -54,7 +55,7 @@ If you're considering developing a new Rule template, please submit an [Issue](h
 
 ## Vulnerability Reporting
 
-Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
+Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
 
 ## What is Auth0?
 
@@ -71,4 +72,4 @@ Auth0 helps you to easily:
 
 ## License
 
-The Auth0-PHP SDK is licensed under MIT - [LICENSE](LICENSE)
+These Rule templates are licensed under MIT - [LICENSE](LICENSE)
