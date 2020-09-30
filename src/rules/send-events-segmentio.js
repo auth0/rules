@@ -13,16 +13,16 @@
  */
 
 function sendEventsToSegmentIo(user, context, callback) {
-  if (context.protocol === 'delegation') {
+  if (context.protocol === "delegation") {
     return callback(null, user, context);
   }
 
-  const request = require('request');
+  const request = require("request");
 
   if (context.stats.loginsCount > 1) {
-    sendEvent('Logged in');
+    sendEvent("Logged in");
   } else {
-    sendEvent('Signed up');
+    sendEvent("Signed up");
   }
 
   function sendEvent(e) {
@@ -41,13 +41,13 @@ function sendEventsToSegmentIo(user, context, callback) {
     // Segment API returns 200 OK for all its request. For possible errors
     // you must use Segment's Debugger (https://segment.com/docs/libraries/http/#errors)
     request({
-      method: 'POST',
-      url: 'https://api.segment.io/v1/track',
+      method: "POST",
+      url: "https://api.segment.io/v1/track",
       headers: {
-        'Content-type' : 'application/json',
-        'Authorization': 'Basic ' + Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ':').toString('base64')
+        "Content-type": "application/json",
+        Authorization: "Basic " + Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ":").toString("base64")
       },
-      body: JSON.stringify(sioTrack),
+      body: JSON.stringify(sioTrack)
     });
   }
 

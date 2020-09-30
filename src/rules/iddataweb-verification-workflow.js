@@ -19,19 +19,9 @@
  */
 
 async function iddatawebVerificationWorkflow(user, context, callback) {
+  const { IDDATAWEB_BASE_URL, IDDATAWEB_CLIENT_ID, IDDATAWEB_CLIENT_SECRET, IDDATAWEB_ALWAYS_VERIFY } = configuration;
 
-  const {
-    IDDATAWEB_BASE_URL,
-    IDDATAWEB_CLIENT_ID,
-    IDDATAWEB_CLIENT_SECRET,
-    IDDATAWEB_ALWAYS_VERIFY,
-  } = configuration;
-
-  if (
-    !IDDATAWEB_BASE_URL ||
-    !IDDATAWEB_CLIENT_ID ||
-    !IDDATAWEB_CLIENT_SECRET
-  ) {
+  if (!IDDATAWEB_BASE_URL || !IDDATAWEB_CLIENT_ID || !IDDATAWEB_CLIENT_SECRET) {
     console.log("Missing required configuration. Skipping.");
     return callback(null, user, context);
   }
@@ -40,15 +30,9 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
   const axiosClient = require("axios@0.19.2");
   const url = require("url");
 
-  const ruleUtils = new Auth0RedirectRuleUtilities(
-    user,
-    context,
-    configuration
-  );
+  const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
 
-  const idwBasicAuth = Buffer.from(
-    IDDATAWEB_CLIENT_ID + ":" + IDDATAWEB_CLIENT_SECRET
-  ).toString("base64");
+  const idwBasicAuth = Buffer.from(IDDATAWEB_CLIENT_ID + ":" + IDDATAWEB_CLIENT_SECRET).toString("base64");
 
   const idwTokenNamepsace = "https://iddataweb.com/";
   const idwTokenEndpoint = `${IDDATAWEB_BASE_URL}/axn/oauth2/token`;
@@ -59,10 +43,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
   iddataweb.verificationResult = iddataweb.verificationResult || {};
 
   // if the user is already verified and we don't need to check, exit
-  if (
-    iddataweb.verificationResult.policyDecision === "approve" &&
-    IDDATAWEB_ALWAYS_VERIFY !== "true"
-  ) {
+  if (iddataweb.verificationResult.policyDecision === "approve" && IDDATAWEB_ALWAYS_VERIFY !== "true") {
     console.log("user " + user.user_id + " has been previously verified.");
     return callback(null, user, context);
   }
@@ -74,22 +55,18 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     const formParams = new url.URLSearchParams({
       grant_type: "authorization_code",
       code: ruleUtils.queryParams.code,
-      redirect_uri: auth0ContinueUrl,
+      redirect_uri: auth0ContinueUrl
     });
 
     const headers = {
       "Content-Type": "application/x-www-form-urlencoded",
       "Cache-Control": "no-cache",
-      Authorization: `Basic ${idwBasicAuth}`,
+      Authorization: `Basic ${idwBasicAuth}`
     };
 
     let decodedToken;
     try {
-      const tokenResponse = await axiosClient.post(
-        idwTokenEndpoint,
-        formParams.toString(),
-        { headers }
-      );
+      const tokenResponse = await axiosClient.post(idwTokenEndpoint, formParams.toString(), { headers });
 
       if (tokenResponse.data.error) {
         throw new Error(tokenResponse.data.error_description);
@@ -101,10 +78,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     }
 
     //check issuer, audience and experiation of ID DataWeb Token
-    if (
-      decodedToken.iss !== IDDATAWEB_BASE_URL ||
-      decodedToken.aud !== IDDATAWEB_CLIENT_ID
-    ) {
+    if (decodedToken.iss !== IDDATAWEB_BASE_URL || decodedToken.aud !== IDDATAWEB_CLIENT_ID) {
       return callback(new Error("ID token invalid."));
     }
 
@@ -118,7 +92,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     iddataweb.verificationResult = {
       policyDecision: decodedToken.policyDecision,
       transactionid: decodedToken.jti,
-      iat: decodedToken.iat,
+      iat: decodedToken.iat
     };
 
     try {
@@ -128,8 +102,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
     }
 
     //include ID DataWeb results in Auth0 ID Token
-    context.idToken[idwTokenNamepsace + "policyDecision"] =
-      decodedToken.policyDecision;
+    context.idToken[idwTokenNamepsace + "policyDecision"] = decodedToken.policyDecision;
     context.idToken[idwTokenNamepsace + "transactionId"] = decodedToken.jti;
     context.idToken[idwTokenNamepsace + "iat"] = decodedToken.iat;
 
@@ -148,7 +121,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
 
   if (ruleUtils.canRedirect) {
     context.redirect = {
-      url: idwRedirectUrl,
+      url: idwRedirectUrl
     };
   }
 

@@ -17,32 +17,35 @@ function sendMailgunEmail(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const request = require('request');
+  const request = require("request");
 
-  request.post( {
-    url: 'https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages',
-      auth:
-      {
-        user: 'api',
+  request.post(
+    {
+      url: "https://api.mailgun.net/v3/{YOUR MAILGUN ACCOUNT}/messages",
+      auth: {
+        user: "api",
         pass: configuration.MAILGUN_API_KEY
       },
-    form: {
-      'to': 'admin@example.com',
-      'subject': 'NEW SIGNUP',
-      'from': 'admin@example.com',
-      'text': 'We have got a new sign up from: ' + user.email + '.'
-    }
-  }, function(err, response, body) {
-    if (err) return callback(err);
-    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
+      form: {
+        to: "admin@example.com",
+        subject: "NEW SIGNUP",
+        from: "admin@example.com",
+        text: "We have got a new sign up from: " + user.email + "."
+      }
+    },
+    function (err, response, body) {
+      if (err) return callback(err);
+      if (response.statusCode !== 200) return callback(new Error("Invalid operation"));
 
-    user.app_metadata.signedUp = true;
-    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function(){
-        callback(null, user, context);
-      })
-      .catch(function(err){
-        callback(err);
-      });
-  });
+      user.app_metadata.signedUp = true;
+      auth0.users
+        .updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function () {
+          callback(null, user, context);
+        })
+        .catch(function (err) {
+          callback(err);
+        });
+    }
+  );
 }

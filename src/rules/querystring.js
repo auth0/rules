@@ -15,8 +15,8 @@
  */
 
 function useQuerystring(user, context, callback) {
-  if (context.request.query.some_querystring === 'whatever') {
-    context.idToken['https://example.com/new_attribute'] = 'foo';
+  if (context.request.query.some_querystring === "whatever") {
+    context.idToken["https://example.com/new_attribute"] = "foo";
   }
 
   callback(null, user, context);

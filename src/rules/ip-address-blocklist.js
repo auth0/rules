@@ -8,13 +8,13 @@
  */
 
 function ipAddressBlocklist(user, context, callback) {
-  const blocklist = ['1.2.3.4', '2.3.4.5'];  // unauthorized IPs
+  const blocklist = ["1.2.3.4", "2.3.4.5"]; // unauthorized IPs
   const notAuthorized = blocklist.some(function (ip) {
     return context.request.ip === ip;
   });
 
   if (notAuthorized) {
-    return callback(new UnauthorizedError('Access denied from this IP address.'));
+    return callback(new UnauthorizedError("Access denied from this IP address."));
   }
 
   return callback(null, user, context);
