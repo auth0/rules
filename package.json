@@ -5,8 +5,9 @@
   "main": "./rules",
   "scripts": {
     "validate": "node validator.js",
-    "build": "npm run format && node build && npm run validate",
+    "build": "node build && npm run validate",
     "format": "prettier --write src/rules",
+    "release": "npm run format && npm test && npm run build",
     "deploy": "node deploy.js",
     "test": "jest"
   },
