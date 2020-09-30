@@ -11,10 +11,10 @@
  */
 
 function trackLoginInMixPanel(user, context, callback) {
-  const request = require("request");
+  const request = require('request');
 
   const mpEvent = {
-    event: "Sign In",
+    event: 'Sign In',
     properties: {
       distinct_id: user.user_id,
       token: configuration.MIXPANEL_API_TOKEN,
@@ -22,11 +22,11 @@ function trackLoginInMixPanel(user, context, callback) {
     }
   };
 
-  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString("base64");
+  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');
 
   request.get(
     {
-      url: "http://api.mixpanel.com/track/",
+      url: 'http://api.mixpanel.com/track/',
       qs: {
         data: base64Event
       }

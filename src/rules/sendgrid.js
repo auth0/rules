@@ -18,24 +18,24 @@ function sendEmailWithSendgrid(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const request = require("request");
+  const request = require('request');
 
   request.post(
     {
-      url: "https://api.sendgrid.com/api/mail.send.json",
+      url: 'https://api.sendgrid.com/api/mail.send.json',
       headers: {
-        Authorization: "Bearer " + configuration.SENDGRID_API_KEY
+        Authorization: 'Bearer ' + configuration.SENDGRID_API_KEY
       },
       form: {
-        to: "admin@example.com",
-        subject: "NEW SIGNUP",
-        from: "admin@example.com",
-        text: "We have got a new sign up from: " + user.email + "."
+        to: 'admin@example.com',
+        subject: 'NEW SIGNUP',
+        from: 'admin@example.com',
+        text: 'We have got a new sign up from: ' + user.email + '.'
       }
     },
     function (error, response, body) {
       if (error) return callback(error);
-      if (response.statusCode !== 200) return callback(new Error("Invalid operation"));
+      if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
 
       user.app_metadata.signedUp = true;
       auth0.users

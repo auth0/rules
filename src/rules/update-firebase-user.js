@@ -13,11 +13,11 @@
  */
 
 function updateFirebaseUser(user, context, callback) {
-  const request = require("request");
+  const request = require('request');
 
   const baseURL = configuration.FIREBASE_URL;
   const secret = configuration.FIREBASE_SECRET;
-  const fb_id = Buffer.from(user.user_id).toString("base64");
+  const fb_id = Buffer.from(user.user_id).toString('base64');
 
   const fbIdentity = {
     identity: {
@@ -29,7 +29,7 @@ function updateFirebaseUser(user, context, callback) {
     }
   };
 
-  const putURL = baseURL + "/users/" + fb_id + ".json?auth=" + secret;
+  const putURL = baseURL + '/users/' + fb_id + '.json?auth=' + secret;
   request.put(
     {
       url: putURL,

@@ -9,15 +9,15 @@
  */
 
 async function addShopifyUser(user, context, callback) {
-  const fetch = require("node-fetch@2.6.0");
+  const fetch = require('node-fetch@2.6.0');
 
   try {
     const res = await fetch(
       `https://${configuration.SHOPIFY_API_KEY}:${configuration.SHOPIFY_API_PWD}@${configuration.SHOPIFY_API_URL}/admin/api/2020-04/customers.json`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           customer: {

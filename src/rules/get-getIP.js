@@ -16,7 +16,7 @@ function getIp(user, context, callback) {
   auth0.users
     .updateUserMetadata(user.user_id, user.user_metadata)
     .then(() => {
-      context.idToken["https://example.com/geoip"] = context.request.geoip;
+      context.idToken['https://example.com/geoip'] = context.request.geoip;
       callback(null, user, context);
     })
     .catch((err) => {

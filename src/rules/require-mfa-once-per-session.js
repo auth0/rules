@@ -11,14 +11,14 @@
  */
 
 function requireMfaOncePerSession(user, context, callback) {
-  const completedMfa = !!context.authentication.methods.find((method) => method.name === "mfa");
+  const completedMfa = !!context.authentication.methods.find((method) => method.name === 'mfa');
 
   if (completedMfa) {
     return callback(null, user, context);
   }
 
   context.multifactor = {
-    provider: "any",
+    provider: 'any',
     allowRememberBrowser: false
   };
 

@@ -19,7 +19,7 @@ function multifactorAuthentication(user, context, callback) {
 
   // if (<condition>) {
   context.multifactor = {
-    provider: "any",
+    provider: 'any',
 
     // optional, defaults to true. Set to false to force authentication every time.
     // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details

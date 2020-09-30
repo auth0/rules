@@ -9,26 +9,26 @@
  */
 
 function dropboxWhitelist(user, context, callback) {
-  const request = require("request");
+  const request = require('request');
 
   // Access should only be granted to verified users.
   if (!user.email || !user.email_verified) {
-    return callback(new UnauthorizedError("Access denied."));
+    return callback(new UnauthorizedError('Access denied.'));
   }
 
   request.get(
     {
-      url: "https://dl.dropboxusercontent.com/u/12345678/email_list.txt"
+      url: 'https://dl.dropboxusercontent.com/u/12345678/email_list.txt'
     },
     (err, response, body) => {
-      const whitelist = body.split("\n");
+      const whitelist = body.split('\n');
 
       const userHasAccess = whitelist.some(function (email) {
         return email === user.email;
       });
 
       if (!userHasAccess) {
-        return callback(new UnauthorizedError("Access denied."));
+        return callback(new UnauthorizedError('Access denied.'));
       }
 
       callback(null, user, context);

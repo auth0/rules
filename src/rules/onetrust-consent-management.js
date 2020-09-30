@@ -18,31 +18,31 @@
  */
 /* global configuration */
 async function oneTrustConsentManagement(user, context, callback) {
-  const axios = require("axios@0.19.2");
+  const axios = require('axios@0.19.2');
 
   const { ONETRUST_REQUEST_INFORMATION, ONETRUST_CONSENT_API_URL, ONETRUST_PURPOSE_ID } = configuration;
 
   if (!ONETRUST_REQUEST_INFORMATION || !ONETRUST_CONSENT_API_URL || !ONETRUST_PURPOSE_ID) {
-    console.log("Missing required configuration. Skipping.");
+    console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
   }
 
-  const skipIfNoEmail = configuration.ONETRUST_SKIP_IF_NO_EMAIL === "true";
+  const skipIfNoEmail = configuration.ONETRUST_SKIP_IF_NO_EMAIL === 'true';
 
   user.app_metadata = user.app_metadata || {};
   let onetrust = user.app_metadata.onetrust || {};
 
   if (onetrust.receipt) {
-    console.log("User has a Collection Point receipt. Skipping.");
+    console.log('User has a Collection Point receipt. Skipping.');
     return callback(null, user, context);
   }
 
   if (!user.email) {
     if (skipIfNoEmail) {
-      console.log("User has no email address. Skipping.");
+      console.log('User has no email address. Skipping.');
       return callback(null, user, context);
     }
-    return callback(new Error("An email address is required."));
+    return callback(new Error('An email address is required.'));
   }
 
   try {
@@ -53,14 +53,14 @@ async function oneTrustConsentManagement(user, context, callback) {
     });
     onetrust.receipt = response.data.receipt;
   } catch (error) {
-    console.log("Error calling the Collection Point.");
+    console.log('Error calling the Collection Point.');
     return callback(error);
   }
 
   try {
     await auth0.users.updateAppMetadata(user.user_id, { onetrust });
   } catch (error) {
-    console.log("Error updating user app_metadata.");
+    console.log('Error updating user app_metadata.');
     return callback(error);
   }
 

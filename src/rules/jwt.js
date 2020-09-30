@@ -8,7 +8,7 @@
  */
 
 function generateJwt(user, context, callback) {
-  const jwt = require("jsonwebtoken");
+  const jwt = require('jsonwebtoken');
   const CLIENT_SECRET = configuration.TARGET_API_CLIENT_SECRET;
   const CLIENT_ID = configuration.TARGET_API_CLIENT_ID;
 
@@ -21,12 +21,12 @@ function generateJwt(user, context, callback) {
 
   const options = {
     subject: user.user_id,
-    expiresIn: "10h", //Should be greater than the SAML token expiration
+    expiresIn: '10h', //Should be greater than the SAML token expiration
     audience: CLIENT_ID,
-    issuer: "https://{your auth0 account}.auth0.com"
+    issuer: 'https://{your auth0 account}.auth0.com'
   };
 
-  context.idToken["https://example.com/id_token"] = jwt.sign(api_user, Buffer.from(CLIENT_SECRET, "base64"), options);
+  context.idToken['https://example.com/id_token'] = jwt.sign(api_user, Buffer.from(CLIENT_SECRET, 'base64'), options);
 
   callback(null, user, context);
 }

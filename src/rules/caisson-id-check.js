@@ -23,11 +23,11 @@ async function caissonIDCheck(user, context, callback) {
     !configuration.CAISSON_PRIVATE_KEY ||
     !configuration.CAISSON_LOGIN_FREQUENCY_DAYS
   ) {
-    console.log("Missing required configuration. Skipping.");
+    console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
   }
 
-  const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
+  const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
 
   //copy off the config obj so we can use our own private key for session token signing.
   let caissonConf = JSON.parse(JSON.stringify(configuration));
@@ -44,11 +44,11 @@ async function caissonIDCheck(user, context, callback) {
       login_frequency_days: parseInt(caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS, 10)
     },
     caissonHosts: {
-      idcheck: "https://id.caisson.com",
-      api: "https://api.caisson.com",
-      dashboard: "https://www.caisson.com"
+      idcheck: 'https://id.caisson.com',
+      api: 'https://api.caisson.com',
+      dashboard: 'https://www.caisson.com'
     },
-    axios: require("axios@0.19.2"),
+    axios: require('axios@0.19.2'),
     util: new Auth0RedirectRuleUtilities(user, context, caissonConf)
   };
 
@@ -92,7 +92,7 @@ async function caissonIDCheck(user, context, callback) {
   async function exchangeToken() {
     try {
       let resp = await manager.axios.post(
-        manager.caissonHosts.api + "/v1/idcheck/exchangetoken",
+        manager.caissonHosts.api + '/v1/idcheck/exchangetoken',
         { check_exchange_token: manager.util.queryParams.t },
         {
           headers: {
@@ -106,7 +106,7 @@ async function caissonIDCheck(user, context, callback) {
       let err = error;
       if (err.response && err.response.status === 401) {
         err = new UnauthorizedError(
-          "Invalid private key.  See your API credentials at https://www.caisson.com/developer ."
+          'Invalid private key.  See your API credentials at https://www.caisson.com/developer .'
         );
       }
       throw err;
@@ -120,15 +120,15 @@ async function caissonIDCheck(user, context, callback) {
    */
   async function idCheckResults(check_id) {
     try {
-      let resp = await manager.axios.get(manager.caissonHosts.api + "/v1/idcheck", {
+      let resp = await manager.axios.get(manager.caissonHosts.api + '/v1/idcheck', {
         headers: {
           Authorization: `Caisson ${manager.creds.private_key}`,
-          "X-Caisson-CheckID": check_id
+          'X-Caisson-CheckID': check_id
         }
       });
 
       if (resp.data.error) {
-        throw new Error("Error in Caisson ID Check: " + JSON.stringify(resp.data));
+        throw new Error('Error in Caisson ID Check: ' + JSON.stringify(resp.data));
       }
 
       let results = {
@@ -146,7 +146,7 @@ async function caissonIDCheck(user, context, callback) {
       let err = error;
       if (err.response && err.response.status === 401) {
         err = new UnauthorizedError(
-          "Invalid private key.  See your API credentials at https://www.caisson.com/developer ."
+          'Invalid private key.  See your API credentials at https://www.caisson.com/developer .'
         );
       }
 
@@ -160,10 +160,10 @@ async function caissonIDCheck(user, context, callback) {
    */
   function validateIDCheck(results) {
     const IDCheckTTL = 20 * 60 * 1000; //20 mins
-    if (results.auth0_id !== user.user_id + "__" + manager.util.queryParams.state) {
-      throw new UnauthorizedError("ID mismatch. Caisson: %o, Auth0: %o", results.auth0_id, user.user_id);
+    if (results.auth0_id !== user.user_id + '__' + manager.util.queryParams.state) {
+      throw new UnauthorizedError('ID mismatch. Caisson: %o, Auth0: %o', results.auth0_id, user.user_id);
     } else if (Date.now() - Date.parse(results.timestamp) > IDCheckTTL) {
-      throw new UnauthorizedError("ID Check too old.");
+      throw new UnauthorizedError('ID Check too old.');
     }
   }
 
@@ -175,7 +175,7 @@ async function caissonIDCheck(user, context, callback) {
     user.app_metadata = user.app_metadata || {};
     let caisson = user.app_metadata.caisson || {};
 
-    caisson.idcheck_url = manager.caissonHosts.dashboard + "/request/" + results.check_id;
+    caisson.idcheck_url = manager.caissonHosts.dashboard + '/request/' + results.check_id;
     caisson.status = results.status;
     caisson.last_check = Date.now();
     caisson.count = caisson.count ? caisson.count + 1 : 1;
@@ -202,7 +202,7 @@ async function caissonIDCheck(user, context, callback) {
 
     try {
       if (!manager.util.queryParams.t) {
-        throw new Error("Missing Caisson exchange key");
+        throw new Error('Missing Caisson exchange key');
       }
 
       const check_id = await exchangeToken();
@@ -210,8 +210,8 @@ async function caissonIDCheck(user, context, callback) {
       await updateUser(results);
 
       //deny the login if the ID Check is flagged
-      if (results.status === "flagged") {
-        throw new UnauthorizedError("ID Check flagged.");
+      if (results.status === 'flagged') {
+        throw new UnauthorizedError('ID Check flagged.');
       }
     } catch (err) {
       dLog(err);
@@ -229,7 +229,7 @@ async function caissonIDCheck(user, context, callback) {
   try {
     if (isNaN(manager.idCheckFlags.login_frequency_days)) {
       //Do nothing.  Skip if no preference is set.
-    } else if (!user.app_metadata.caisson.last_check || user.app_metadata.caisson.status !== "passed") {
+    } else if (!user.app_metadata.caisson.last_check || user.app_metadata.caisson.status !== 'passed') {
       //Always perform the first ID Check or if the
       //last ID Check didn't pass.
       setIDCheckRedirect();

@@ -9,28 +9,28 @@
  */
 
 function fraudPrevention(user, context, callback) {
-  const querystring = require("querystring");
-  const request = require("request");
-  const crypto = require("crypto");
+  const querystring = require('querystring');
+  const request = require('request');
+  const crypto = require('crypto');
 
-  const MINFRAUD_API = "https://minfraud.maxmind.com/app/ccv2r";
+  const MINFRAUD_API = 'https://minfraud.maxmind.com/app/ccv2r';
 
   const data = {
     i: context.request.ip,
     user_agent: context.request.userAgent,
     license_key: configuration.MINFRAUD_LICENSE_KEY,
-    emailMD5: (user.email && crypto.createHash("md5").update(user.email).digest("hex")) || null,
-    usernameMD5: (user.username && crypto.createHash("md5").update(user.username).digest("hex")) || null
+    emailMD5: (user.email && crypto.createHash('md5').update(user.email).digest('hex')) || null,
+    usernameMD5: (user.username && crypto.createHash('md5').update(user.username).digest('hex')) || null
   };
 
   request.post(MINFRAUD_API, { form: data, timeout: 3000 }, (err, res, body) => {
     if (!err && res.statusCode === 200) {
-      const result = querystring.parse(body, ";");
+      const result = querystring.parse(body, ';');
 
       console.log(`Fraud response: ${JSON.stringify(result, null, 2)}`);
 
       if (result.riskScore && result.riskScore * 100 > 20) {
-        return callback(new UnauthorizedError("Fraud prevention!"));
+        return callback(new UnauthorizedError('Fraud prevention!'));
       }
     }
 
