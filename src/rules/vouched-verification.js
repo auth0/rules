@@ -29,7 +29,11 @@ async function vouchedVerification(user, context, callback) {
   const url = require('url');
   const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
 
-  const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
+  const ruleUtils = new Auth0RedirectRuleUtilities(
+    user,
+    context,
+    configuration
+  );
 
   const defaultApiUrl = 'https://verify.vouched.id/api';
   const defaultUiUrl = 'https://i.vouched.id';
@@ -54,7 +58,13 @@ async function vouchedVerification(user, context, callback) {
     return items[0];
   };
 
-  const createPacket = async (apiKey, publicKey, continueUrl, user, apiUrl = defaultApiUrl) => {
+  const createPacket = async (
+    apiKey,
+    publicKey,
+    continueUrl,
+    user,
+    apiUrl = defaultApiUrl
+  ) => {
     const requestBody = {
       pk: publicKey,
       uid: user.user_id,
@@ -84,7 +94,11 @@ async function vouchedVerification(user, context, callback) {
 
   const isJobForUser = (job, userId) => {
     try {
-      return job.request.properties.filter((prop) => prop.name === 'uid' && prop.value === userId).length === 1;
+      return (
+        job.request.properties.filter(
+          (prop) => prop.name === 'uid' && prop.value === userId
+        ).length === 1
+      );
     } catch (e) {
       return false;
     }
@@ -123,11 +137,17 @@ async function vouchedVerification(user, context, callback) {
     const jobToken = ruleUtils.queryParams.jobToken;
     if (ruleUtils.isRedirectCallback && jobToken) {
       // get job from API
-      const job = await getJob(configuration.VOUCHED_API_KEY, jobToken, vouchedApiUrl);
+      const job = await getJob(
+        configuration.VOUCHED_API_KEY,
+        jobToken,
+        vouchedApiUrl
+      );
 
       // check if job's user is the same as current user
       if (!isJobForUser(job, user.user_id)) {
-        return callback(new Error(`The ID Verification results do not belong to this user.`));
+        return callback(
+          new Error(`The ID Verification results do not belong to this user.`)
+        );
       }
 
       // update app metadata w/ results
@@ -139,11 +159,17 @@ async function vouchedVerification(user, context, callback) {
     if (vouchedResults) {
       if (!isJobVerified(vouchedResults)) {
         // user failed id verification
-        const mostRecentJob = await getJob(configuration.VOUCHED_API_KEY, jobToken, vouchedApiUrl);
+        const mostRecentJob = await getJob(
+          configuration.VOUCHED_API_KEY,
+          jobToken,
+          vouchedApiUrl
+        );
 
         // check if job's user is the same as current user
         if (!isJobForUser(mostRecentJob, user.user_id)) {
-          return callback(new Error(`The ID Verification results do not belong to this user.`));
+          return callback(
+            new Error(`The ID Verification results do not belong to this user.`)
+          );
         }
 
         // user is now verified, update app metadata

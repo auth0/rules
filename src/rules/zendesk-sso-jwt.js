@@ -28,7 +28,10 @@ function zendeskSsoWithJwt(user, context, callback) {
 
   const zendesk_token = jwt.sign(payload, configuration.ZENDESK_JWT_SECRET);
   context.idToken['https://example.com/zendesk_jwt_url'] =
-    'https://' + ZENDESK_SUBDOMAIN + '.zendesk.com/access/jwt?jwt=' + zendesk_token;
+    'https://' +
+    ZENDESK_SUBDOMAIN +
+    '.zendesk.com/access/jwt?jwt=' +
+    zendesk_token;
 
   callback(null, user, context);
 }

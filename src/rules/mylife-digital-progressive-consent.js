@@ -22,7 +22,11 @@ function consentricProgressiveConsent(user, context, callback) {
   const moment = require('moment@2.11.2');
   const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
 
-  const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
+  const ruleUtils = new Auth0RedirectRuleUtilities(
+    user,
+    context,
+    configuration
+  );
 
   const asMilliSeconds = (seconds) => seconds * 1000;
 
@@ -61,7 +65,8 @@ function consentricProgressiveConsent(user, context, callback) {
 
   // Returns Consentric API Access Token (JWT) from either the global cache or generates it anew from clientId and secret
   const getConsentricApiAccessToken = async () => {
-    const consentricApiTokenNotValid = !global.consentricApiToken || global.consentricApiToken.exp < Date.now();
+    const consentricApiTokenNotValid =
+      !global.consentricApiToken || global.consentricApiToken.exp < Date.now();
 
     if (consentricApiTokenNotValid) {
       try {
@@ -119,10 +124,14 @@ function consentricProgressiveConsent(user, context, callback) {
   };
 
   // Function to retrieve Consentric User Token from User Metadata
-  const getConsentricUserTokenFromMetadata = (user) => user.app_metadata && user.app_metadata.consentric;
+  const getConsentricUserTokenFromMetadata = (user) =>
+    user.app_metadata && user.app_metadata.consentric;
 
   // Generates On Demand Consentric User Token for the given User using the API Access Token
-  const generateConsentricUserAccessToken = async ({ userRef, apiAccessToken }) => {
+  const generateConsentricUserAccessToken = async ({
+    userRef,
+    apiAccessToken
+  }) => {
     try {
       console.log(`Attempting to generate access token API for ${userRef}`);
 
@@ -155,7 +164,10 @@ function consentricProgressiveConsent(user, context, callback) {
   const loadConsentricUserAccessToken = async ({ user }) => {
     try {
       const metadataUserToken = getConsentricUserTokenFromMetadata(user);
-      if (metadataUserToken && moment(metadataUserToken.exp).subtract(1, 'days').isAfter(moment()))
+      if (
+        metadataUserToken &&
+        moment(metadataUserToken.exp).subtract(1, 'days').isAfter(moment())
+      )
         return metadataUserToken;
 
       const { jwt: apiAccessToken } = await getConsentricApiAccessToken();
@@ -168,14 +180,20 @@ function consentricProgressiveConsent(user, context, callback) {
       await createCitizen(apiCredentials);
 
       // Generate an On Demand Access Token for the created citizen
-      const generatedToken = await generateConsentricUserAccessToken(apiCredentials);
+      const generatedToken = await generateConsentricUserAccessToken(
+        apiCredentials
+      );
 
       // Persist the app_metadata update
-      await auth0.users.updateAppMetadata(user.user_id, { consentric: generatedToken });
+      await auth0.users.updateAppMetadata(user.user_id, {
+        consentric: generatedToken
+      });
 
       return generatedToken;
     } catch (err) {
-      console.error(`Issue loading Consentric User Access Token for user ${user.user_id} - ${err}`);
+      console.error(
+        `Issue loading Consentric User Access Token for user ${user.user_id} - ${err}`
+      );
       throw err;
     }
   };
@@ -184,7 +202,8 @@ function consentricProgressiveConsent(user, context, callback) {
     try {
       const { token } = await loadConsentricUserAccessToken({ user });
       const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
-      const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
+      const redirectUrl =
+        CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
 
       context.redirect = {
         url: redirectUrl

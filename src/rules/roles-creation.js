@@ -20,7 +20,13 @@ function setRolesToUser(user, context, callback) {
   const addRolesToUser = function (user) {
     const endsWith = '@example.com';
 
-    if (user.email && user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith) {
+    if (
+      user.email &&
+      user.email.substring(
+        user.email.length - endsWith.length,
+        user.email.length
+      ) === endsWith
+    ) {
       return ['admin'];
     }
     return ['user'];

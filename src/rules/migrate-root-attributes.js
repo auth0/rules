@@ -31,14 +31,18 @@ function migrateRootAttributes(user, context, cb) {
       token: auth0.accessToken
     });
 
-    management.updateUser({ id: user.user_id }, generateUserPayload(user), function (err, updatedUser) {
-      if (err) {
-        cb(err);
-      } else {
-        updateRuleUser(user, updatedUser);
-        cb(null, user, context);
+    management.updateUser(
+      { id: user.user_id },
+      generateUserPayload(user),
+      function (err, updatedUser) {
+        if (err) {
+          cb(err);
+        } else {
+          updateRuleUser(user, updatedUser);
+          cb(null, user, context);
+        }
       }
-    });
+    );
   } else {
     cb(null, user, context);
   }
@@ -75,7 +79,12 @@ function migrateRootAttributes(user, context, cb) {
     }
   }
 
-  function generateUserPayloadField(userMetadata, payload, rootField, metadataField) {
+  function generateUserPayloadField(
+    userMetadata,
+    payload,
+    rootField,
+    metadataField
+  ) {
     if (typeof userMetadata[metadataField] === 'string') {
       payload[rootField] = userMetadata[metadataField];
       payload.user_metadata[metadataField] = null;

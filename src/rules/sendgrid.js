@@ -35,7 +35,8 @@ function sendEmailWithSendgrid(user, context, callback) {
     },
     function (error, response, body) {
       if (error) return callback(error);
-      if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
+      if (response.statusCode !== 200)
+        return callback(new Error('Invalid operation'));
 
       user.app_metadata.signedUp = true;
       auth0.users

@@ -1,13 +1,11 @@
 {
-  "printWidth": 120,
+  "printWidth": 80,
   "singleQuote": true,
   "semi": true,
   "tabWidth": 2,
   "useTabs": false,
-  "jsxSingleQuote": false,
   "trailingComma": "none",
   "bracketSpacing": true,
-  "jsxBracketSameLine": false,
   "parser": "typescript",
   "arrowParens": "always"
 }

@@ -29,9 +29,11 @@ function getRolesFromSoapService(user, context, callback) {
 
         const parser = new xmldom.DOMParser();
         const doc = parser.parseFromString(body);
-        const roles = xpath.select("//*[local-name(.)='string']", doc).map(function (node) {
-          return node.textContent;
-        });
+        const roles = xpath
+          .select("//*[local-name(.)='string']", doc)
+          .map(function (node) {
+            return node.textContent;
+          });
         return cb(null, roles);
       }
     );

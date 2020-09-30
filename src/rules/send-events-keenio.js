@@ -37,7 +37,11 @@ function sendEventsToKeen(user, context, callback) {
 
   request.post(
     {
-      url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection,
+      url:
+        'https://api.keen.io/3.0/projects/' +
+        projectId +
+        '/events/' +
+        eventCollection,
       headers: {
         'Content-type': 'application/json',
         Authorization: writeKey
@@ -50,7 +54,11 @@ function sendEventsToKeen(user, context, callback) {
           channel: '#some_channel',
           text: 'KEEN API ERROR',
           fields: {
-            error: error ? error.toString() : response ? response.statusCode + ' ' + body : ''
+            error: error
+              ? error.toString()
+              : response
+              ? response.statusCode + ' ' + body
+              : ''
           }
         });
       }

@@ -39,9 +39,14 @@ function sendMandrillEmail(user, context, callback) {
       ]
     }
   };
-  const mandrill_send_endpoint = 'https://mandrillapp.com/api/1.0/messages/send.json';
+  const mandrill_send_endpoint =
+    'https://mandrillapp.com/api/1.0/messages/send.json';
 
-  request.post({ url: mandrill_send_endpoint, form: body }, function (err, resp, body) {
+  request.post({ url: mandrill_send_endpoint, form: body }, function (
+    err,
+    resp,
+    body
+  ) {
     if (err) {
       return callback(err);
     }

@@ -42,7 +42,9 @@ function generateParseSessionToken(user, context, callback) {
 
       // user was found, add sessionToken to user profile
       if (response.statusCode === 200) {
-        context.idToken['https://example.com/parse_session_token'] = JSON.parse(body).sessionToken;
+        context.idToken['https://example.com/parse_session_token'] = JSON.parse(
+          body
+        ).sessionToken;
         return callback(null, user, context);
       }
 
@@ -66,17 +68,26 @@ function generateParseSessionToken(user, context, callback) {
 
             // user created, add sessionToken to user profile
             if (response.statusCode === 201) {
-              context.idToken['https://example.com/parse_session_token'] = body.sessionToken;
+              context.idToken['https://example.com/parse_session_token'] =
+                body.sessionToken;
               return callback(null, user, context);
             }
             return callback(
-              new Error('The user provisioning returned an unknown error. Body: ' + JSON.stringify(body))
+              new Error(
+                'The user provisioning returned an unknown error. Body: ' +
+                  JSON.stringify(body)
+              )
             );
           }
         );
       } else {
         return callback(
-          new Error('The login returned an unknown error. Status: ' + response.statusCode + ' Body: ' + body)
+          new Error(
+            'The login returned an unknown error. Status: ' +
+              response.statusCode +
+              ' Body: ' +
+              body
+          )
         );
       }
     }

@@ -34,7 +34,10 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
   const { URLSearchParams } = require('url');
 
   const getM2mToken = () => {
-    if (global.scaledAccessM2mToken && global.scaledAccessM2mTokenExpiryInMillis > new Date().getTime() + 60000) {
+    if (
+      global.scaledAccessM2mToken &&
+      global.scaledAccessM2mTokenExpiryInMillis > new Date().getTime() + 60000
+    ) {
       return Promise.resolve(global.scaledAccessM2mToken);
     } else {
       const tokenUrl = `https://${context.request.hostname}/oauth/token`;
@@ -60,7 +63,8 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
         })
         .then(({ access_token, expires_in }) => {
           global.scaledAccessM2mToken = access_token;
-          global.scaledAccessM2mTokenExpiryInMillis = new Date().getTime() + expires_in * 1000;
+          global.scaledAccessM2mTokenExpiryInMillis =
+            new Date().getTime() + expires_in * 1000;
           return access_token;
         });
     }
@@ -89,11 +93,16 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
   };
 
   const getRelationships = (accessToken) => {
-    return callRelationshipManagementApi(accessToken, `actors/user/${user.user_id}/relationships`);
+    return callRelationshipManagementApi(
+      accessToken,
+      `actors/user/${user.user_id}/relationships`
+    );
   };
 
   const addClaimToToken = (apiResponse) => {
-    const claimName = configuration.SCALED_ACCESS_CUSTOMCLAIM || `https://scaledaccess.com/relationships`;
+    const claimName =
+      configuration.SCALED_ACCESS_CUSTOMCLAIM ||
+      `https://scaledaccess.com/relationships`;
     context.accessToken[claimName] = apiResponse.map((relationship) => ({
       relationshipType: relationship.relationshipType,
       to: relationship.to

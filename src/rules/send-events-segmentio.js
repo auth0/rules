@@ -45,7 +45,11 @@ function sendEventsToSegmentIo(user, context, callback) {
       url: 'https://api.segment.io/v1/track',
       headers: {
         'Content-type': 'application/json',
-        Authorization: 'Basic ' + Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ':').toString('base64')
+        Authorization:
+          'Basic ' +
+          Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ':').toString(
+            'base64'
+          )
       },
       body: JSON.stringify(sioTrack)
     });
