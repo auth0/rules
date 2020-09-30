@@ -9,10 +9,10 @@
  */
 
 function defaultPictureForNullAvatars(user, context, callback) {
-  if (user.picture.indexOf('cdn.auth0.com') > -1) {
-    const url = require('url');
+  if (user.picture.indexOf("cdn.auth0.com") > -1) {
+    const url = require("url");
     const u = url.parse(user.picture, true);
-    u.query.d = 'URL_TO_YOUR_DEFAULT_PICTURE_HERE';
+    u.query.d = "URL_TO_YOUR_DEFAULT_PICTURE_HERE";
     delete u.search;
     user.picture = url.format(u);
   }

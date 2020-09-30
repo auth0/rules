@@ -20,17 +20,9 @@
 async function oneTrustConsentManagement(user, context, callback) {
   const axios = require("axios@0.19.2");
 
-  const {
-    ONETRUST_REQUEST_INFORMATION,
-    ONETRUST_CONSENT_API_URL,
-    ONETRUST_PURPOSE_ID,
-  } = configuration;
+  const { ONETRUST_REQUEST_INFORMATION, ONETRUST_CONSENT_API_URL, ONETRUST_PURPOSE_ID } = configuration;
 
-  if (
-    !ONETRUST_REQUEST_INFORMATION ||
-    !ONETRUST_CONSENT_API_URL ||
-    !ONETRUST_PURPOSE_ID
-  ) {
+  if (!ONETRUST_REQUEST_INFORMATION || !ONETRUST_CONSENT_API_URL || !ONETRUST_PURPOSE_ID) {
     console.log("Missing required configuration. Skipping.");
     return callback(null, user, context);
   }
@@ -57,7 +49,7 @@ async function oneTrustConsentManagement(user, context, callback) {
     const response = await axios.post(ONETRUST_CONSENT_API_URL, {
       identifier: user.email,
       requestInformation: ONETRUST_REQUEST_INFORMATION,
-      purposes: [{ Id: ONETRUST_PURPOSE_ID }],
+      purposes: [{ Id: ONETRUST_PURPOSE_ID }]
     });
     onetrust.receipt = response.data.receipt;
   } catch (error) {

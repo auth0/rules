@@ -13,7 +13,7 @@
  */
 
 function generateApperySessionToken(user, context, callback) {
-  const request = require('request');
+  const request = require("request");
 
   // run this only for the Appery.io application
   // if (context.clientID !== 'APPERYIO CLIENT ID IN AUTH0') return callback(null, user, context);
@@ -22,53 +22,56 @@ function generateApperySessionToken(user, context, callback) {
   const PASSWORD_SECRET = configuration.APPERYIO_PASSWORD_SECRET; // you can use this to generate one http://www.random.org/strings/
   const username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db
 
-  request.get({
-    url: 'https://api.appery.io/rest/1/db/login',
-    qs: {
-      username: username,
-      password: PASSWORD_SECRET
-    },
-    headers: {
-      'X-Appery-Database-Id': APPERYIO_DATABASE_ID
-    },
-    json: true
-  },
-  (err, response, body) => {
-    if (err) return callback(err);
-
-    // user was found, add sessionToken to user profile
-    if (response.statusCode === 200) {
-      context.idToken['https://example.com/apperyio_session_token'] = body.sessionToken;
-      context.idToken['https://example.com/apperyio_user_id'] = body._id;
-      return callback(null, user, context);
-    }
-
-    // user don't exist, create it
-    if (response.statusCode === 404) {
-      console.log('not found');
-      request.post({
-        url: 'https://api.appery.io/rest/1/db/users',
-        json: {
-          username: username,
-          password: PASSWORD_SECRET
-        },
-        headers: {
-          'X-Appery-Database-Id': APPERYIO_DATABASE_ID
-        }
+  request.get(
+    {
+      url: "https://api.appery.io/rest/1/db/login",
+      qs: {
+        username: username,
+        password: PASSWORD_SECRET
       },
-      (err, response, body) => {
-        if (err) return callback(err);
+      headers: {
+        "X-Appery-Database-Id": APPERYIO_DATABASE_ID
+      },
+      json: true
+    },
+    (err, response, body) => {
+      if (err) return callback(err);
 
-        // user created, add sessionToken to user profile
-        if (response.statusCode === 200) {
-          context.idToken['https://example.com/apperyio_session_token'] = body.sessionToken;
-          context.idToken['https://example.com/apperyio_user_id'] = body._id;
-          return callback(null, user, context);
-        }
+      // user was found, add sessionToken to user profile
+      if (response.statusCode === 200) {
+        context.idToken["https://example.com/apperyio_session_token"] = body.sessionToken;
+        context.idToken["https://example.com/apperyio_user_id"] = body._id;
+        return callback(null, user, context);
+      }
 
-        return callback(new Error('The login returned an unknown error. Body: ' + body));
+      // user don't exist, create it
+      if (response.statusCode === 404) {
+        console.log("not found");
+        request.post(
+          {
+            url: "https://api.appery.io/rest/1/db/users",
+            json: {
+              username: username,
+              password: PASSWORD_SECRET
+            },
+            headers: {
+              "X-Appery-Database-Id": APPERYIO_DATABASE_ID
+            }
+          },
+          (err, response, body) => {
+            if (err) return callback(err);
 
-      });
+            // user created, add sessionToken to user profile
+            if (response.statusCode === 200) {
+              context.idToken["https://example.com/apperyio_session_token"] = body.sessionToken;
+              context.idToken["https://example.com/apperyio_user_id"] = body._id;
+              return callback(null, user, context);
+            }
+
+            return callback(new Error("The login returned an unknown error. Body: " + body));
+          }
+        );
+      }
     }
-  });
+  );
 }

@@ -8,13 +8,13 @@
  */
 
 function guardianMultifactorIpRange(user, context, callback) {
-  const ipaddr = require('ipaddr.js');
+  const ipaddr = require("ipaddr.js");
   const corp_network = "192.168.1.134/26";
   const current_ip = ipaddr.parse(context.request.ip);
 
   if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {
     context.multifactor = {
-      provider: 'guardian',
+      provider: "guardian",
 
       // optional, defaults to true. Set to false to force Guardian authentication every time.
       // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details

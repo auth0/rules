@@ -12,7 +12,7 @@
  */
 
 function changeSamlConfiguration(user, context, callback) {
-  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);
+  if (context.clientID !== "{YOUR_SAMLP_OR_WSFED_CLIENT_ID}") return callback(null, user, context);
 
   context.samlConfiguration = context.samlConfiguration || {};
   context.samlConfiguration.audience = "urn:foo";

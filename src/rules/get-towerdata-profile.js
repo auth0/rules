@@ -13,7 +13,7 @@
  */
 
 function getTowerdataProfile(user, context, callback) {
-  const request = require('request');
+  const request = require("request");
 
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);
@@ -22,7 +22,9 @@ function getTowerdataProfile(user, context, callback) {
     return callback(null, user, context);
   }
 
-  request.get('https://api.towerdata.com/v5/td', {
+  request.get(
+    "https://api.towerdata.com/v5/td",
+    {
       qs: {
         email: user.email,
         api_key: configuration.TOWERDATA_API_KEY
@@ -33,9 +35,10 @@ function getTowerdataProfile(user, context, callback) {
       if (err) return callback(err);
 
       if (response.statusCode === 200) {
-        context.idToken['https://example.com/towerdata'] = body;
+        context.idToken["https://example.com/towerdata"] = body;
       }
 
       return callback(null, user, context);
-    });
+    }
+  );
 }

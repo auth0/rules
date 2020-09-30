@@ -11,26 +11,29 @@
  */
 
 function trackLoginInMixPanel(user, context, callback) {
-  const request = require('request');
+  const request = require("request");
 
   const mpEvent = {
-    "event": "Sign In",
-    "properties": {
-        "distinct_id": user.user_id,
-        "token": configuration.MIXPANEL_API_TOKEN,
-        "application": context.clientName
+    event: "Sign In",
+    properties: {
+      distinct_id: user.user_id,
+      token: configuration.MIXPANEL_API_TOKEN,
+      application: context.clientName
     }
   };
 
-  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString('base64');
+  const base64Event = Buffer.from(JSON.stringify(mpEvent)).toString("base64");
 
-  request.get({
-    url: 'http://api.mixpanel.com/track/',
-    qs: {
-      data: base64Event
-    }
-  }, (err, res, body) => {
+  request.get(
+    {
+      url: "http://api.mixpanel.com/track/",
+      qs: {
+        data: base64Event
+      }
+    },
+    (err, res, body) => {
       // don’t wait for the MixPanel API call to finish, return right away (the request will continue on the sandbox)`
       callback(null, user, context);
-  });
+    }
+  );
 }

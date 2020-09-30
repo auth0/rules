@@ -18,8 +18,8 @@ function triggerZapOnNewUser(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const _ = require('lodash');
-  const request = require('request');
+  const _ = require("lodash");
+  const request = require("request");
 
   const small_context = {
     appName: context.clientName,

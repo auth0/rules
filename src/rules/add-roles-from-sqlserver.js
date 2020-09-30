@@ -11,7 +11,7 @@
  */
 
 function addRolesFromSqlServer(user, context, callback) {
-  const tedious = require('tedious');
+  const tedious = require("tedious");
 
   // Roles should only be set to verified users.
   if (!user.email || !user.email_verified) {
@@ -21,7 +21,7 @@ function addRolesFromSqlServer(user, context, callback) {
   getRoles(user.email, (err, roles) => {
     if (err) return callback(err);
 
-    context.idToken['https://example.com/roles'] = roles;
+    context.idToken["https://example.com/roles"] = roles;
 
     callback(null, user, context);
   });
@@ -31,19 +31,19 @@ function addRolesFromSqlServer(user, context, callback) {
     const connection = new tedious.Connection({
       userName: configuration.SQL_DATABASE_USERNAME,
       password: configuration.SQL_DATABASE_PASSWORD,
-      server:   configuration.SQL_DATABASE_HOSTNAME,
+      server: configuration.SQL_DATABASE_HOSTNAME,
       options: {
         database: configuration.SQL_DATABASE_NAME,
-        encrypt:  true,
+        encrypt: true,
         rowCollectionOnRequestCompletion: true
       }
-    }).on('errorMessage', (error) => {
+    }).on("errorMessage", (error) => {
       console.log(error.message);
     });
 
     const query = "SELECT Email, Role FROM dbo.Role WHERE Email = @email";
 
-    connection.on('connect', (err) => {
+    connection.on("connect", (err) => {
       if (err) return done(new Error(err));
 
       const request = new tedious.Request(query, (err, rowCount, rows) => {
@@ -56,7 +56,7 @@ function addRolesFromSqlServer(user, context, callback) {
         done(null, roles);
       });
 
-      request.addParameter('email', tedious.TYPES.VarChar, email);
+      request.addParameter("email", tedious.TYPES.VarChar, email);
 
       connection.execSql(request);
     });

@@ -22,13 +22,12 @@ function guardianMultifactorStepUpAuthentication(user, context, callback) {
   // current session/
 
   if (
-    context.request.query.acr_values ===
-      "http://schemas.openid.net/pape/policies/2007/06/multi-factor" &&
+    context.request.query.acr_values === "http://schemas.openid.net/pape/policies/2007/06/multi-factor" &&
     !context.authentication.methods.some((method) => method.name === "mfa")
   ) {
     context.multifactor = {
       provider: "any",
-      allowRememberBrowser: false,
+      allowRememberBrowser: false
     };
   }
 

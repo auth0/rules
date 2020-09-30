@@ -9,30 +9,38 @@
  */
 
 function getRolesFromSoapService(user, context, callback) {
-  const request = require('request');
-  const xmldom = require('xmldom');
-  const xpath = require('xpath');
+  const request = require("request");
+  const xmldom = require("xmldom");
+  const xpath = require("xpath");
 
   function getRoles(cb) {
-    request.post({
-      url:  'https://somedomain.com/RoleService.svc',
-      body: '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><GetRolesForCurrentUser xmlns="http://tempuri.org"/></s:Body></s:Envelope>',
-      headers: { 'Content-Type': 'text/xml; charset=utf-8',
-              'SOAPAction': 'http://tempuri.org/RoleService/GetRolesForCurrentUser' }
-    }, function (err, response, body) {
-      if (err) return cb(err);
+    request.post(
+      {
+        url: "https://somedomain.com/RoleService.svc",
+        body:
+          '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><GetRolesForCurrentUser xmlns="http://tempuri.org"/></s:Body></s:Envelope>',
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+          SOAPAction: "http://tempuri.org/RoleService/GetRolesForCurrentUser"
+        }
+      },
+      function (err, response, body) {
+        if (err) return cb(err);
 
-      const parser = new xmldom.DOMParser();
-      const doc = parser.parseFromString(body);
-      const roles = xpath.select("//*[local-name(.)='string']", doc).map(function(node) { return node.textContent; });
-      return cb(null, roles);
-    });
+        const parser = new xmldom.DOMParser();
+        const doc = parser.parseFromString(body);
+        const roles = xpath.select("//*[local-name(.)='string']", doc).map(function (node) {
+          return node.textContent;
+        });
+        return cb(null, roles);
+      }
+    );
   }
 
-  getRoles(function(err, roles) {
+  getRoles(function (err, roles) {
     if (err) return callback(err);
 
-    context.idToken['https://example.com/roles'] = roles;
+    context.idToken["https://example.com/roles"] = roles;
 
     callback(null, user, context);
   });
