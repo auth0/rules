@@ -16,7 +16,11 @@ function facebookCustomPicture(user, context, callback) {
     // for more sizes and types of images that can be returned, see:
     // https://developers.facebook.com/docs/graph-api/reference/user/picture/
     const pictureType = 'large';
-    context.idToken.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;
+    context.idToken.picture =
+      'https://graph.facebook.com/v2.5/' +
+      fbIdentity.user_id +
+      '/picture?type=' +
+      pictureType;
   }
   callback(null, user, context);
 }

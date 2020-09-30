@@ -34,7 +34,11 @@ async function onfidoIdentityVerification(user, context, callback) {
   // requiring Onfido's node SDK for making the calls easier to Onfido's service.
   const { Onfido, Region } = require('@onfido/api@1.5.1');
 
-  const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
+  const ruleUtils = new Auth0RedirectRuleUtilities(
+    user,
+    context,
+    configuration
+  );
 
   // creating a claim namespace for adding the Onfido IDV check results back to the ID Token
   const claimNamespace = 'https://claims.onfido.com/';
@@ -100,9 +104,14 @@ async function onfidoIdentityVerification(user, context, callback) {
       });
 
       // create the session token with the applicant id as a custom claim
-      const sessionToken = ruleUtils.createSessionToken({ applicant: applicant.id });
+      const sessionToken = ruleUtils.createSessionToken({
+        applicant: applicant.id
+      });
       // redirect to Onfido implementation with sessionToken
-      ruleUtils.doRedirect(configuration.ONFIDO_ID_VERIFICATION_URL, sessionToken);
+      ruleUtils.doRedirect(
+        configuration.ONFIDO_ID_VERIFICATION_URL,
+        sessionToken
+      );
       return callback(null, user, context);
     } catch (error) {
       return callback(error);

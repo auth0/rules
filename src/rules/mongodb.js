@@ -11,7 +11,10 @@ function enrichProfileWithMongo(user, context, callback) {
   const MongoClient = require('mongodb@3.1.4').MongoClient;
   const mongoUrl = configuration.MONGO_CONNECTION_STRING;
 
-  MongoClient.connect(mongoUrl, { useNewUrlParser: true }, function (err, client) {
+  MongoClient.connect(mongoUrl, { useNewUrlParser: true }, function (
+    err,
+    client
+  ) {
     if (err) return callback(err);
 
     const db = client.db('YOUR_MONGO_DATABASE_NAME');

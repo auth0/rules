@@ -52,8 +52,10 @@ function getSignifydScore(user, context, callback) {
       auth0.users
         .updateAppMetadata(user.user_id, user.app_metadata)
         .then(function () {
-          context.idToken['https://example.com/signifyd_status'] = user.app_metadata.signifyd_status;
-          context.idToken['https://example.com/signifyd_score'] = user.app_metadata.signifyd_score;
+          context.idToken['https://example.com/signifyd_status'] =
+            user.app_metadata.signifyd_status;
+          context.idToken['https://example.com/signifyd_score'] =
+            user.app_metadata.signifyd_score;
           callback(null, user, context);
         })
         .catch(function (err) {

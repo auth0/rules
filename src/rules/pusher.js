@@ -15,8 +15,13 @@ function getPusherToken(user, context, callback) {
   const pusherSecret = configuration.PUSHER_SECRET;
 
   if (context.request.query.channel && context.request.query.socket_id) {
-    const pusherSigned = sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
-    context.idToken['https://example.com/pusherAuth'] = pusherKey + ':' + pusherSigned;
+    const pusherSigned = sign(
+      pusherSecret,
+      context.request.query.channel,
+      context.request.query.socket_id
+    );
+    context.idToken['https://example.com/pusherAuth'] =
+      pusherKey + ':' + pusherSigned;
   }
 
   callback(null, user, context);

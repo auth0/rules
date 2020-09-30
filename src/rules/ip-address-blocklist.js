@@ -14,7 +14,9 @@ function ipAddressBlocklist(user, context, callback) {
   });
 
   if (notAuthorized) {
-    return callback(new UnauthorizedError('Access denied from this IP address.'));
+    return callback(
+      new UnauthorizedError('Access denied from this IP address.')
+    );
   }
 
   return callback(null, user, context);

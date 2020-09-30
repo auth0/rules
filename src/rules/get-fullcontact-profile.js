@@ -23,7 +23,8 @@ function getFullContactProfile(user, context, callback) {
   if (!user.email) return callback(null, user, context);
 
   // skip if fullcontact metadata is already there
-  if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
+  if (user.user_metadata && user.user_metadata.fullcontact)
+    return callback(null, user, context);
 
   request.get(
     'https://api.fullcontact.com/v2/person.json',
@@ -40,7 +41,11 @@ function getFullContactProfile(user, context, callback) {
           channel: '#slack_channel',
           text: 'Fullcontact API Error',
           fields: {
-            error: error ? error.toString() : response ? response.statusCode + ' ' + body : ''
+            error: error
+              ? error.toString()
+              : response
+              ? response.statusCode + ' ' + body
+              : ''
           }
         });
 
@@ -53,7 +58,8 @@ function getFullContactProfile(user, context, callback) {
       user.user_metadata.fullcontact = body;
 
       auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
-      context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;
+      context.idToken['https://example.com/fullcontact'] =
+        user.user_metadata.fullcontact;
       return callback(null, user, context);
     }
   );

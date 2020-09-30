@@ -41,7 +41,10 @@ async function caissonIDCheck(user, context, callback) {
     /* prettier-ignore */
     debug: caissonConf.CAISSON_DEBUG && caissonConf.CAISSON_DEBUG.toLowerCase() === "true" ? true : false,
     idCheckFlags: {
-      login_frequency_days: parseInt(caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS, 10)
+      login_frequency_days: parseInt(
+        caissonConf.CAISSON_LOGIN_FREQUENCY_DAYS,
+        10
+      )
     },
     caissonHosts: {
       idcheck: 'https://id.caisson.com',
@@ -120,15 +123,20 @@ async function caissonIDCheck(user, context, callback) {
    */
   async function idCheckResults(check_id) {
     try {
-      let resp = await manager.axios.get(manager.caissonHosts.api + '/v1/idcheck', {
-        headers: {
-          Authorization: `Caisson ${manager.creds.private_key}`,
-          'X-Caisson-CheckID': check_id
+      let resp = await manager.axios.get(
+        manager.caissonHosts.api + '/v1/idcheck',
+        {
+          headers: {
+            Authorization: `Caisson ${manager.creds.private_key}`,
+            'X-Caisson-CheckID': check_id
+          }
         }
-      });
+      );
 
       if (resp.data.error) {
-        throw new Error('Error in Caisson ID Check: ' + JSON.stringify(resp.data));
+        throw new Error(
+          'Error in Caisson ID Check: ' + JSON.stringify(resp.data)
+        );
       }
 
       let results = {
@@ -160,8 +168,15 @@ async function caissonIDCheck(user, context, callback) {
    */
   function validateIDCheck(results) {
     const IDCheckTTL = 20 * 60 * 1000; //20 mins
-    if (results.auth0_id !== user.user_id + '__' + manager.util.queryParams.state) {
-      throw new UnauthorizedError('ID mismatch. Caisson: %o, Auth0: %o', results.auth0_id, user.user_id);
+    if (
+      results.auth0_id !==
+      user.user_id + '__' + manager.util.queryParams.state
+    ) {
+      throw new UnauthorizedError(
+        'ID mismatch. Caisson: %o, Auth0: %o',
+        results.auth0_id,
+        user.user_id
+      );
     } else if (Date.now() - Date.parse(results.timestamp) > IDCheckTTL) {
       throw new UnauthorizedError('ID Check too old.');
     }
@@ -175,7 +190,8 @@ async function caissonIDCheck(user, context, callback) {
     user.app_metadata = user.app_metadata || {};
     let caisson = user.app_metadata.caisson || {};
 
-    caisson.idcheck_url = manager.caissonHosts.dashboard + '/request/' + results.check_id;
+    caisson.idcheck_url =
+      manager.caissonHosts.dashboard + '/request/' + results.check_id;
     caisson.status = results.status;
     caisson.last_check = Date.now();
     caisson.count = caisson.count ? caisson.count + 1 : 1;
@@ -195,7 +211,10 @@ async function caissonIDCheck(user, context, callback) {
   if (manager.util.isRedirectCallback) {
     //is it our redirect?
 
-    if (!manager.util.queryParams.caisson_flow || parseInt(manager.util.queryParams.caisson_flow, 10) !== 1) {
+    if (
+      !manager.util.queryParams.caisson_flow ||
+      parseInt(manager.util.queryParams.caisson_flow, 10) !== 1
+    ) {
       //no, end it.
       return callback(null, user, context);
     }
@@ -229,13 +248,17 @@ async function caissonIDCheck(user, context, callback) {
   try {
     if (isNaN(manager.idCheckFlags.login_frequency_days)) {
       //Do nothing.  Skip if no preference is set.
-    } else if (!user.app_metadata.caisson.last_check || user.app_metadata.caisson.status !== 'passed') {
+    } else if (
+      !user.app_metadata.caisson.last_check ||
+      user.app_metadata.caisson.status !== 'passed'
+    ) {
       //Always perform the first ID Check or if the
       //last ID Check didn't pass.
       setIDCheckRedirect();
     } else if (
       manager.idCheckFlags.login_frequency_days >= 0 &&
-      millisToDays(Date.now() - user.app_metadata.caisson.last_check) >= manager.idCheckFlags.login_frequency_days
+      millisToDays(Date.now() - user.app_metadata.caisson.last_check) >=
+        manager.idCheckFlags.login_frequency_days
     ) {
       //ID Check if the requisite number of days have passed since the last check.
       //Skip if we're only supposed to check once (login_frequency_days < -1).

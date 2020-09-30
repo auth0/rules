@@ -23,7 +23,8 @@ function trackEventsWithSplunkHec(user, context, callback) {
   const request = require('request');
 
   user.app_metadata = user.app_metadata || {};
-  const endpoint = 'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; // replace with your Splunk HEC endpoint;
+  const endpoint =
+    'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; // replace with your Splunk HEC endpoint;
 
   //Add any interesting info to the event
   const hec_event = {
@@ -50,7 +51,8 @@ function trackEventsWithSplunkHec(user, context, callback) {
     },
     function (error, response, body) {
       if (error) return callback(error);
-      if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
+      if (response.statusCode !== 200)
+        return callback(new Error('Invalid operation'));
       user.app_metadata.signedUp = true;
       auth0.users
         .updateAppMetadata(user.user_id, user.app_metadata)

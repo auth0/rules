@@ -52,9 +52,12 @@ function getSocureFraudScore(user, context, callback) {
       auth0.users
         .updateAppMetadata(user.user_id, user.app_metadata)
         .then(function () {
-          context.idToken['https://example.com/socure_fraudscore'] = user.app_metadata.socure_fraudscore;
-          context.idToken['https://example.com/socure_confidence'] = user.app_metadata.socure_confidence;
-          context.idToken['https://example.com/socure_details'] = user.app_metadata.socure_details;
+          context.idToken['https://example.com/socure_fraudscore'] =
+            user.app_metadata.socure_fraudscore;
+          context.idToken['https://example.com/socure_confidence'] =
+            user.app_metadata.socure_confidence;
+          context.idToken['https://example.com/socure_details'] =
+            user.app_metadata.socure_details;
           callback(null, user, context);
         })
         .catch(function (err) {

@@ -26,7 +26,9 @@ async function userRiskScore(user, context, cb) {
 
   // Skip if not user facing app type
   if (context.clientMetadata.userApp !== 'true') {
-    log.info(`Skipping risk check as not enabled for app ${context.clientName}`);
+    log.info(
+      `Skipping risk check as not enabled for app ${context.clientName}`
+    );
     return callback(null, user, context);
   }
 
@@ -37,7 +39,9 @@ async function userRiskScore(user, context, cb) {
   const fakeData = false;
 
   const ipAddress = fakeData ? '87.242.77.197' : context.request.ip;
-  const userAgent = fakeData ? 'naughty-fraud-agent' : context.request.userAgent;
+  const userAgent = fakeData
+    ? 'naughty-fraud-agent'
+    : context.request.userAgent;
 
   const data = {
     device: {
@@ -65,7 +69,9 @@ async function userRiskScore(user, context, cb) {
     });
 
     const userInfo = `${user.email || user.username} (${user.user_id})`;
-    log.info(`Fraud response for user ${userInfo}: ${JSON.stringify(result, null, 2)}`);
+    log.info(
+      `Fraud response for user ${userInfo}: ${JSON.stringify(result, null, 2)}`
+    );
 
     user.risk = {
       score: result.risk_score,

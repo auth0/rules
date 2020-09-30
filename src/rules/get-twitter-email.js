@@ -52,7 +52,13 @@ function getTwitterEmail(user, context, callback) {
     oauth_version: '1.0'
   };
 
-  params.oauth_signature = oauth.hmacsign('GET', url, params, consumerSecretKey, oauthTokenSecret);
+  params.oauth_signature = oauth.hmacsign(
+    'GET',
+    url,
+    params,
+    consumerSecretKey,
+    oauthTokenSecret
+  );
 
   const auth = Object.keys(params)
     .sort()
@@ -71,7 +77,9 @@ function getTwitterEmail(user, context, callback) {
     },
     (err, resp, body) => {
       if (resp.statusCode !== 200) {
-        return callback(new Error('Error retrieving email from twitter: ' + body || err));
+        return callback(
+          new Error('Error retrieving email from twitter: ' + body || err)
+        );
       }
       user.email = body.email;
       return callback(err, user, context);

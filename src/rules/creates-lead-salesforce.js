@@ -28,36 +28,46 @@ function createLeadSalesforce(user, context, callback) {
   const SFCOM_CLIENT_SECRET = configuration.SALESFORCE_CLIENT_SECRET;
   const USERNAME = configuration.SALESFORCE_USERNAME;
   const PASSWORD = configuration.SALESFORCE_PASSWORD;
-  getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD, (response) => {
-    if (!response.instance_url || !response.access_token) {
-      slack.alert({
-        channel: '#some_channel',
-        text: 'Error Getting SALESFORCE Access Token',
-        fields: {
-          error: response
-        }
-      });
-
-      return;
-    }
-
-    createLead(response.instance_url, response.access_token, (err, result) => {
-      if (err || !result || !result.id) {
+  getAccessToken(
+    SFCOM_CLIENT_ID,
+    SFCOM_CLIENT_SECRET,
+    USERNAME,
+    PASSWORD,
+    (response) => {
+      if (!response.instance_url || !response.access_token) {
         slack.alert({
           channel: '#some_channel',
-          text: 'Error Creating SALESFORCE Lead',
+          text: 'Error Getting SALESFORCE Access Token',
           fields: {
-            error: err || result
+            error: response
           }
         });
 
         return;
       }
 
-      user.app_metadata.recordedAsLead = true;
-      auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
-    });
-  });
+      createLead(
+        response.instance_url,
+        response.access_token,
+        (err, result) => {
+          if (err || !result || !result.id) {
+            slack.alert({
+              channel: '#some_channel',
+              text: 'Error Creating SALESFORCE Lead',
+              fields: {
+                error: err || result
+              }
+            });
+
+            return;
+          }
+
+          user.app_metadata.recordedAsLead = true;
+          auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
+        }
+      );
+    }
+  );
 
   //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm
   function createLead(url, access_token, callback) {
@@ -82,7 +92,13 @@ function createLeadSalesforce(user, context, callback) {
   }
 
   //Obtains a SFCOM access_token with user credentials
-  function getAccessToken(client_id, client_secret, username, password, callback) {
+  function getAccessToken(
+    client_id,
+    client_secret,
+    username,
+    password,
+    callback
+  ) {
     request.post(
       {
         url: 'https://login.salesforce.com/services/oauth2/token',
