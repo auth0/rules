@@ -22,7 +22,7 @@ function checkDomainsAgainstConnectionAliases(user, context, callback) {
   }
 
   // Domain aliases exist but no tenant domain exists
-  if (domainAliases.length && !tenantDomain) return callback("Access denied");
+  if (domainAliases.length && !tenantDomain) return callback('Access denied');
 
   const allowedDomains = new Set([tenantDomain]);
   domainAliases.forEach(function (alias) {
@@ -30,9 +30,9 @@ function checkDomainsAgainstConnectionAliases(user, context, callback) {
   });
 
   // Access allowed if domain is found
-  const emailSplit = user.email.split("@");
+  const emailSplit = user.email.split('@');
   const userEmailDomain = emailSplit[emailSplit.length - 1].toLowerCase();
   if (allowedDomains.has(userEmailDomain)) return callback(null, user, context);
 
-  return callback("Access denied");
+  return callback('Access denied');
 }

@@ -17,24 +17,24 @@ function generateParseSessionToken(user, context, callback) {
   // run this only for the Parse application
   // if (context.clientID !== 'PARSE CLIENT ID IN AUTH0') return callback(null, user, context);
 
-  const request = require("request");
+  const request = require('request');
 
-  const PARSE_APP_ID = "PLACE HERE YOUR PARSE APP ID";
-  const PARSE_API_KEY = "PLACE HERE YOUR PARSE REST API KEY";
-  const PARSE_USER_PASSWORD = "PARSE_USER_MASTER_KEY"; // you can use this to generate one http://www.random.org/strings/
+  const PARSE_APP_ID = 'PLACE HERE YOUR PARSE APP ID';
+  const PARSE_API_KEY = 'PLACE HERE YOUR PARSE REST API KEY';
+  const PARSE_USER_PASSWORD = 'PARSE_USER_MASTER_KEY'; // you can use this to generate one http://www.random.org/strings/
 
   const username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db
 
   request.get(
     {
-      url: "https://api.parse.com/1/login",
+      url: 'https://api.parse.com/1/login',
       qs: {
         username: username,
         password: PARSE_USER_PASSWORD
       },
       headers: {
-        "X-Parse-Application-Id": PARSE_APP_ID,
-        "X-Parse-REST-API-Key": PARSE_API_KEY
+        'X-Parse-Application-Id': PARSE_APP_ID,
+        'X-Parse-REST-API-Key': PARSE_API_KEY
       }
     },
     function (err, response, body) {
@@ -42,7 +42,7 @@ function generateParseSessionToken(user, context, callback) {
 
       // user was found, add sessionToken to user profile
       if (response.statusCode === 200) {
-        context.idToken["https://example.com/parse_session_token"] = JSON.parse(body).sessionToken;
+        context.idToken['https://example.com/parse_session_token'] = JSON.parse(body).sessionToken;
         return callback(null, user, context);
       }
 
@@ -50,15 +50,15 @@ function generateParseSessionToken(user, context, callback) {
       if (response.statusCode === 404) {
         request.post(
           {
-            url: "https://api.parse.com/1/users",
+            url: 'https://api.parse.com/1/users',
             json: {
               username: username,
               password: PARSE_USER_PASSWORD
             },
             headers: {
-              "X-Parse-Application-Id": PARSE_APP_ID,
-              "X-Parse-REST-API-Key": PARSE_API_KEY,
-              "Content-Type": "application/json"
+              'X-Parse-Application-Id': PARSE_APP_ID,
+              'X-Parse-REST-API-Key': PARSE_API_KEY,
+              'Content-Type': 'application/json'
             }
           },
           function (err, response, body) {
@@ -66,17 +66,17 @@ function generateParseSessionToken(user, context, callback) {
 
             // user created, add sessionToken to user profile
             if (response.statusCode === 201) {
-              context.idToken["https://example.com/parse_session_token"] = body.sessionToken;
+              context.idToken['https://example.com/parse_session_token'] = body.sessionToken;
               return callback(null, user, context);
             }
             return callback(
-              new Error("The user provisioning returned an unknown error. Body: " + JSON.stringify(body))
+              new Error('The user provisioning returned an unknown error. Body: ' + JSON.stringify(body))
             );
           }
         );
       } else {
         return callback(
-          new Error("The login returned an unknown error. Status: " + response.statusCode + " Body: " + body)
+          new Error('The login returned an unknown error. Status: ' + response.statusCode + ' Body: ' + body)
         );
       }
     }

@@ -20,29 +20,29 @@
 
 async function vouchedVerification(user, context, callback) {
   if (!configuration.VOUCHED_API_KEY || !configuration.VOUCHED_PUBLIC_KEY) {
-    console.log("Missing required configuration. Skipping.");
+    console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
   }
 
   /* ----------- START helpers ----------- */
-  const axios = require("axios");
-  const url = require("url");
-  const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
+  const axios = require('axios');
+  const url = require('url');
+  const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
 
   const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
 
-  const defaultApiUrl = "https://verify.vouched.id/api";
-  const defaultUiUrl = "https://i.vouched.id";
-  const idTokenClaim = "https://vouched.id/is_verified";
+  const defaultApiUrl = 'https://verify.vouched.id/api';
+  const defaultUiUrl = 'https://i.vouched.id';
+  const idTokenClaim = 'https://vouched.id/is_verified';
 
   const getJob = async (apiKey, jobToken, apiUrl) => {
     const response = await axios({
       headers: {
-        "X-Api-Key": apiKey,
-        "Content-Type": "application/json"
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json'
       },
       baseURL: apiUrl,
-      url: "/jobs",
+      url: '/jobs',
       params: {
         token: jobToken
       }
@@ -66,13 +66,13 @@ async function vouchedVerification(user, context, callback) {
     if (user.family_name) requestBody.lastName = user.family_name;
 
     const response = await axios({
-      method: "post",
+      method: 'post',
       headers: {
-        "X-Api-Key": apiKey,
-        "Content-Type": "application/json"
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json'
       },
       baseURL: apiUrl,
-      url: "/packet/auth0",
+      url: '/packet/auth0',
       data: requestBody
     });
     const data = response.data;
@@ -84,7 +84,7 @@ async function vouchedVerification(user, context, callback) {
 
   const isJobForUser = (job, userId) => {
     try {
-      return job.request.properties.filter((prop) => prop.name === "uid" && prop.value === userId).length === 1;
+      return job.request.properties.filter((prop) => prop.name === 'uid' && prop.value === userId).length === 1;
     } catch (e) {
       return false;
     }
@@ -110,7 +110,7 @@ async function vouchedVerification(user, context, callback) {
 
   const redirectToVerification = (packetId, baseUrl = defaultUiUrl) => {
     const redirectUrl = new url.URL(`${baseUrl}/auth0`);
-    redirectUrl.searchParams.append("id", packetId);
+    redirectUrl.searchParams.append('id', packetId);
     return redirectUrl.href;
   };
 
@@ -152,10 +152,10 @@ async function vouchedVerification(user, context, callback) {
           await auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
         } else {
           // user failed verification check and doesn't have an override
-          if (configuration.VOUCHED_ID_TOKEN_CLAIM === "true") {
+          if (configuration.VOUCHED_ID_TOKEN_CLAIM === 'true') {
             context.idToken[idTokenClaim] = false;
           }
-          if (configuration.VOUCHED_VERIFICATION_OPTIONAL === "true") {
+          if (configuration.VOUCHED_VERIFICATION_OPTIONAL === 'true') {
             return callback(null, user, context);
           }
 
@@ -181,7 +181,7 @@ async function vouchedVerification(user, context, callback) {
     return callback(e);
   }
 
-  if (configuration.VOUCHED_ID_TOKEN_CLAIM === "true") {
+  if (configuration.VOUCHED_ID_TOKEN_CLAIM === 'true') {
     context.idToken[idTokenClaim] = true;
   }
 

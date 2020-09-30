@@ -9,8 +9,8 @@
  */
 
 function intercomUser(user, context, callback) {
-  const request = require("request");
-  const moment = require("moment-timezone");
+  const request = require('request');
+  const moment = require('moment-timezone');
 
   const data = {
     user_id: user.user_id,
@@ -25,10 +25,10 @@ function intercomUser(user, context, callback) {
   const accessToken = configuration.INTERCOM_ACCESS_TOKEN;
 
   request.post({
-    url: "https://api.intercom.io/users",
+    url: 'https://api.intercom.io/users',
     headers: {
-      Authorization: "Bearer " + accessToken,
-      Accept: "application/json"
+      Authorization: 'Bearer ' + accessToken,
+      Accept: 'application/json'
     },
     json: data
   });

@@ -13,7 +13,7 @@
  */
 
 function getTowerdataProfile(user, context, callback) {
-  const request = require("request");
+  const request = require('request');
 
   //Filter by app
   //if(context.clientName !== 'AN APP') return callback(null, user, context);
@@ -23,7 +23,7 @@ function getTowerdataProfile(user, context, callback) {
   }
 
   request.get(
-    "https://api.towerdata.com/v5/td",
+    'https://api.towerdata.com/v5/td',
     {
       qs: {
         email: user.email,
@@ -35,7 +35,7 @@ function getTowerdataProfile(user, context, callback) {
       if (err) return callback(err);
 
       if (response.statusCode === 200) {
-        context.idToken["https://example.com/towerdata"] = body;
+        context.idToken['https://example.com/towerdata'] = body;
       }
 
       return callback(null, user, context);

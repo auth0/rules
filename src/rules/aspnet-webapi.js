@@ -19,18 +19,18 @@
  */
 
 function aspnetWebApi(user, context, callback) {
-  const request = require("request");
+  const request = require('request');
 
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.customId) {
-    console.log("Found ID!");
+    console.log('Found ID!');
     return callback(null, user, context);
   }
 
   // You should make your requests over SSL to protect your app secrets.
   request.post(
     {
-      url: "https://yourwebsite.com/auth0",
+      url: 'https://yourwebsite.com/auth0',
       json: {
         user: user,
         context: context,
@@ -42,7 +42,7 @@ function aspnetWebApi(user, context, callback) {
       if (err) return callback(new Error(err));
 
       user.app_metadata.customId = body.customId;
-      context.idToken["https://example.com/custom_id"] = body.customId;
+      context.idToken['https://example.com/custom_id'] = body.customId;
 
       auth0.users
         .updateAppMetadata(user.user_id, user.app_metadata)

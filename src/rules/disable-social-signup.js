@@ -9,7 +9,7 @@
  */
 
 function disableSocialSignups(user, context, callback) {
-  const CLIENTS_ENABLED = ["REPLACE_WITH_YOUR_CLIENT_ID"];
+  const CLIENTS_ENABLED = ['REPLACE_WITH_YOUR_CLIENT_ID'];
   // run only for the specified clients
   if (CLIENTS_ENABLED.indexOf(context.clientID) === -1) {
     return callback(null, user, context);
@@ -29,7 +29,7 @@ function disableSocialSignups(user, context, callback) {
       .updateAppMetadata(user.user_id, user.app_metadata)
       .then(function () {
         // throw error
-        return callback(new Error("Signup disabled"));
+        return callback(new Error('Signup disabled'));
       })
       .catch(function (err) {
         callback(err);
@@ -40,7 +40,7 @@ function disableSocialSignups(user, context, callback) {
 
   // if flag is enabled, throw error
   if (user.app_metadata.is_signup) {
-    return callback(new Error("Signup disabled"));
+    return callback(new Error('Signup disabled'));
   }
 
   // else it is a non social login or it is not a signup

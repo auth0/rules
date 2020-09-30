@@ -20,7 +20,7 @@ function guardianMultifactor(user, context, callback) {
   //if (user.user_metadata && user.user_metadata.use_mfa){
   context.multifactor = {
     // required
-    provider: "guardian",
+    provider: 'guardian',
 
     // optional, defaults to true. Set to false to force Guardian authentication every time.
     // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details

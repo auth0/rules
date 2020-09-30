@@ -14,7 +14,7 @@
  */
 
 function createNewContactAndAddToContactListHubSpot(user, context, callback) {
-  const request = require("request");
+  const request = require('request');
   user.app_metadata = user.app_metadata || {};
 
   //Populate the variables below with appropriate values
@@ -25,34 +25,34 @@ function createNewContactAndAddToContactListHubSpot(user, context, callback) {
   const contactData = JSON.stringify({
     properties: [
       {
-        property: "email",
+        property: 'email',
         value: user.email
       },
       {
-        property: "firstname",
-        value: user.given_name || ""
+        property: 'firstname',
+        value: user.given_name || ''
       },
       {
-        property: "lastname",
-        value: user.family_name || ""
+        property: 'lastname',
+        value: user.family_name || ''
       }
     ]
   });
 
   const contactOptions = {
-    url: "https://api.hubapi.com/contacts/v1/contact/?hapikey=" + apiKey,
-    method: "POST",
+    url: 'https://api.hubapi.com/contacts/v1/contact/?hapikey=' + apiKey,
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json'
     },
     body: contactData
   };
   request(contactOptions, function (err, response, body) {
     if (err || (response.statusCode !== 200 && response.statusCode !== 409)) {
-      console.log("NOTIFY YOUR MONITOR APPLICATION OF AN ERROR ADDING A NEW CONTACT");
+      console.log('NOTIFY YOUR MONITOR APPLICATION OF AN ERROR ADDING A NEW CONTACT');
       user.app_metadata.hubSpotContactCreated = false;
     } else {
-      console.log("[NEW CONTACT] HANDLE ANY POSSIBLE INFORMATION YOU MIGHT WANT TO STORE IN THE USERS PROFILE");
+      console.log('[NEW CONTACT] HANDLE ANY POSSIBLE INFORMATION YOU MIGHT WANT TO STORE IN THE USERS PROFILE');
       const newContactId = JSON.parse(body).vid;
       user.app_metadata.hubSpotContactCreated = true;
       user.app_metadata.hubSpotContactId = newContactId;
@@ -61,22 +61,22 @@ function createNewContactAndAddToContactListHubSpot(user, context, callback) {
       const subscribeData = JSON.stringify({ vids: [newContactId] });
       //************** NOTE THIS USES LIST NUMBER AND HUBSPOT API KEY THE URL BELOW **********************/
       const subscribeOptions = {
-        url: "https://api.hubapi.com/contacts/v1/lists/" + newMemberListId + "/add?hapikey=" + apiKey,
-        method: "POST",
+        url: 'https://api.hubapi.com/contacts/v1/lists/' + newMemberListId + '/add?hapikey=' + apiKey,
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: subscribeData
       };
 
       request(subscribeOptions, function (err, response, body) {
         if (err || (response.statusCode !== 200 && response.statusCode !== 409)) {
-          console.log("NOTIFY YOUR MONITOR APPLICATION OF AN ERROR ON ADDING CONTACT TO A EMAIL LIST");
+          console.log('NOTIFY YOUR MONITOR APPLICATION OF AN ERROR ON ADDING CONTACT TO A EMAIL LIST');
           console.log(err);
           user.app_metadata.hubSpotContactAddedToList = false;
         } else {
           user.app_metadata.hubSpotContactAddedToList = true;
-          console.log("[EMAIL LIST] HANDLE ANY POSSIBLE INFORMATION YOU MIGHT WANT TO STORE IN THE USERS PROFILE");
+          console.log('[EMAIL LIST] HANDLE ANY POSSIBLE INFORMATION YOU MIGHT WANT TO STORE IN THE USERS PROFILE');
         }
 
         auth0.users.updateAppMetadata(user.user_id, user.app_metadata);

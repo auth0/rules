@@ -18,20 +18,20 @@ function getSignifydScore(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const request = require("request");
+  const request = require('request');
 
   request(
     {
       url: `https://api.signifyd.com/v2/cases/${user.app_metadata.caseId}`,
       headers: {
-        Authorization: "Basic YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo6"
+        Authorization: 'Basic YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo6'
       }
     },
     function (err, resp, body) {
       if (err) return callback(null, user, context);
       if (resp.statusCode !== 200) return callback(null, user, context);
       const signifyd = JSON.parse(body);
-      if (signifyd.status !== "Ok") return callback(null, user, context);
+      if (signifyd.status !== 'Ok') return callback(null, user, context);
 
       user.app_metadata = user.app_metadata || {};
       user.app_metadata.signifyd_status = signifyd.data.status;
@@ -52,8 +52,8 @@ function getSignifydScore(user, context, callback) {
       auth0.users
         .updateAppMetadata(user.user_id, user.app_metadata)
         .then(function () {
-          context.idToken["https://example.com/signifyd_status"] = user.app_metadata.signifyd_status;
-          context.idToken["https://example.com/signifyd_score"] = user.app_metadata.signifyd_score;
+          context.idToken['https://example.com/signifyd_status'] = user.app_metadata.signifyd_status;
+          context.idToken['https://example.com/signifyd_score'] = user.app_metadata.signifyd_score;
           callback(null, user, context);
         })
         .catch(function (err) {

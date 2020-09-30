@@ -16,8 +16,8 @@ function getFullContactProfile(user, context, callback) {
   const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
-  const request = require("request");
-  const slack = require("slack-notify")(SLACK_HOOK);
+  const request = require('request');
+  const slack = require('slack-notify')(SLACK_HOOK);
 
   // skip if no email
   if (!user.email) return callback(null, user, context);
@@ -26,7 +26,7 @@ function getFullContactProfile(user, context, callback) {
   if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
 
   request.get(
-    "https://api.fullcontact.com/v2/person.json",
+    'https://api.fullcontact.com/v2/person.json',
     {
       qs: {
         email: user.email,
@@ -37,10 +37,10 @@ function getFullContactProfile(user, context, callback) {
     (error, response, body) => {
       if (error || (response && response.statusCode !== 200)) {
         slack.alert({
-          channel: "#slack_channel",
-          text: "Fullcontact API Error",
+          channel: '#slack_channel',
+          text: 'Fullcontact API Error',
           fields: {
-            error: error ? error.toString() : response ? response.statusCode + " " + body : ""
+            error: error ? error.toString() : response ? response.statusCode + ' ' + body : ''
           }
         });
 
@@ -53,7 +53,7 @@ function getFullContactProfile(user, context, callback) {
       user.user_metadata.fullcontact = body;
 
       auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
-      context.idToken["https://example.com/fullcontact"] = user.user_metadata.fullcontact;
+      context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;
       return callback(null, user, context);
     }
   );

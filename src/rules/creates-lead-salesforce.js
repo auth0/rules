@@ -18,10 +18,10 @@ function createLeadSalesforce(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const request = require("request");
+  const request = require('request');
 
-  const MY_SLACK_WEBHOOK_URL = "YOUR SLACK WEBHOOK URL";
-  const slack = require("slack-notify")(MY_SLACK_WEBHOOK_URL);
+  const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
+  const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
   //Populate the variables below with appropriate values
   const SFCOM_CLIENT_ID = configuration.SALESFORCE_CLIENT_ID;
@@ -31,8 +31,8 @@ function createLeadSalesforce(user, context, callback) {
   getAccessToken(SFCOM_CLIENT_ID, SFCOM_CLIENT_SECRET, USERNAME, PASSWORD, (response) => {
     if (!response.instance_url || !response.access_token) {
       slack.alert({
-        channel: "#some_channel",
-        text: "Error Getting SALESFORCE Access Token",
+        channel: '#some_channel',
+        text: 'Error Getting SALESFORCE Access Token',
         fields: {
           error: response
         }
@@ -44,8 +44,8 @@ function createLeadSalesforce(user, context, callback) {
     createLead(response.instance_url, response.access_token, (err, result) => {
       if (err || !result || !result.id) {
         slack.alert({
-          channel: "#some_channel",
-          text: "Error Creating SALESFORCE Lead",
+          channel: '#some_channel',
+          text: 'Error Creating SALESFORCE Lead',
           fields: {
             error: err || result
           }
@@ -64,14 +64,14 @@ function createLeadSalesforce(user, context, callback) {
     //Can use many more fields
     const data = {
       LastName: user.name,
-      Company: "Web channel signups"
+      Company: 'Web channel signups'
     };
 
     request.post(
       {
-        url: url + "/services/data/v20.0/sobjects/Lead",
+        url: url + '/services/data/v20.0/sobjects/Lead',
         headers: {
-          Authorization: "OAuth " + access_token
+          Authorization: 'OAuth ' + access_token
         },
         json: data
       },
@@ -85,9 +85,9 @@ function createLeadSalesforce(user, context, callback) {
   function getAccessToken(client_id, client_secret, username, password, callback) {
     request.post(
       {
-        url: "https://login.salesforce.com/services/oauth2/token",
+        url: 'https://login.salesforce.com/services/oauth2/token',
         form: {
-          grant_type: "password",
+          grant_type: 'password',
           client_id: client_id,
           client_secret: client_secret,
           username: username,

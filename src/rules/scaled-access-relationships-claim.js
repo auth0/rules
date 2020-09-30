@@ -26,12 +26,12 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
     !configuration.SCALED_ACCESS_BASEURL ||
     !configuration.SCALED_ACCESS_TENANT
   ) {
-    console.log("Missing required configuration. Skipping.");
+    console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
   }
 
-  const fetch = require("node-fetch");
-  const { URLSearchParams } = require("url");
+  const fetch = require('node-fetch');
+  const { URLSearchParams } = require('url');
 
   const getM2mToken = () => {
     if (global.scaledAccessM2mToken && global.scaledAccessM2mTokenExpiryInMillis > new Date().getTime() + 60000) {
@@ -39,19 +39,19 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
     } else {
       const tokenUrl = `https://${context.request.hostname}/oauth/token`;
       return fetch(tokenUrl, {
-        method: "POST",
+        method: 'POST',
         body: new URLSearchParams({
-          grant_type: "client_credentials",
+          grant_type: 'client_credentials',
           client_id: configuration.SCALED_ACCESS_CLIENTID,
           client_secret: configuration.SCALED_ACCESS_CLIENTSECRET,
           audience: configuration.SCALED_ACCESS_AUDIENCE,
-          scope: "pg:tenant:admin"
+          scope: 'pg:tenant:admin'
         })
       })
         .then((response) => {
           if (!response.ok) {
             return response.text().then((error) => {
-              console.error("Failed to obtain m2m token from " + tokenUrl);
+              console.error('Failed to obtain m2m token from ' + tokenUrl);
               throw Error(error);
             });
           } else {
@@ -69,17 +69,17 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
   const callRelationshipManagementApi = async (accessToken, path) => {
     const url = `${configuration.SCALED_ACCESS_BASEURL}/${configuration.SCALED_ACCESS_TENANT}/${path}`;
     return fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Authorization: "Bearer " + accessToken,
-        "Content-Type": "application/json"
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'application/json'
       }
     }).then(async (response) => {
       if (response.status === 404) {
         return [];
       } else if (!response.ok) {
         return response.text().then((error) => {
-          console.error("Failed to call relationship management API", url);
+          console.error('Failed to call relationship management API', url);
           throw Error(error);
         });
       } else {
@@ -108,7 +108,7 @@ function scaledAccessAddRelationshipsClaim(user, context, callback) {
     })
     .catch((err) => {
       console.error(err);
-      console.log("Using configuration: ", JSON.stringify(configuration));
+      console.log('Using configuration: ', JSON.stringify(configuration));
       callback(null, user, context); // fail gracefully, token just won't have extra claim
     });
 }

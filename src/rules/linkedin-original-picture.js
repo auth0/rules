@@ -9,19 +9,19 @@
  */
 
 function useOriginallinkedInProfilePicture(user, context, callback) {
-  if (context.connection !== "linkedin") {
+  if (context.connection !== 'linkedin') {
     return callback(null, user, context);
   }
 
-  const _ = require("lodash");
-  const request = require("request");
+  const _ = require('lodash');
+  const request = require('request');
 
-  const liIdentity = _.find(user.identities, { connection: "linkedin" });
+  const liIdentity = _.find(user.identities, { connection: 'linkedin' });
 
   const options = {
-    url: "https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json",
+    url: 'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',
     headers: {
-      Authorization: "Bearer " + liIdentity.access_token
+      Authorization: 'Bearer ' + liIdentity.access_token
     },
     json: true
   };

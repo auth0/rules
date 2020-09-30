@@ -15,7 +15,7 @@
 async function userRiskScore(user, context, cb) {
   // For Logging Events
   const log = global.getLogger
-    ? global.getLogger("Get Risk Score", cb)
+    ? global.getLogger('Get Risk Score', cb)
     : {
         callback: cb,
         error: console.error,
@@ -25,7 +25,7 @@ async function userRiskScore(user, context, cb) {
   const { callback } = log;
 
   // Skip if not user facing app type
-  if (context.clientMetadata.userApp !== "true") {
+  if (context.clientMetadata.userApp !== 'true') {
     log.info(`Skipping risk check as not enabled for app ${context.clientName}`);
     return callback(null, user, context);
   }
@@ -36,8 +36,8 @@ async function userRiskScore(user, context, cb) {
   // Will set IP to Russian IP and change user agent.
   const fakeData = false;
 
-  const ipAddress = fakeData ? "87.242.77.197" : context.request.ip;
-  const userAgent = fakeData ? "naughty-fraud-agent" : context.request.userAgent;
+  const ipAddress = fakeData ? '87.242.77.197' : context.request.ip;
+  const userAgent = fakeData ? 'naughty-fraud-agent' : context.request.userAgent;
 
   const data = {
     device: {
@@ -48,16 +48,16 @@ async function userRiskScore(user, context, cb) {
       user_id: user.user_id
     },
     email: {
-      address: user.email || ""
+      address: user.email || ''
     },
     billing: {
-      first_name: user.given_name || "",
-      last_name: user.last_name || ""
+      first_name: user.given_name || '',
+      last_name: user.last_name || ''
     }
   };
 
   try {
-    const request = require("request-promise");
+    const request = require('request-promise');
     const result = await request.post(MINFRAUD_API, {
       body: data,
       json: true,
@@ -75,8 +75,8 @@ async function userRiskScore(user, context, cb) {
     };
 
     // Append to tokens
-    context.idToken["https://travel0.net/risk"] = user.risk;
-    context.accessToken["https://travel0.net/risk"] = user.risk;
+    context.idToken['https://travel0.net/risk'] = user.risk;
+    context.accessToken['https://travel0.net/risk'] = user.risk;
   } catch (err) {
     // If the service is down, the request failed, or the result is OK just continue.
     log.error(`Error while attempting fraud check: ${err.message}`);

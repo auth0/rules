@@ -18,9 +18,9 @@
 *
 */
 function consentricProgressiveConsent(user, context, callback) {
-  const axios = require("axios@0.19.2");
-  const moment = require("moment@2.11.2");
-  const { Auth0RedirectRuleUtilities } = require("@auth0/rule-utilities@0.1.0");
+  const axios = require('axios@0.19.2');
+  const moment = require('moment@2.11.2');
+  const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
 
   const ruleUtils = new Auth0RedirectRuleUtilities(user, context, configuration);
 
@@ -45,7 +45,7 @@ function consentricProgressiveConsent(user, context, callback) {
     !CONSENTRIC_APPLICATION_ID ||
     !CONSENTRIC_REDIRECT_URL
   ) {
-    console.log("Missing required configuration. Skipping.");
+    console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
   }
 
@@ -68,8 +68,8 @@ function consentricProgressiveConsent(user, context, callback) {
         // Exchange Credentials for Consentric Api Access token
         const {
           data: { expires_in, access_token }
-        } = await consentricAuth.post("/oauth/token", {
-          grant_type: "client_credentials",
+        } = await consentricAuth.post('/oauth/token', {
+          grant_type: 'client_credentials',
           client_id: CONSENTRIC_CLIENT_ID,
           client_secret: CONSENTRIC_CLIENT_SECRET,
           audience: CONSENTRIC_AUDIENCE,
@@ -86,7 +86,7 @@ function consentricProgressiveConsent(user, context, callback) {
         global.consentricApiToken = auth;
       } catch (error) {
         console.error(
-          "Unable to retrieve API Access token for Consentric. Please check that your credentials (CONSENTRIC_CLIENT_ID and CONSENTRIC_CLIENT_SECRET) are correct."
+          'Unable to retrieve API Access token for Consentric. Please check that your credentials (CONSENTRIC_CLIENT_ID and CONSENTRIC_CLIENT_SECRET) are correct.'
         );
         throw error;
       }
@@ -104,9 +104,9 @@ function consentricProgressiveConsent(user, context, callback) {
     };
 
     return consentricApi
-      .post("/v1/citizens", data, {
+      .post('/v1/citizens', data, {
         headers: {
-          Authorization: "Bearer " + apiAccessToken
+          Authorization: 'Bearer ' + apiAccessToken
         }
       })
       .catch((err) => {
@@ -129,15 +129,15 @@ function consentricProgressiveConsent(user, context, callback) {
       const {
         data: { token, expiryDate: exp }
       } = await consentricApi.post(
-        "/v1/access-tokens/tokens",
+        '/v1/access-tokens/tokens',
         {
           applicationId: CONSENTRIC_APPLICATION_ID,
           externalRef: userRef,
-          expiryDate: moment().add(3, "months").toISOString()
+          expiryDate: moment().add(3, 'months').toISOString()
         },
         {
           headers: {
-            Authorization: "Bearer " + apiAccessToken
+            Authorization: 'Bearer ' + apiAccessToken
           }
         }
       );
@@ -155,7 +155,7 @@ function consentricProgressiveConsent(user, context, callback) {
   const loadConsentricUserAccessToken = async ({ user }) => {
     try {
       const metadataUserToken = getConsentricUserTokenFromMetadata(user);
-      if (metadataUserToken && moment(metadataUserToken.exp).subtract(1, "days").isAfter(moment()))
+      if (metadataUserToken && moment(metadataUserToken.exp).subtract(1, 'days').isAfter(moment()))
         return metadataUserToken;
 
       const { jwt: apiAccessToken } = await getConsentricApiAccessToken();
@@ -183,8 +183,8 @@ function consentricProgressiveConsent(user, context, callback) {
   const initConsentricFlow = async () => {
     try {
       const { token } = await loadConsentricUserAccessToken({ user });
-      const urlConnector = CONSENTRIC_REDIRECT_URL.includes("?") ? "&" : "?";
-      const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + "token=" + token;
+      const urlConnector = CONSENTRIC_REDIRECT_URL.includes('?') ? '&' : '?';
+      const redirectUrl = CONSENTRIC_REDIRECT_URL + urlConnector + 'token=' + token;
 
       context.redirect = {
         url: redirectUrl

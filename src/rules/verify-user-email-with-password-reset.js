@@ -8,11 +8,11 @@
  */
 
 function verifyUserWithPasswordReset(user, context, callback) {
-  const request = require("request");
-  const userApiUrl = auth0.baseUrl + "/users/";
+  const request = require('request');
+  const userApiUrl = auth0.baseUrl + '/users/';
 
   // This rule is only for Auth0 databases
-  if (context.connectionStrategy !== "auth0") {
+  if (context.connectionStrategy !== 'auth0') {
     return callback(null, user, context);
   }
 
@@ -25,7 +25,7 @@ function verifyUserWithPasswordReset(user, context, callback) {
     {
       url: userApiUrl + user.user_id,
       headers: {
-        Authorization: "Bearer " + auth0.accessToken
+        Authorization: 'Bearer ' + auth0.accessToken
       },
       json: { email_verified: true },
       timeout: 5000
