@@ -48,6 +48,48 @@ describe(ruleName, () => {
     });
   });
 
+  it('should do nothing if handling a redirect callback', (done) => {
+    context.stats.loginsCount = 1;
+    context.protocol = 'redirect-callback';
+
+    rule({}, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c).toEqual(context);
+      done();
+    });
+  });
+
+  it('should do nothing if doing silent auth', (done) => {
+    context.stats.loginsCount = 1;
+    context.request = {
+      query: { prompt: 'none' }
+    };
+
+    rule({}, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c).toEqual(context);
+      done();
+    });
+  });
+
+  it('should do nothing if missing the Slack hook URL', (done) => {
+    context.stats.loginsCount = 1;
+    rule = loadRule(
+      ruleName,
+      { configuration: {}, UnauthorizedError: Error },
+      stubs
+    );
+
+    const request = new RequestBuilder().build();
+    context = new ContextBuilder().withRequest(request).build();
+
+    rule({}, context, (err, u, c) => {
+      expect(err).toBeFalsy();
+      expect(c).toEqual(context);
+      done();
+    });
+  });
+
   it('should send message to slack on new user signup', (done) => {
     context.stats.loginsCount = 1;
     context.protocol = 'oidc-basic-profile';
