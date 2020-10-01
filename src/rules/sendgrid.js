@@ -20,28 +20,33 @@ function sendEmailWithSendgrid(user, context, callback) {
 
   const request = require('request');
 
-  request.post({
-    url: 'https://api.sendgrid.com/api/mail.send.json',
-    headers: {
-      'Authorization': 'Bearer ' + configuration.SENDGRID_API_KEY
+  request.post(
+    {
+      url: 'https://api.sendgrid.com/api/mail.send.json',
+      headers: {
+        Authorization: 'Bearer ' + configuration.SENDGRID_API_KEY
+      },
+      form: {
+        to: 'admin@example.com',
+        subject: 'NEW SIGNUP',
+        from: 'admin@example.com',
+        text: 'We have got a new sign up from: ' + user.email + '.'
+      }
     },
-    form: {
-      'to': 'admin@example.com',
-      'subject': 'NEW SIGNUP',
-      'from': 'admin@example.com',
-      'text': 'We have got a new sign up from: ' + user.email + '.'
-    }
-  }, function (error, response, body) {
-    if (error) return callback(error);
-    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
+    function (error, response, body) {
+      if (error) return callback(error);
+      if (response.statusCode !== 200)
+        return callback(new Error('Invalid operation'));
 
-    user.app_metadata.signedUp = true;
-    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function () {
-        callback(null, user, context);
-      })
-      .catch(function (err) {
-        callback(err);
-      });
-  });
+      user.app_metadata.signedUp = true;
+      auth0.users
+        .updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function () {
+          callback(null, user, context);
+        })
+        .catch(function (err) {
+          callback(err);
+        });
+    }
+  );
 }

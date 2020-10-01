@@ -13,11 +13,15 @@
 
 function mapSamlAttributes(user, context, callback) {
   context.samlConfiguration.mappings = {
-     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "user_id",
-     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress":   "email",
-     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name":           "name",
-     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food":           "user_metadata.favorite_food",
-     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address":        "app_metadata.shipping_address"
+    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier':
+      'user_id',
+    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress':
+      'email',
+    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name': 'name',
+    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/food':
+      'user_metadata.favorite_food',
+    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/address':
+      'app_metadata.shipping_address'
   };
 
   callback(null, user, context);

@@ -10,16 +10,15 @@
  *
  */
 
-  function activeDirectoryGroups(user, context, callback) {
+function activeDirectoryGroups(user, context, callback) {
   var groupAllowed = 'group1';
   if (user.groups) {
-    if(typeof user.groups === "string"){
+    if (typeof user.groups === 'string') {
       user.groups = [user.groups];
     }
-    var userHasAccess = user.groups.some(
-      function (group) {
-        return groupAllowed === group;
-      });
+    var userHasAccess = user.groups.some(function (group) {
+      return groupAllowed === group;
+    });
 
     if (!userHasAccess) {
       return callback(new UnauthorizedError('Access denied.'));

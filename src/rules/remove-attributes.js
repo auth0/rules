@@ -9,9 +9,9 @@
  */
 
 function removeUserAttribute(user, context, callback) {
-  const blacklist = [ 'some_attribute' ];
+  const blacklist = ['some_attribute'];
 
-  Object.keys(user).forEach(function(key) {
+  Object.keys(user).forEach(function (key) {
     if (blacklist.indexOf(key) > -1) {
       delete user[key];
     }

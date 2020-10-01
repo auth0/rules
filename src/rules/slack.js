@@ -10,7 +10,10 @@
 
 function slackNotificationOnUserSignup(user, context, callback) {
   // short-circuit if the user signed up already or is using a refresh token
-  if (context.stats.loginsCount > 1 || context.protocol === 'oauth2-refresh-token') {
+  if (
+    context.stats.loginsCount > 1 ||
+    context.protocol === 'oauth2-refresh-token'
+  ) {
     return callback(null, user, context);
   }
   // check this isn't a checkSession call  
@@ -20,7 +23,8 @@ function slackNotificationOnUserSignup(user, context, callback) {
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
   const slack = require('slack-notify')(SLACK_HOOK);
-  const message = 'New User: ' + (user.name || user.email) + ' (' + user.email + ')';
+  const message =
+    'New User: ' + (user.name || user.email) + ' (' + user.email + ')';
   const channel = '#some_channel';
 
   slack.success({

@@ -15,15 +15,20 @@ function getPusherToken(user, context, callback) {
   const pusherSecret = configuration.PUSHER_SECRET;
 
   if (context.request.query.channel && context.request.query.socket_id) {
-    const pusherSigned = sign(pusherSecret, context.request.query.channel, context.request.query.socket_id);
-    context.idToken['https://example.com/pusherAuth'] = pusherKey + ":" + pusherSigned;
+    const pusherSigned = sign(
+      pusherSecret,
+      context.request.query.channel,
+      context.request.query.socket_id
+    );
+    context.idToken['https://example.com/pusherAuth'] =
+      pusherKey + ':' + pusherSigned;
   }
 
   callback(null, user, context);
 
   function sign(secret, channel, socket_id) {
-    const string_to_sign = socket_id + ":" + channel;
+    const string_to_sign = socket_id + ':' + channel;
     const sha = crypto.createHmac('sha256', secret);
     return sha.update(string_to_sign).digest('hex');
   }
- }
+}

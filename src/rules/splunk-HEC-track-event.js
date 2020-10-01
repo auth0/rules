@@ -23,7 +23,8 @@ function trackEventsWithSplunkHec(user, context, callback) {
   const request = require('request');
 
   user.app_metadata = user.app_metadata || {};
-  const endpoint = 'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; // replace with your Splunk HEC endpoint;
+  const endpoint =
+    'https://http-inputs-mysplunkcloud.example.com:443/services/collector'; // replace with your Splunk HEC endpoint;
 
   //Add any interesting info to the event
   const hec_event = {
@@ -39,24 +40,28 @@ function trackEventsWithSplunkHec(user, context, callback) {
     sourcetype: 'auth0_activity'
   };
 
-  request.post({
-    url: endpoint,
-    headers: {
-      'Authorization': 'Splunk ' + configuration.SPLUNK_HEC_TOKEN
+  request.post(
+    {
+      url: endpoint,
+      headers: {
+        Authorization: 'Splunk ' + configuration.SPLUNK_HEC_TOKEN
+      },
+      strictSSL: true, // set to false if using a self-signed cert
+      json: hec_event
     },
-    strictSSL: true, // set to false if using a self-signed cert
-    json: hec_event
-  }, function(error, response, body) {
-    if (error) return callback(error);
-    if (response.statusCode !== 200) return callback(new Error('Invalid operation'));
-    user.app_metadata.signedUp = true;
-    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function () {
-        callback(null, user, context);
-      })
-      .catch(function (err) {
-        callback(err);
-      });
-  });
-
+    function (error, response, body) {
+      if (error) return callback(error);
+      if (response.statusCode !== 200)
+        return callback(new Error('Invalid operation'));
+      user.app_metadata.signedUp = true;
+      auth0.users
+        .updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function () {
+          callback(null, user, context);
+        })
+        .catch(function (err) {
+          callback(err);
+        });
+    }
+  );
 }

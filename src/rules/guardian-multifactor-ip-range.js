@@ -9,7 +9,7 @@
 
 function guardianMultifactorIpRange(user, context, callback) {
   const ipaddr = require('ipaddr.js');
-  const corp_network = "192.168.1.134/26";
+  const corp_network = '192.168.1.134/26';
   const current_ip = ipaddr.parse(context.request.ip);
 
   if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {

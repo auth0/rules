@@ -28,26 +28,30 @@ function aspnetWebApi(user, context, callback) {
   }
 
   // You should make your requests over SSL to protect your app secrets.
-  request.post({
-    url: 'https://yourwebsite.com/auth0',
-    json: {
-      user: user,
-      context: context,
-      secretToken: configuration.YOURWEBSITE_SECRET_TOKEN,
+  request.post(
+    {
+      url: 'https://yourwebsite.com/auth0',
+      json: {
+        user: user,
+        context: context,
+        secretToken: configuration.YOURWEBSITE_SECRET_TOKEN
+      },
+      timeout: 15000
     },
-    timeout: 15000
-  }, (err, response, body) => {
-    if (err) return callback(new Error(err));
+    (err, response, body) => {
+      if (err) return callback(new Error(err));
 
-    user.app_metadata.customId = body.customId;
-    context.idToken['https://example.com/custom_id'] = body.customId;
+      user.app_metadata.customId = body.customId;
+      context.idToken['https://example.com/custom_id'] = body.customId;
 
-    auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function(){
-        callback(null, user, context);
-      })
-      .catch(function(err){
-        callback(err);
-      });
-  });
+      auth0.users
+        .updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function () {
+          callback(null, user, context);
+        })
+        .catch(function (err) {
+          callback(err);
+        });
+    }
+  );
 }

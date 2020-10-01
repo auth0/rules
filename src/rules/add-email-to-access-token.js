@@ -9,7 +9,7 @@
  *
  */
 
-function (user, context, callback) {
+function addEmailToAccessToken(user, context, callback) {
   // This rule adds the authenticated user's email address to the access token.
 
   var namespace = 'https://example.com/';

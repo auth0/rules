@@ -19,7 +19,8 @@ function useOriginallinkedInProfilePicture(user, context, callback) {
   const liIdentity = _.find(user.identities, { connection: 'linkedin' });
 
   const options = {
-    url: 'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',
+    url:
+      'https://api.linkedin.com/v1/people/~/picture-urls::(original)?format=json',
     headers: {
       Authorization: 'Bearer ' + liIdentity.access_token
     },
