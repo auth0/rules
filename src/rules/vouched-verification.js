@@ -39,7 +39,15 @@ async function vouchedVerification(user, context, callback) {
   const defaultUiUrl = 'https://i.vouched.id';
   const idTokenClaim = 'https://vouched.id/is_verified';
 
-  const getJob = async (apiKey, jobToken, apiUrl) => {
+  const getJobByToken = async (apiKey, jobToken, apiUrl) => {
+    return getJob(apiKey, { token: jobToken }, apiUrl);
+  };
+
+  const getJobById = async (apiKey, jobId, apiUrl) => {
+    return getJob(apiKey, { id: jobId }, apiUrl);
+  };
+
+  const getJob = async (apiKey, params, apiUrl) => {
     const response = await axios({
       headers: {
         'X-Api-Key': apiKey,
@@ -47,9 +55,7 @@ async function vouchedVerification(user, context, callback) {
       },
       baseURL: apiUrl,
       url: '/jobs',
-      params: {
-        token: jobToken
-      }
+      params: params
     });
     const items = response.data.items;
     if (items.length === 0) {
@@ -137,7 +143,7 @@ async function vouchedVerification(user, context, callback) {
     const jobToken = ruleUtils.queryParams.jobToken;
     if (ruleUtils.isRedirectCallback && jobToken) {
       // get job from API
-      const job = await getJob(
+      const job = await getJobByToken(
         configuration.VOUCHED_API_KEY,
         jobToken,
         vouchedApiUrl
@@ -159,9 +165,9 @@ async function vouchedVerification(user, context, callback) {
     if (vouchedResults) {
       if (!isJobVerified(vouchedResults)) {
         // user failed id verification
-        const mostRecentJob = await getJob(
+        const mostRecentJob = await getJobById(
           configuration.VOUCHED_API_KEY,
-          jobToken,
+          vouchedResults.id,
           vouchedApiUrl
         );
 
