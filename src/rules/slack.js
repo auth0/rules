@@ -4,22 +4,30 @@
  * @gallery true
  * @category webhook
  *
- * This rule sends a message to a slack channel on every user signup.
+ * This rule sends a message to a Slack channel on every user signup.
  *
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
+ *
+ *    - `SLACK_HOOK_URL` URL to the Slack hook to notify.
  */
 
 function slackNotificationOnUserSignup(user, context, callback) {
   // short-circuit if the user signed up already or is using a refresh token
   if (
     context.stats.loginsCount > 1 ||
-    context.protocol === 'oauth2-refresh-token'
+    context.protocol === 'oauth2-refresh-token' ||
+    context.protocol === 'redirect-callback' ||
+    context.request.query.prompt === 'none'
   ) {
     return callback(null, user, context);
   }
-  // check this isn't a checkSession call  
-  if (context.request.query.prompt !== 'none'){
 
-  // get your slack's hook url from: https://slack.com/services/10525858050
+  if (!configuration.SLACK_HOOK_URL) {
+    console.log('Missing required configuration. Skipping.');
+    return callback(null, user, context);
+  }
+
+  // https://api.slack.com/messaging/webhooks
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
   const slack = require('slack-notify')(SLACK_HOOK);
@@ -34,7 +42,4 @@ function slackNotificationOnUserSignup(user, context, callback) {
 
   // don’t wait for the Slack API call to finish, return right away (the request will continue on the sandbox)`
   callback(null, user, context);
-  } else {  
-  callback(null, user, context);
-  }
 }
