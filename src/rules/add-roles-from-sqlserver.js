@@ -31,17 +31,17 @@ function addRolesFromSqlServer(user, context, callback) {
     const connection = new tedious.Connection({
       userName: configuration.SQL_DATABASE_USERNAME,
       password: configuration.SQL_DATABASE_PASSWORD,
-      server:   configuration.SQL_DATABASE_HOSTNAME,
+      server: configuration.SQL_DATABASE_HOSTNAME,
       options: {
         database: configuration.SQL_DATABASE_NAME,
-        encrypt:  true,
+        encrypt: true,
         rowCollectionOnRequestCompletion: true
       }
     }).on('errorMessage', (error) => {
       console.log(error.message);
     });
 
-    const query = "SELECT Email, Role FROM dbo.Role WHERE Email = @email";
+    const query = 'SELECT Email, Role FROM dbo.Role WHERE Email = @email';
 
     connection.on('connect', (err) => {
       if (err) return done(new Error(err));

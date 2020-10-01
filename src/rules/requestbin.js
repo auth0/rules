@@ -20,21 +20,24 @@ function sendVariablesToRequestBin(user, context, callback) {
 
   // https://auth0.com/docs/user-profile/user-profile-structure
   const user_whitelist = ['user_id', 'email', 'email_verified'];
-  const user_filtered  = _.pick(user, user_whitelist);
+  const user_filtered = _.pick(user, user_whitelist);
 
   // https://auth0.com/docs/rules/current/context
   const context_whitelist = ['clientID', 'connection', 'stats'];
-  const context_filtered  = _.pick(context, context_whitelist);
+  const context_filtered = _.pick(context, context_whitelist);
 
-  request.post({
-    url: 'https://requestbin.fullcontact.com/YourBinUrl',
-    json: {
-      user: user_filtered,
-      context: context_filtered,
+  request.post(
+    {
+      url: 'https://requestbin.fullcontact.com/YourBinUrl',
+      json: {
+        user: user_filtered,
+        context: context_filtered
+      },
+      timeout: 15000
     },
-    timeout: 15000
-  }, function (err, response, body){
-    if (err) return callback(err);
-    return callback(null, user, context);
-  });
+    function (err, response, body) {
+      if (err) return callback(err);
+      return callback(null, user, context);
+    }
+  );
 }

@@ -52,22 +52,37 @@ function getTwitterEmail(user, context, callback) {
     oauth_version: '1.0'
   };
 
-  params.oauth_signature = oauth.hmacsign('GET', url, params, consumerSecretKey, oauthTokenSecret);
+  params.oauth_signature = oauth.hmacsign(
+    'GET',
+    url,
+    params,
+    consumerSecretKey,
+    oauthTokenSecret
+  );
 
-  const auth = Object.keys(params).sort().map(function (k) {
-    return k + '="' + oauth.rfc3986(params[k]) + '"';
-  }).join(', ');
+  const auth = Object.keys(params)
+    .sort()
+    .map(function (k) {
+      return k + '="' + oauth.rfc3986(params[k]) + '"';
+    })
+    .join(', ');
 
-  request.get(url + '?include_email=true', {
-    headers: {
-      'Authorization': 'OAuth ' + auth
+  request.get(
+    url + '?include_email=true',
+    {
+      headers: {
+        Authorization: 'OAuth ' + auth
+      },
+      json: true
     },
-    json: true
-  }, (err, resp, body) => {
-    if (resp.statusCode !== 200) {
-      return callback(new Error('Error retrieving email from twitter: ' + body || err));
+    (err, resp, body) => {
+      if (resp.statusCode !== 200) {
+        return callback(
+          new Error('Error retrieving email from twitter: ' + body || err)
+        );
+      }
+      user.email = body.email;
+      return callback(err, user, context);
     }
-    user.email = body.email;
-    return callback(err, user, context);
-  });
+  );
 }

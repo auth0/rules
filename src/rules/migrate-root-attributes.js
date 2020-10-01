@@ -32,8 +32,10 @@ function migrateRootAttributes(user, context, cb) {
     });
 
     management.updateUser(
-      { id: user.user_id }, generateUserPayload(user), function (err, updatedUser) {
-        if ( err ) {
+      { id: user.user_id },
+      generateUserPayload(user),
+      function (err, updatedUser) {
+        if (err) {
           cb(err);
         } else {
           updateRuleUser(user, updatedUser);
@@ -58,7 +60,7 @@ function migrateRootAttributes(user, context, cb) {
   }
 
   function generateUserPayload(user) {
-    var payload = { user_metadata: {}};
+    var payload = { user_metadata: {} };
     var userMetadata = user.user_metadata;
 
     for (var key in fieldMapping) {
@@ -77,7 +79,12 @@ function migrateRootAttributes(user, context, cb) {
     }
   }
 
-  function generateUserPayloadField(userMetadata, payload, rootField, metadataField) {
+  function generateUserPayloadField(
+    userMetadata,
+    payload,
+    rootField,
+    metadataField
+  ) {
     if (typeof userMetadata[metadataField] === 'string') {
       payload[rootField] = userMetadata[metadataField];
       payload.user_metadata[metadataField] = null;

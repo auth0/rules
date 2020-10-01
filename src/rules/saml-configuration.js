@@ -12,12 +12,13 @@
  */
 
 function changeSamlConfiguration(user, context, callback) {
-  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}') return callback(null, user, context);
+  if (context.clientID !== '{YOUR_SAMLP_OR_WSFED_CLIENT_ID}')
+    return callback(null, user, context);
 
   context.samlConfiguration = context.samlConfiguration || {};
-  context.samlConfiguration.audience = "urn:foo";
-  context.samlConfiguration.recipient = "http://foo";
-  context.samlConfiguration.destination = "http://foo";
+  context.samlConfiguration.audience = 'urn:foo';
+  context.samlConfiguration.recipient = 'http://foo';
+  context.samlConfiguration.destination = 'http://foo';
   context.samlConfiguration.lifetimeInSeconds = 3600;
   //context.samlConfiguration.mappings = {
   //   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier":     "user_id",

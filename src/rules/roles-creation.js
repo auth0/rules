@@ -9,7 +9,6 @@
  */
 
 function setRolesToUser(user, context, callback) {
-
   // Roles should only be set to verified users.
   if (!user.email || !user.email_verified) {
     return callback(null, user, context);
@@ -21,7 +20,13 @@ function setRolesToUser(user, context, callback) {
   const addRolesToUser = function (user) {
     const endsWith = '@example.com';
 
-    if (user.email && (user.email.substring(user.email.length - endsWith.length, user.email.length) === endsWith)) {
+    if (
+      user.email &&
+      user.email.substring(
+        user.email.length - endsWith.length,
+        user.email.length
+      ) === endsWith
+    ) {
       return ['admin'];
     }
     return ['user'];
@@ -30,7 +35,8 @@ function setRolesToUser(user, context, callback) {
   const roles = addRolesToUser(user);
 
   user.app_metadata.roles = roles;
-  auth0.users.updateAppMetadata(user.user_id, user.app_metadata)
+  auth0.users
+    .updateAppMetadata(user.user_id, user.app_metadata)
     .then(function () {
       context.idToken['https://example.com/roles'] = user.app_metadata.roles;
       callback(null, user, context);
