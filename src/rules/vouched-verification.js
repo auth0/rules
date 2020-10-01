@@ -59,7 +59,7 @@ async function vouchedVerification(user, context, callback) {
     });
     const items = response.data.items;
     if (items.length === 0) {
-      throw new Error(`Unable to find Job with the following id: ${jobToken}`);
+      throw new Error(`Unable to find Job with the following params: ${JSON.stringify(params)}`);
     }
     return items[0];
   };
