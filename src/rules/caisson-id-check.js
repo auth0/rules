@@ -55,6 +55,10 @@ async function caissonIDCheck(user, context, callback) {
     util: new Auth0RedirectRuleUtilities(user, context, caissonConf)
   };
 
+  user.app_metadata = user.app_metadata || {};
+  user.app_metadata.caisson = user.app_metadata.caisson || {};
+  const caisson = user.app_metadata.caisson;
+
   /**
    * Toggleable logger.  Set CAISSON_DEBUG in the Auth0 configuration to enable.
    *
@@ -187,19 +191,14 @@ async function caissonIDCheck(user, context, callback) {
    * @param {object} results
    */
   async function updateUser(results) {
-    user.app_metadata = user.app_metadata || {};
-    let caisson = user.app_metadata.caisson || {};
-
     caisson.idcheck_url =
       manager.caissonHosts.dashboard + '/request/' + results.check_id;
     caisson.status = results.status;
     caisson.last_check = Date.now();
     caisson.count = caisson.count ? caisson.count + 1 : 1;
 
-    user.app_metadata.caisson = caisson;
-
     try {
-      await auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
+      await auth0.users.updateAppMetadata(user.user_id, { caisson });
     } catch (err) {
       throw err;
     }
@@ -248,16 +247,13 @@ async function caissonIDCheck(user, context, callback) {
   try {
     if (isNaN(manager.idCheckFlags.login_frequency_days)) {
       //Do nothing.  Skip if no preference is set.
-    } else if (
-      !user.app_metadata.caisson.last_check ||
-      user.app_metadata.caisson.status !== 'passed'
-    ) {
+    } else if (!caisson.last_check || caisson.status !== 'passed') {
       //Always perform the first ID Check or if the
       //last ID Check didn't pass.
       setIDCheckRedirect();
     } else if (
       manager.idCheckFlags.login_frequency_days >= 0 &&
-      millisToDays(Date.now() - user.app_metadata.caisson.last_check) >=
+      millisToDays(Date.now() - caisson.last_check) >=
         manager.idCheckFlags.login_frequency_days
     ) {
       //ID Check if the requisite number of days have passed since the last check.
