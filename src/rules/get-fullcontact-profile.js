@@ -27,13 +27,15 @@ function getFullContactProfile(user, context, callback) {
     return callback(null, user, context);
 
   request.get(
-    'https://api.fullcontact.com/v2/person.json',
+    'https://api.fullcontact.com/v3/person.enrich',
     {
-      qs: {
-        email: user.email,
-        apiKey: FULLCONTACT_KEY
+      body: {
+        email: user.email
       },
-      json: true
+      json: true,
+      headers: {
+        'Authorization': 'Bearer ' + FULLCONTACT_KEY
+      }
     },
     (error, response, body) => {
       if (error || (response && response.statusCode !== 200)) {
