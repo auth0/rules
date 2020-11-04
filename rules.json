@@ -168,14 +168,14 @@
     "name": "multifactor",
     "templates": [
       {
-        "id": "adaptive-mfa",
-        "title": "Adaptive MFA",
+        "id": "adaptive-mfa-custom-confidence",
+        "title": "Adaptive MFA with Custom Confidence",
         "overview": "Trigger multifactor authentication for a specific risk assessment result.",
         "categories": [
           "multifactor"
         ],
         "description": "<p>This rule is used to trigger multifactor authentication when a specific risk assessment result is detected.</p>\n<p>The <code>context.riskAssessment</code> attribute will be available only when the Adaptive MFA policy is enabled for your tenant. This feature is only available to customers that have subscribed to an Enterprise plan.</p>\n<p>For more information about Adaptive MFA and the <code>context.riskAssessment</code> attribute, read our <a href=\"https://auth0.com/docs/<<<TODO>>\">full documentation</a>.</p>",
-        "code": "function adaptiveMfa(user, context, callback) {\n  const riskAssessment = context.riskAssessment;\n\n  // Example condition: prompt MFA only based on the ImpossibleTravel confidence level.\n  let shouldPromptMfa;\n  switch (riskAssessment.assessments.ImpossibleTravel.confidence) {\n    case 'low':\n    case 'medium':\n      shouldPromptMfa = true;\n      break;\n    case 'high':\n      shouldPromptMfa = false;\n      break;\n    case 'neutral':\n      // When this assessor has no useful information about the confidence, do not prompt MFA.\n      shouldPromptMfa = false;\n      break;\n  }\n\n  // It only makes sense to prompt for MFA when the user has at least one enrolled MFA factor.\n  const userEnrolledFactors = user.multifactor || [];\n  const canPromptMfa = userEnrolledFactors.length > 0;\n\n  if (shouldPromptMfa && canPromptMfa) {\n    context.multifactor = {\n      provider: 'any',\n      // ensure that we will prompt MFA, even if the end-user has selected to remember the browser.\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
+        "code": "function adaptiveMfaWithCustomConfidence(user, context, callback) {\n  const riskAssessment = context.riskAssessment;\n\n  // Example condition: prompt MFA only based on the ImpossibleTravel confidence level.\n  let shouldPromptMfa;\n  switch (riskAssessment.assessments.ImpossibleTravel.confidence) {\n    case 'low':\n    case 'medium':\n      shouldPromptMfa = true;\n      break;\n    case 'high':\n      shouldPromptMfa = false;\n      break;\n    case 'neutral':\n      // When this assessor has no useful information about the confidence, do not prompt MFA.\n      shouldPromptMfa = false;\n      break;\n  }\n\n  // It only makes sense to prompt for MFA when the user has at least one enrolled MFA factor.\n  const userEnrolledFactors = user.multifactor || [];\n  const canPromptMfa = userEnrolledFactors.length > 0;\n\n  if (shouldPromptMfa && canPromptMfa) {\n    context.multifactor = {\n      provider: 'any',\n      // ensure that we will prompt MFA, even if the end-user has selected to remember the browser.\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
       },
       {
         "id": "duo-multifactor",

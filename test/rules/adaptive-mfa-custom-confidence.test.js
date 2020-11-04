@@ -5,7 +5,7 @@ const ContextBuilder = require('../utils/contextBuilder');
 const RiskAssessmentBuilder = require('../utils/riskAssessmentBuilder');
 const UserBuilder = require('../utils/userBuilder');
 
-const ruleName = 'adaptive-mfa';
+const ruleName = 'adaptive-mfa-custom-confidence';
 
 describe(ruleName, () => {
   let rule;

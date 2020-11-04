@@ -1,5 +1,5 @@
 /**
- * @title Adaptive MFA
+ * @title Adaptive MFA with Custom Confidence
  * @overview Trigger multifactor authentication for a specific risk assessment result.
  * @gallery true
  * @category multifactor
@@ -12,7 +12,7 @@
  *
  */
 
-function adaptiveMfa(user, context, callback) {
+function adaptiveMfaWithCustomConfidence(user, context, callback) {
   const riskAssessment = context.riskAssessment;
 
   // Example condition: prompt MFA only based on the ImpossibleTravel confidence level.
