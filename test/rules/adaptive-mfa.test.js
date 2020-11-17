@@ -5,7 +5,7 @@ const ContextBuilder = require('../utils/contextBuilder');
 const RiskAssessmentBuilder = require('../utils/riskAssessmentBuilder');
 const UserBuilder = require('../utils/userBuilder');
 
-const ruleName = 'adaptive-mfa-custom-confidence';
+const ruleName = 'adaptive-mfa';
 
 describe(ruleName, () => {
   let rule;
@@ -40,11 +40,11 @@ describe(ruleName, () => {
     });
   });
 
-  describe('when confidence of ImpossibleTravel is low', () => {
+  describe('when confidence of NewDevice is low', () => {
     it("should set multifactor provider to 'any'", (done) => {
       const user = givenEnrolledUser();
       const riskAssessment = new RiskAssessmentBuilder()
-        .withAssessmentConfidence('ImpossibleTravel', 'low')
+        .withAssessmentConfidence('NewDevice', 'low')
         .build();
       const context = new ContextBuilder()
         .withRiskAssessment(riskAssessment)
@@ -59,11 +59,11 @@ describe(ruleName, () => {
     });
   });
 
-  describe('when confidence of ImpossibleTravel is low for unenrolled user', () => {
+  describe('when confidence of NewDevice is low for unenrolled user', () => {
     it('should not set multifactor', (done) => {
       const user = givenNotEnrolledUser();
       const riskAssessment = new RiskAssessmentBuilder()
-        .withAssessmentConfidence('ImpossibleTravel', 'low')
+        .withAssessmentConfidence('NewDevice', 'low')
         .build();
       const context = new ContextBuilder()
         .withRiskAssessment(riskAssessment)

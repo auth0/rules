@@ -165,104 +165,6 @@
     ]
   },
   {
-    "name": "multifactor",
-    "templates": [
-      {
-        "id": "adaptive-mfa-custom-confidence",
-        "title": "Adaptive MFA with Custom Confidence",
-        "overview": "Trigger multifactor authentication for a specific risk assessment result.",
-        "categories": [
-          "multifactor"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when a specific risk assessment result is detected.</p>\n<p>The <code>context.riskAssessment</code> attribute will be available only when the Adaptive MFA policy is enabled for your tenant. This feature is only available to customers that have subscribed to an Enterprise plan.</p>\n<p>For more information about Adaptive MFA and the <code>context.riskAssessment</code> attribute, read our <a href=\"https://auth0.com/docs/<<<TODO>>\">full documentation</a>.</p>",
-        "code": "function adaptiveMfaWithCustomConfidence(user, context, callback) {\n  const riskAssessment = context.riskAssessment;\n\n  // Example condition: prompt MFA only based on the ImpossibleTravel confidence level.\n  let shouldPromptMfa;\n  switch (riskAssessment.assessments.ImpossibleTravel.confidence) {\n    case 'low':\n    case 'medium':\n      shouldPromptMfa = true;\n      break;\n    case 'high':\n      shouldPromptMfa = false;\n      break;\n    case 'neutral':\n      // When this assessor has no useful information about the confidence, do not prompt MFA.\n      shouldPromptMfa = false;\n      break;\n  }\n\n  // It only makes sense to prompt for MFA when the user has at least one enrolled MFA factor.\n  const userEnrolledFactors = user.multifactor || [];\n  const canPromptMfa = userEnrolledFactors.length > 0;\n\n  if (shouldPromptMfa && canPromptMfa) {\n    context.multifactor = {\n      provider: 'any',\n      // ensure that we will prompt MFA, even if the end-user has selected to remember the browser.\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "duo-multifactor",
-        "title": "Multifactor with Duo Security",
-        "overview": "Trigger multifactor authentication with Duo Security when a condition is met.",
-        "categories": [
-          "multifactor"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>",
-        "code": "function duoMultifactor(user, context, callback) {\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n    context.multifactor = {\n      //required\n      provider: 'duo',\n      ikey: configuration.DUO_IKEY,\n      skey: configuration.DUO_SKEY,\n      host: configuration.DUO_HOST, // e.g.: 'api-XXXXXXXX.duosecurity.com',\n\n      // optional, defaults to true. Set to false to force DuoSecurity every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n\n      // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n      // username: user.nickname\n    };\n    // }\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor-authorization-extension",
-        "title": "Multifactor with Auth0 Guardian and Authorization Extension",
-        "overview": "Guardian mfa + authorization extension working together.",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
-        "code": "function guardianMultifactorAuthorization(user, context, callback) {\n  if (\n    !user.app_metadata ||\n    !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)\n  ) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    admins: true\n  };\n\n  const needsMFA = !!groups.find(function (group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA) {\n    context.multifactor = {\n      // required\n      provider: 'guardian', //required\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor-ip-range",
-        "title": "Multifactor when request comes from outside an IP range",
-        "overview": "Trigger multifactor authentication when IP is outside the expected range.",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
-        "code": "function guardianMultifactorIpRange(user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = '192.168.1.134/26';\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor-stepup-authentication",
-        "title": "Multifactor Stepup Authentication",
-        "overview": "Used to challenge for a second factor when requested by sending acr_values.",
-        "categories": [
-          "multifactor"
-        ],
-        "description": "<p>This rule will challenge for a second authentication factor on request (step up) when\nacr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor' is sent in\nthe request. Before the challenge is made, 'context.authentication.methods' is checked\nto determine when the user has already successfully completed a challenge in the\ncurrent session.</p>",
-        "code": "function guardianMultifactorStepUpAuthentication(user, context, callback) {\n  // This rule initiates multi-factor authenticaiton as a second factor\n  // whenever the request contains the following value:\n  //\n  // acr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor'\n  //\n  // and multi-factor authentication has not already been completed in the\n  // current session/\n\n  if (\n    context.request.query.acr_values ===\n      'http://schemas.openid.net/pape/policies/2007/06/multi-factor' &&\n    !context.authentication.methods.some((method) => method.name === 'mfa')\n  ) {\n    context.multifactor = {\n      provider: 'any',\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "guardian-multifactor",
-        "title": "Multifactor with Auth0 Guardian",
-        "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
-        "categories": [
-          "multifactor",
-          "guardian"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
-        "code": "function guardianMultifactor(user, context, callback) {\n  //const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n\n  // run only for the specified clients\n  //if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n\n  // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n  //if (user.user_metadata && user.user_metadata.use_mfa){\n  context.multifactor = {\n    // required\n    provider: 'guardian',\n\n    // optional, defaults to true. Set to false to force Guardian authentication every time.\n    // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n    allowRememberBrowser: false\n  };\n  //}\n  //}\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "mfa-require-enrollment",
-        "title": "Require MFA Enrollment",
-        "overview": "Require MFA Enrollment on next login",
-        "categories": [
-          "multifactor"
-        ],
-        "description": "<p>This rule requires that any user not already enrolled in MFA will be presented with an enrollment prompt on their next login.</p>\n<p>This rule can be paired with the Adaptive MFA feature that prompts for an MFA challenge only when the login confidence is low. It can also be combined with another custom Rule that prompts for an MFA challenge under a custom condition.</p>\n<p>Note that the Adaptive MFA feature is only available to customers that have subscribed to an Enterprise plan. See our <a href=\"https://auth0.com/docs/<<<TODO>>\">Adaptive MFA documentation</a> for more information.</p>",
-        "code": "function requireMfaEnrollment(user, context, callback) {\n  const enrolledFactors = user.multifactor || [];\n  if (enrolledFactors.length === 0) {\n    // The user has not enrolled in any MFA factor yet, trigger an MFA enrollment\n    context.multifactor = {\n      provider: 'any'\n    };\n  }\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "mfa",
-        "title": "Multifactor Authentication",
-        "overview": "Trigger multifactor authentication when a condition is met.",
-        "categories": [
-          "multifactor"
-        ],
-        "description": "<p>This rule is used to trigger multifactor authentication when a condition is met.</p>",
-        "code": "function multifactorAuthentication(user, context, callback) {\n  /*\n  You can trigger MFA conditionally by checking:\n  1. Client ID:\n  context.clientID === 'REPLACE_WITH_YOUR_CLIENT_ID'\n  2. User metadata:\n  user.user_metadata.use_mfa\n  */\n\n  // if (<condition>) {\n  context.multifactor = {\n    provider: 'any',\n\n    // optional, defaults to true. Set to false to force authentication every time.\n    // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n    allowRememberBrowser: false\n  };\n  //}\n\n  callback(null, user, context);\n}"
-      },
-      {
-        "id": "require-mfa-once-per-session",
-        "title": "Require MFA once per session",
-        "overview": "Require multifactor authentication only once per session",
-        "categories": [
-          "multifactor"
-        ],
-        "description": "<p>This rule can be used to avoid prompting a user for multifactor authentication if they have successfully completed MFA in their current session.</p>\n<p>This is particularly useful when performing silent authentication (<code>prompt=none</code>) to renew short-lived access tokens in a SPA (Single Page Application) during the duration of a user's session without having to rely on setting <code>allowRememberBrowser</code> to <code>true</code>.</p>",
-        "code": "function requireMfaOncePerSession(user, context, callback) {\n  const completedMfa = !!context.authentication.methods.find(\n    (method) => method.name === 'mfa'\n  );\n\n  if (completedMfa) {\n    return callback(null, user, context);\n  }\n\n  context.multifactor = {\n    provider: 'any',\n    allowRememberBrowser: false\n  };\n\n  callback(null, user, context);\n}"
-      }
-    ]
-  },
-  {
     "name": "enrich profile",
     "templates": [
       {
@@ -695,6 +597,84 @@
         ],
         "description": "<p>Please see the <a href=\"https://marketplace.auth0.com/integrations/vouched-id-verification\">Vouched integration</a> for more information and detailed installation instructions.</p>\n<p><strong>Required configuration</strong> (this Rule will be skipped if any of the below are not defined):</p>\n<ul>\n<li><code>VOUCHED_API_KEY</code> Your Private Key located in Vouched Dashboard</li>\n<li><code>VOUCHED_PUBLIC_KEY</code> Your Public Key located in Vouched Dashboard</li>\n</ul>\n<p><strong>Optional configuration:</strong></p>\n<ul>\n<li><code>VOUCHED_API_URL</code> Your Vouched API URL; leave blank unless instructed by your Vouched rep</li>\n<li><code>VOUCHED_ID_TOKEN_CLAIM</code> Set a <code>https://vouchedid/is_verified</code> claim in the ID token with results</li>\n<li><code>VOUCHED_VERIFICATION_OPTIONAL</code> Set to \"true\" to succeed even if verification fails</li>\n</ul>",
         "code": "async function vouchedVerification(user, context, callback) {\n  if (!configuration.VOUCHED_API_KEY || !configuration.VOUCHED_PUBLIC_KEY) {\n    console.log('Missing required configuration. Skipping.');\n    return callback(null, user, context);\n  }\n\n  /* ----------- START helpers ----------- */\n  const axios = require('axios');\n  const url = require('url');\n  const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');\n\n  const ruleUtils = new Auth0RedirectRuleUtilities(\n    user,\n    context,\n    configuration\n  );\n\n  const defaultApiUrl = 'https://verify.vouched.id/api';\n  const defaultUiUrl = 'https://i.vouched.id';\n  const idTokenClaim = 'https://vouched.id/is_verified';\n\n  const getJobByToken = async (apiKey, jobToken, apiUrl) => {\n    return getJob(apiKey, { token: jobToken }, apiUrl);\n  };\n\n  const getJobById = async (apiKey, jobId, apiUrl) => {\n    return getJob(apiKey, { id: jobId }, apiUrl);\n  };\n\n  const getJob = async (apiKey, params, apiUrl) => {\n    const response = await axios({\n      headers: {\n        'X-Api-Key': apiKey,\n        'Content-Type': 'application/json'\n      },\n      baseURL: apiUrl,\n      url: '/jobs',\n      params: params\n    });\n    const items = response.data.items;\n    if (items.length === 0) {\n      throw new Error(\n        `Unable to find Job with the following params: ${JSON.stringify(\n          params\n        )}`\n      );\n    }\n    return items[0];\n  };\n\n  const createPacket = async (\n    apiKey,\n    publicKey,\n    continueUrl,\n    user,\n    apiUrl = defaultApiUrl\n  ) => {\n    const requestBody = {\n      pk: publicKey,\n      uid: user.user_id,\n      continueUrl\n    };\n\n    if (user.given_name) requestBody.firstName = user.given_name;\n\n    if (user.family_name) requestBody.lastName = user.family_name;\n\n    const response = await axios({\n      method: 'post',\n      headers: {\n        'X-Api-Key': apiKey,\n        'Content-Type': 'application/json'\n      },\n      baseURL: apiUrl,\n      url: '/packet/auth0',\n      data: requestBody\n    });\n    const data = response.data;\n    if (data.errors) {\n      throw new Error(`${data.errors[0].message}`);\n    }\n    return data.id;\n  };\n\n  const isJobForUser = (job, userId) => {\n    try {\n      return (\n        job.request.properties.filter(\n          (prop) => prop.name === 'uid' && prop.value === userId\n        ).length === 1\n      );\n    } catch (e) {\n      return false;\n    }\n  };\n\n  const extractResults = (job) => {\n    const { id, status, reviewSuccess, result } = job;\n    return {\n      id,\n      status,\n      reviewSuccess,\n      result\n    };\n  };\n\n  const isJobVerified = (job) => {\n    try {\n      return job.result.success || job.reviewSuccess;\n    } catch (e) {\n      return false;\n    }\n  };\n\n  const redirectToVerification = (packetId, baseUrl = defaultUiUrl) => {\n    const redirectUrl = new url.URL(`${baseUrl}/auth0`);\n    redirectUrl.searchParams.append('id', packetId);\n    return redirectUrl.href;\n  };\n\n  /* ----------- END helpers ----------- */\n\n  user.app_metadata = user.app_metadata || {};\n  const vouchedApiUrl = configuration.VOUCHED_API_URL || defaultApiUrl;\n\n  try {\n    const jobToken = ruleUtils.queryParams.jobToken;\n    if (ruleUtils.isRedirectCallback && jobToken) {\n      // get job from API\n      const job = await getJobByToken(\n        configuration.VOUCHED_API_KEY,\n        jobToken,\n        vouchedApiUrl\n      );\n\n      // check if job's user is the same as current user\n      if (!isJobForUser(job, user.user_id)) {\n        return callback(\n          new Error(`The ID Verification results do not belong to this user.`)\n        );\n      }\n\n      // update app metadata w/ results\n      user.app_metadata.vouched = extractResults(job);\n      await auth0.users.updateAppMetadata(user.user_id, user.app_metadata);\n    }\n\n    const vouchedResults = user.app_metadata.vouched;\n    if (vouchedResults) {\n      if (!isJobVerified(vouchedResults)) {\n        // user failed id verification\n        const mostRecentJob = await getJobById(\n          configuration.VOUCHED_API_KEY,\n          vouchedResults.id,\n          vouchedApiUrl\n        );\n\n        // check if job's user is the same as current user\n        if (!isJobForUser(mostRecentJob, user.user_id)) {\n          return callback(\n            new Error(`The ID Verification results do not belong to this user.`)\n          );\n        }\n\n        // user is now verified, update app metadata\n        if (isJobVerified(mostRecentJob)) {\n          user.app_metadata.vouched = extractResults(mostRecentJob);\n          await auth0.users.updateAppMetadata(user.user_id, user.app_metadata);\n        } else {\n          // user failed verification check and doesn't have an override\n          if (configuration.VOUCHED_ID_TOKEN_CLAIM === 'true') {\n            context.idToken[idTokenClaim] = false;\n          }\n          if (configuration.VOUCHED_VERIFICATION_OPTIONAL === 'true') {\n            return callback(null, user, context);\n          }\n\n          return callback(new Error(`This user's ID cannot be verified.`));\n        }\n      }\n    } else {\n      // create Auth0 packet to securely pass info to Vouched\n      const packetId = await createPacket(\n        configuration.VOUCHED_API_KEY,\n        configuration.VOUCHED_PUBLIC_KEY,\n        `https://${context.request.hostname}/continue`,\n        user\n      );\n\n      // user doesn't have a verification result, redirect to Vouched with packet\n      if (ruleUtils.canRedirect) {\n        context.redirect = { url: redirectToVerification(packetId) };\n      }\n      return callback(null, user, context);\n    }\n  } catch (e) {\n    return callback(e);\n  }\n\n  if (configuration.VOUCHED_ID_TOKEN_CLAIM === 'true') {\n    context.idToken[idTokenClaim] = true;\n  }\n\n  return callback(null, user, context);\n}"
+      }
+    ]
+  },
+  {
+    "name": "multifactor",
+    "templates": [
+      {
+        "id": "duo-multifactor",
+        "title": "Multifactor with Duo Security",
+        "overview": "Trigger multifactor authentication with Duo Security when a condition is met.",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with <a href=\"http://duosecurity.com\">Duo Security</a> when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>\n<p>You need to create two <strong>integrations</strong> in <strong>Duo Security</strong>: one of type <strong>WebSDK</strong> and the other <strong>Admin SDK</strong>.</p>",
+        "code": "function duoMultifactor(user, context, callback) {\n  var CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n  // run only for the specified clients\n  if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n    // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n    // if (user.user_metadata && user.user_metadata.use_mfa){\n    context.multifactor = {\n      //required\n      provider: 'duo',\n      ikey: configuration.DUO_IKEY,\n      skey: configuration.DUO_SKEY,\n      host: configuration.DUO_HOST, // e.g.: 'api-XXXXXXXX.duosecurity.com',\n\n      // optional, defaults to true. Set to false to force DuoSecurity every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n\n      // optional. Use some attribute of the profile as the username in DuoSecurity. This is also useful if you already have your users enrolled in Duo.\n      // username: user.nickname\n    };\n    // }\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "guardian-multifactor-authorization-extension",
+        "title": "Multifactor with Auth0 Guardian and Authorization Extension",
+        "overview": "Guardian mfa + authorization extension working together.",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 for one or more groups on the authorization extension.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function guardianMultifactorAuthorization(user, context, callback) {\n  if (\n    !user.app_metadata ||\n    !user.app_metadata.authorization ||\n    !Array.isArray(user.app_metadata.authorization.groups)\n  ) {\n    return callback(null, user, context);\n  }\n\n  const groups = user.app_metadata.authorization.groups;\n  const GROUPS_WITH_MFA = {\n    // Add groups that need MFA here\n    // Example\n    admins: true\n  };\n\n  const needsMFA = !!groups.find(function (group) {\n    return GROUPS_WITH_MFA[group];\n  });\n\n  if (needsMFA) {\n    context.multifactor = {\n      // required\n      provider: 'guardian', //required\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "guardian-multifactor-ip-range",
+        "title": "Multifactor when request comes from outside an IP range",
+        "overview": "Trigger multifactor authentication when IP is outside the expected range.",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.</p>",
+        "code": "function guardianMultifactorIpRange(user, context, callback) {\n  const ipaddr = require('ipaddr.js');\n  const corp_network = '192.168.1.134/26';\n  const current_ip = ipaddr.parse(context.request.ip);\n\n  if (!current_ip.match(ipaddr.parseCIDR(corp_network))) {\n    context.multifactor = {\n      provider: 'guardian',\n\n      // optional, defaults to true. Set to false to force Guardian authentication every time.\n      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "guardian-multifactor-stepup-authentication",
+        "title": "Multifactor Stepup Authentication",
+        "overview": "Used to challenge for a second factor when requested by sending acr_values.",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule will challenge for a second authentication factor on request (step up) when\nacr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor' is sent in\nthe request. Before the challenge is made, 'context.authentication.methods' is checked\nto determine when the user has already successfully completed a challenge in the\ncurrent session.</p>",
+        "code": "function guardianMultifactorStepUpAuthentication(user, context, callback) {\n  // This rule initiates multi-factor authenticaiton as a second factor\n  // whenever the request contains the following value:\n  //\n  // acr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor'\n  //\n  // and multi-factor authentication has not already been completed in the\n  // current session/\n\n  if (\n    context.request.query.acr_values ===\n      'http://schemas.openid.net/pape/policies/2007/06/multi-factor' &&\n    !context.authentication.methods.some((method) => method.name === 'mfa')\n  ) {\n    context.multifactor = {\n      provider: 'any',\n      allowRememberBrowser: false\n    };\n  }\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "guardian-multifactor",
+        "title": "Multifactor with Auth0 Guardian",
+        "overview": "Trigger multifactor authentication with Auth0 when a condition is met.",
+        "categories": [
+          "multifactor",
+          "guardian"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication with Auth0 when a condition is met.</p>\n<p>Upon first login, the user can enroll the device.</p>",
+        "code": "function guardianMultifactor(user, context, callback) {\n  //const CLIENTS_WITH_MFA = ['REPLACE_WITH_YOUR_CLIENT_ID'];\n\n  // run only for the specified clients\n  //if (CLIENTS_WITH_MFA.indexOf(context.clientID) !== -1) {\n\n  // uncomment the following if clause in case you want to request a second factor only from user's that have user_metadata.use_mfa === true\n  //if (user.user_metadata && user.user_metadata.use_mfa){\n  context.multifactor = {\n    // required\n    provider: 'guardian',\n\n    // optional, defaults to true. Set to false to force Guardian authentication every time.\n    // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n    allowRememberBrowser: false\n  };\n  //}\n  //}\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "mfa",
+        "title": "Multifactor Authentication",
+        "overview": "Trigger multifactor authentication when a condition is met.",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule is used to trigger multifactor authentication when a condition is met.</p>",
+        "code": "function multifactorAuthentication(user, context, callback) {\n  /*\n  You can trigger MFA conditionally by checking:\n  1. Client ID:\n  context.clientID === 'REPLACE_WITH_YOUR_CLIENT_ID'\n  2. User metadata:\n  user.user_metadata.use_mfa\n  */\n\n  // if (<condition>) {\n  context.multifactor = {\n    provider: 'any',\n\n    // optional, defaults to true. Set to false to force authentication every time.\n    // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details\n    allowRememberBrowser: false\n  };\n  //}\n\n  callback(null, user, context);\n}"
+      },
+      {
+        "id": "require-mfa-once-per-session",
+        "title": "Require MFA once per session",
+        "overview": "Require multifactor authentication only once per session",
+        "categories": [
+          "multifactor"
+        ],
+        "description": "<p>This rule can be used to avoid prompting a user for multifactor authentication if they have successfully completed MFA in their current session.</p>\n<p>This is particularly useful when performing silent authentication (<code>prompt=none</code>) to renew short-lived access tokens in a SPA (Single Page Application) during the duration of a user's session without having to rely on setting <code>allowRememberBrowser</code> to <code>true</code>.</p>",
+        "code": "function requireMfaOncePerSession(user, context, callback) {\n  const completedMfa = !!context.authentication.methods.find(\n    (method) => method.name === 'mfa'\n  );\n\n  if (completedMfa) {\n    return callback(null, user, context);\n  }\n\n  context.multifactor = {\n    provider: 'any',\n    allowRememberBrowser: false\n  };\n\n  callback(null, user, context);\n}"
       }
     ]
   },
