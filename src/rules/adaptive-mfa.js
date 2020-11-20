@@ -8,7 +8,7 @@
  *
  * The `context.riskAssessment` attribute will be available only when Adaptive MFA is enabled for your tenant. Use of the Adaptive MFA feature requires an add-on for the Enterprise plan. Please contact sales with any questions.
  *
- * For more information about Adaptive MFA and the `context.riskAssessment` attribute, read our [full documentation](https://auth0.com/docs/<<<TODO>>>).
+ * For more information about Adaptive MFA and the `context.riskAssessment` attribute, read our [full documentation](https://auth0.com/docs/mfa/adaptive-mfa).
  *
  */
 
@@ -16,9 +16,11 @@ function adaptiveMfa(user, context, callback) {
   /*
    * This rule is used to trigger multifactor authentication when a specific risk assessment result is detected.
    *
-   * The `context.riskAssessment` attribute will be available only when Adaptive MFA is enabled for your tenant. Use of the Adaptive MFA feature requires an add-on for the Enterprise plan. Please contact sales with any questions.
+   * The `context.riskAssessment` attribute will be available only when Adaptive MFA is enabled for your tenant. Use of
+   * the Adaptive MFA feature requires an add-on for the Enterprise plan. Please contact sales with any questions.
    *
-   * For more information about Adaptive MFA and the `context.riskAssessment` attribute, read our [full documentation](https://auth0.com/docs/<<<TODO>>>).
+   * For more information about Adaptive MFA and the `context.riskAssessment` attribute, read our full documentation
+   * at https://auth0.com/docs/mfa/adaptive-mfa.
    */
   const riskAssessment = context.riskAssessment;
 
