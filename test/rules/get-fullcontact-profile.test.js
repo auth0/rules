@@ -29,7 +29,7 @@ describe(ruleName, () => {
     stubs['slack-notify'] = jest.fn();
 
     stubs.request = {
-      get: jest
+      post: jest
         .fn()
         .mockImplementationOnce((url, obj, cb) => {
           cb(null, { statusCode: 200 }, fullContactData);
