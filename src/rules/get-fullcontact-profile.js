@@ -8,7 +8,7 @@
  *
  * If the information is immediately available (signaled by a `statusCode=200`), it adds a new property `fullcontact` to the user_metadata and returns. Any other conditions are ignored.
  *
- * See [FullContact docs](https://dashboard.fullcontact.com/api-ref) for full details.
+ * See [FullContact docs](https://dashboard.fullcontact.com/api-ref#enrich) for full details.
  *
  */
 
@@ -28,10 +28,10 @@ function (user, context, callback) {
   // skip if no email
   if (!user.email) return callback(null, user, context);
 
-  // skip if FullContact metadata is already there
+  // skip if FullContact metadata has already been added to the user profile
   if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
 
-  request.get('https://api.fullcontact.com/v3/person.enrich', {
+  request.post('https://api.fullcontact.com/v3/person.enrich', {
     'headers': {
       'Authorization': 'Bearer ' + FULLCONTACT_KEY,
     },
