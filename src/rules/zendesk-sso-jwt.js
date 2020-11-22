@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function zendeskSsoWithJwt(user, context, callback) {
   const jwt = require('jsonwebtoken');
   const uuid = require('uuid');
 
@@ -27,7 +27,11 @@ function (user, context, callback) {
   };
 
   const zendesk_token = jwt.sign(payload, configuration.ZENDESK_JWT_SECRET);
-  context.idToken['https://example.com/zendesk_jwt_url'] = 'https://' + ZENDESK_SUBDOMAIN + '.zendesk.com/access/jwt?jwt=' + zendesk_token;
+  context.idToken['https://example.com/zendesk_jwt_url'] =
+    'https://' +
+    ZENDESK_SUBDOMAIN +
+    '.zendesk.com/access/jwt?jwt=' +
+    zendesk_token;
 
   callback(null, user, context);
 }

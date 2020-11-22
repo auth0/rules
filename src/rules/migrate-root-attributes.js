@@ -13,7 +13,7 @@
  * 2- The mapped fields from user_metadata will be removed following the update.
  * 3- This rule will be executed on each login event. For signup scenarios, you should only consider using this rule if you currently use a custom signup form or Authentication Signup API, as these signup methods do not support setting the root attributes.
  */
-function (user, context, cb) {
+function migrateRootAttributes(user, context, cb) {
   // Field Mapping, the property is the root attribute and the value is the field name on user_metadata.
   // You can change the value in case you don't have the same name on user_metadata.
   var fieldMapping = {
@@ -32,8 +32,10 @@ function (user, context, cb) {
     });
 
     management.updateUser(
-      { id: user.user_id }, generateUserPayload(user), function (err, updatedUser) {
-        if ( err ) {
+      { id: user.user_id },
+      generateUserPayload(user),
+      function (err, updatedUser) {
+        if (err) {
           cb(err);
         } else {
           updateRuleUser(user, updatedUser);
@@ -58,7 +60,7 @@ function (user, context, cb) {
   }
 
   function generateUserPayload(user) {
-    var payload = { user_metadata: {}};
+    var payload = { user_metadata: {} };
     var userMetadata = user.user_metadata;
 
     for (var key in fieldMapping) {
@@ -77,7 +79,12 @@ function (user, context, cb) {
     }
   }
 
-  function generateUserPayloadField(userMetadata, payload, rootField, metadataField) {
+  function generateUserPayloadField(
+    userMetadata,
+    payload,
+    rootField,
+    metadataField
+  ) {
     if (typeof userMetadata[metadataField] === 'string') {
       payload[rootField] = userMetadata[metadataField];
       payload.user_metadata[metadataField] = null;

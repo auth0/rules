@@ -13,7 +13,7 @@
  *
  */
 
-function (user, context, callback) {
+function generateParseSessionToken(user, context, callback) {
   // run this only for the Parse application
   // if (context.clientID !== 'PARSE CLIENT ID IN AUTH0') return callback(null, user, context);
 
@@ -25,52 +25,71 @@ function (user, context, callback) {
 
   const username = user.email || user.name || user.user_id; // this is the Auth0 user prop that will be mapped to the username in the db
 
-  request.get({
-    url: 'https://api.parse.com/1/login',
-    qs: {
-      username: username,
-      password: PARSE_USER_PASSWORD
-    },
-    headers: {
-      'X-Parse-Application-Id': PARSE_APP_ID,
-      'X-Parse-REST-API-Key': PARSE_API_KEY
-    }
-  },
-  function (err, response, body) {
-    if (err) return callback(err);
-
-    // user was found, add sessionToken to user profile
-    if (response.statusCode === 200) {
-      context.idToken['https://example.com/parse_session_token'] = JSON.parse(body).sessionToken;
-      return callback(null, user, context);
-    }
-
-    // Not found. Likely the user doesn't exist, we provision one
-    if (response.statusCode === 404) {
-      request.post({
-        url: 'https://api.parse.com/1/users',
-        json: {
-          username: username,
-          password: PARSE_USER_PASSWORD
-        },
-        headers: {
-          'X-Parse-Application-Id': PARSE_APP_ID,
-          'X-Parse-REST-API-Key': PARSE_API_KEY,
-          'Content-Type': 'application/json'
-        }
+  request.get(
+    {
+      url: 'https://api.parse.com/1/login',
+      qs: {
+        username: username,
+        password: PARSE_USER_PASSWORD
       },
-      function (err, response, body) {
-        if (err) return callback(err);
+      headers: {
+        'X-Parse-Application-Id': PARSE_APP_ID,
+        'X-Parse-REST-API-Key': PARSE_API_KEY
+      }
+    },
+    function (err, response, body) {
+      if (err) return callback(err);
 
-        // user created, add sessionToken to user profile
-        if (response.statusCode === 201) {
-          context.idToken['https://example.com/parse_session_token'] = body.sessionToken;
-          return callback(null, user, context);
-        }
-        return callback(new Error('The user provisioning returned an unknown error. Body: ' + JSON.stringify(body)));
-      });
-    } else {
-      return callback(new Error('The login returned an unknown error. Status: ' + response.statusCode + ' Body: ' + body));
+      // user was found, add sessionToken to user profile
+      if (response.statusCode === 200) {
+        context.idToken['https://example.com/parse_session_token'] = JSON.parse(
+          body
+        ).sessionToken;
+        return callback(null, user, context);
+      }
+
+      // Not found. Likely the user doesn't exist, we provision one
+      if (response.statusCode === 404) {
+        request.post(
+          {
+            url: 'https://api.parse.com/1/users',
+            json: {
+              username: username,
+              password: PARSE_USER_PASSWORD
+            },
+            headers: {
+              'X-Parse-Application-Id': PARSE_APP_ID,
+              'X-Parse-REST-API-Key': PARSE_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          },
+          function (err, response, body) {
+            if (err) return callback(err);
+
+            // user created, add sessionToken to user profile
+            if (response.statusCode === 201) {
+              context.idToken['https://example.com/parse_session_token'] =
+                body.sessionToken;
+              return callback(null, user, context);
+            }
+            return callback(
+              new Error(
+                'The user provisioning returned an unknown error. Body: ' +
+                  JSON.stringify(body)
+              )
+            );
+          }
+        );
+      } else {
+        return callback(
+          new Error(
+            'The login returned an unknown error. Status: ' +
+              response.statusCode +
+              ' Body: ' +
+              body
+          )
+        );
+      }
     }
-  });
+  );
 }

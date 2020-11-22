@@ -5,6 +5,7 @@ const ContextBuilder = require('../utils/contextBuilder');
 const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'get-fullcontact-profile';
+
 describe(ruleName, () => {
   let rule;
   let context;
@@ -14,13 +15,6 @@ describe(ruleName, () => {
 
   beforeEach(() => {
     globals = {
-      request: {
-        get: jest
-          .fn()
-          .mockImplementationOnce((url, obj, cb) => {
-            cb(null, { statusCode: 200 }, fullContactData)
-          })
-      },
       auth0: {
         users: {
           updateUserMetadata: jest.fn()
@@ -31,7 +25,16 @@ describe(ruleName, () => {
         SLACK_HOOK_URL: 'YOUR SLACK HOOK URL'
       }
     };
-    stubs['slack-notify'] = jest.fn()
+
+    stubs['slack-notify'] = jest.fn();
+
+    stubs.request = {
+      get: jest
+        .fn()
+        .mockImplementationOnce((url, obj, cb) => {
+          cb(null, { statusCode: 200 }, fullContactData);
+        })
+    };
 
     user = new UserBuilder().build();
 

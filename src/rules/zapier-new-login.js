@@ -12,7 +12,8 @@
  *
  */
 
-function (user, context, callback) {
+function triggerZapOnUserLogin(user, context, callback) {
+  const _ = require('lodash');
   const request = require('request');
 
   const small_context = {
@@ -25,12 +26,14 @@ function (user, context, callback) {
 
   const payload_to_zap = _.extend({}, user, small_context);
 
-  request.post({
-    url : configuration.ZAP_HOOK_URL,
-    json: payload_to_zap
-  },
-  function (err, response, body) {
-    // swallow error
-    callback(null, user, context);
-  });
+  request.post(
+    {
+      url: configuration.ZAP_HOOK_URL,
+      json: payload_to_zap
+    },
+    function (err, response, body) {
+      // swallow error
+      callback(null, user, context);
+    }
+  );
 }

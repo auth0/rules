@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function sendEventsToSegmentIo(user, context, callback) {
   if (context.protocol === 'delegation') {
     return callback(null, user, context);
   }
@@ -44,10 +44,14 @@ function (user, context, callback) {
       method: 'POST',
       url: 'https://api.segment.io/v1/track',
       headers: {
-        'Content-type' : 'application/json',
-        'Authorization': 'Basic ' + Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ':').toString('base64')
+        'Content-type': 'application/json',
+        Authorization:
+          'Basic ' +
+          Buffer.from(configuration.SEGMENTIO_WRITE_KEY + ':').toString(
+            'base64'
+          )
       },
-      body: JSON.stringify(sioTrack),
+      body: JSON.stringify(sioTrack)
     });
   }
 

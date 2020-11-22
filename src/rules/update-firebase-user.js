@@ -12,7 +12,7 @@
  *
  */
 
-function (user, context, callback) {
+function updateFirebaseUser(user, context, callback) {
   const request = require('request');
 
   const baseURL = configuration.FIREBASE_URL;
@@ -30,12 +30,14 @@ function (user, context, callback) {
   };
 
   const putURL = baseURL + '/users/' + fb_id + '.json?auth=' + secret;
-  request.put({
-    url: putURL,
-    json: fbIdentity
-  },
-  function(err, response, body) {
-    if (err) return callback(err);
-    return callback(null, user, context);
-  });
+  request.put(
+    {
+      url: putURL,
+      json: fbIdentity
+    },
+    function (err, response, body) {
+      if (err) return callback(err);
+      return callback(null, user, context);
+    }
+  );
 }

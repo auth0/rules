@@ -1,4 +1,5 @@
-function (user, context, callback) {
+function activeDirectoryPasswordResetPolicy(user, context, callback) {
+  const jwt = require('jsonwebtoken');
 
   if (context.connection !== 'FabrikamAD') {
     return callback(null, user, context);

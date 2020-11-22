@@ -8,13 +8,19 @@
  *
  */
 
-function (user, context, callback) {
+function facebookCustomPicture(user, context, callback) {
+  const _ = require('lodash');
+
   if (context.connection === 'facebook') {
     const fbIdentity = _.find(user.identities, { connection: 'facebook' });
     // for more sizes and types of images that can be returned, see:
     // https://developers.facebook.com/docs/graph-api/reference/user/picture/
     const pictureType = 'large';
-    context.idToken.picture = 'https://graph.facebook.com/v2.5/' + fbIdentity.user_id + '/picture?type=' + pictureType;
+    context.idToken.picture =
+      'https://graph.facebook.com/v2.5/' +
+      fbIdentity.user_id +
+      '/picture?type=' +
+      pictureType;
   }
   callback(null, user, context);
 }

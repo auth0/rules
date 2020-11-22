@@ -8,8 +8,7 @@
  *
  */
 
-function (user, context, callback) {
-
+function userWhitelistForSpecificApp(user, context, callback) {
   // Access should only be granted to verified users.
   if (!user.email || !user.email_verified) {
     return callback(new UnauthorizedError('Access denied.'));
@@ -17,11 +16,11 @@ function (user, context, callback) {
 
   // only enforce for NameOfTheAppWithWhiteList
   // bypass this rule for all other apps
-  if(context.clientName !== 'NameOfTheAppWithWhiteList'){
+  if (context.clientName !== 'NameOfTheAppWithWhiteList') {
     return callback(null, user, context);
   }
 
-  const whitelist = [ 'user1@example.com', 'user2@example.com' ]; // authorized users
+  const whitelist = ['user1@example.com', 'user2@example.com']; // authorized users
   const userHasAccess = whitelist.some(function (email) {
     return email === user.email;
   });

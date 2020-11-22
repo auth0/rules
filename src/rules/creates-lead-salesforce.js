@@ -12,11 +12,13 @@
  *
  */
 
-function (user, context, callback) {
+function createLeadSalesforce(user, context, callback) {
   user.app_metadata = user.app_metadata || {};
   if (user.app_metadata.recordedAsLead) {
-    return callback(null,user,context);
+    return callback(null, user, context);
   }
+
+  const request = require('request');
 
   const MY_SLACK_WEBHOOK_URL = 'YOUR SLACK WEBHOOK URL';
   const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
@@ -48,55 +50,70 @@ function (user, context, callback) {
         response.instance_url,
         response.access_token,
         (err, result) => {
-        if (err || !result || !result.id) {
-          slack.alert({
-            channel: '#some_channel',
-            text: 'Error Creating SALESFORCE Lead',
-            fields: {
-              error: err || result
-            }
-          });
+          if (err || !result || !result.id) {
+            slack.alert({
+              channel: '#some_channel',
+              text: 'Error Creating SALESFORCE Lead',
+              fields: {
+                error: err || result
+              }
+            });
 
-          return;
+            return;
+          }
+
+          user.app_metadata.recordedAsLead = true;
+          auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
         }
-
-        user.app_metadata.recordedAsLead = true;
-        auth0.users.updateAppMetadata(user.user_id, user.app_metadata);
-      });
-    });
+      );
+    }
+  );
 
   //See http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm
-  function createLead(url, access_token, callback){
+  function createLead(url, access_token, callback) {
     //Can use many more fields
     const data = {
       LastName: user.name,
       Company: 'Web channel signups'
     };
 
-    request.post({
-      url: url + "/services/data/v20.0/sobjects/Lead",
-      headers: {
-        "Authorization": "OAuth " + access_token
+    request.post(
+      {
+        url: url + '/services/data/v20.0/sobjects/Lead',
+        headers: {
+          Authorization: 'OAuth ' + access_token
+        },
+        json: data
       },
-      json: data
-      }, (err, response, body) => {
+      (err, response, body) => {
         return callback(err, body);
-      });
+      }
+    );
   }
 
   //Obtains a SFCOM access_token with user credentials
-  function getAccessToken(client_id, client_secret, username, password, callback) {
-    request.post({
-      url: 'https://login.salesforce.com/services/oauth2/token',
-      form: {
-        grant_type: 'password',
-        client_id: client_id,
-        client_secret: client_secret,
-        username: username,
-        password: password
-      }}, (err, respose, body) => {
+  function getAccessToken(
+    client_id,
+    client_secret,
+    username,
+    password,
+    callback
+  ) {
+    request.post(
+      {
+        url: 'https://login.salesforce.com/services/oauth2/token',
+        form: {
+          grant_type: 'password',
+          client_id: client_id,
+          client_secret: client_secret,
+          username: username,
+          password: password
+        }
+      },
+      (err, respose, body) => {
         return callback(JSON.parse(body));
-      });
+      }
+    );
   }
 
   // don’t wait for the SF API call to finish, return right away (the request will continue on the sandbox)`

@@ -15,7 +15,7 @@
  *
  */
 
-function(user, context, callback) {
+function sendEventsToKeen(user, context, callback) {
   if (context.stats.loginsCount > 1) {
     return callback(null, user, context);
   }
@@ -26,7 +26,7 @@ function(user, context, callback) {
   const slack = require('slack-notify')(MY_SLACK_WEBHOOK_URL);
 
   const projectId = configuration.KEEN_PROJ_ID;
-  const writeKey  = configuration.KEEN_WRITE_KEY;
+  const writeKey = configuration.KEEN_WRITE_KEY;
   const eventCollection = 'signups';
 
   const keenEvent = {
@@ -35,25 +35,35 @@ function(user, context, callback) {
     ip: context.request.ip // Potentially any other properties in the user profile/context
   };
 
-  request.post({
-    url: 'https://api.keen.io/3.0/projects/' + projectId + '/events/' + eventCollection,
-    headers: {
-      'Content-type': 'application/json',
-      'Authorization': writeKey,
+  request.post(
+    {
+      url:
+        'https://api.keen.io/3.0/projects/' +
+        projectId +
+        '/events/' +
+        eventCollection,
+      headers: {
+        'Content-type': 'application/json',
+        Authorization: writeKey
+      },
+      body: JSON.stringify(keenEvent)
     },
-    body: JSON.stringify(keenEvent),
-  },
-  function (error, response, body) {
-    if (error || (response && response.statusCode !== 200)) {
-      slack.alert({
-        channel: '#some_channel',
-        text: 'KEEN API ERROR',
-        fields: {
-          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')
-        }
-      });
+    function (error, response, body) {
+      if (error || (response && response.statusCode !== 200)) {
+        slack.alert({
+          channel: '#some_channel',
+          text: 'KEEN API ERROR',
+          fields: {
+            error: error
+              ? error.toString()
+              : response
+              ? response.statusCode + ' ' + body
+              : ''
+          }
+        });
+      }
     }
-  });
+  );
 
   callback(null, user, context);
 }

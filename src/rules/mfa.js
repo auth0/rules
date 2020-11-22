@@ -8,7 +8,7 @@
  *
  */
 
-function (user, context, callback) {
+function multifactorAuthentication(user, context, callback) {
   /*
   You can trigger MFA conditionally by checking:
   1. Client ID:
@@ -18,13 +18,13 @@ function (user, context, callback) {
   */
 
   // if (<condition>) {
-    context.multifactor = {
-      provider: 'any',
+  context.multifactor = {
+    provider: 'any',
 
-      // optional, defaults to true. Set to false to force authentication every time.
-      // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
-      allowRememberBrowser: false
-    };
+    // optional, defaults to true. Set to false to force authentication every time.
+    // See https://auth0.com/docs/multifactor-authentication/custom#change-the-frequency-of-authentication-requests for details
+    allowRememberBrowser: false
+  };
   //}
 
   callback(null, user, context);

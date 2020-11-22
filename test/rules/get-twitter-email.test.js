@@ -5,6 +5,11 @@ const RequestBuilder = require('../utils/requestBuilder');
 const UserBuilder = require('../utils/userBuilder');
 
 const ruleName = 'get-twitter-email';
+
+const twitterDataSample = {
+  email: 'some@email.test'
+};
+
 describe(ruleName, () => {
   let rule;
   let context;
@@ -14,18 +19,10 @@ describe(ruleName, () => {
 
   beforeEach(() => {
     globals = {
-      request: {
-        get: jest
-          .fn()
-          .mockImplementationOnce((url, obj, cb) => {
-            cb(null, { statusCode: 200 }, twitterDataSample)
-          })
-      },
       configuration: {
         TWITTER_CONSUMER_KEY: 'UPDATE-WITH-YOUR-CONSUMER-KEY',
         TWITTER_CONSUMER_SECRET_KEY: 'UPDATE-WITH-YOUR-CONSUMER-SECRET-KEY'
       },
-      _: require('lodash')
     };
 
     user = new UserBuilder()
@@ -42,10 +39,18 @@ describe(ruleName, () => {
       .withConnectionStrategy('twitter')
       .build();
 
+    stubs['request'] = {
+      get: jest.fn()
+        .mockImplementationOnce((url, obj, cb) => {
+          cb(null, { statusCode: 200 }, twitterDataSample);
+        })
+    };
+
     stubs['oauth-sign'] = {
       hmacsign: jest.fn(() => 'oauth sig'),
       rfc3986: jest.fn(() => 'rfc val')
     };
+
     stubs['uuid'] = {
       v4: jest.fn(() => 'cfef96ed-3198-44ee-b7fd-64caeaca7b76')
     };
@@ -61,7 +66,3 @@ describe(ruleName, () => {
     });
   });
 });
-
-const twitterDataSample = {
-  email: 'some@email.test'
-}

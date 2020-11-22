@@ -22,6 +22,7 @@ function (user, context, callback) {
   // Create a Slack app and get a hook URL: https://api.slack.com/messaging/webhooks#getting-started  
   const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
+  const request = require('request');
   const slack = require('slack-notify')(SLACK_HOOK);
 
   // skip if no email
@@ -56,8 +57,14 @@ function (user, context, callback) {
     user.user_metadata = user.user_metadata || {};
     user.user_metadata.fullcontact = body;
 
-    auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
-    context.idToken['https://example.com/fullcontact'] = user.user_metadata.fullcontact;
-    return callback(null, user, context);
-  });
+      // if we reach here, it means fullcontact returned info and we'll add it to the metadata
+      user.user_metadata = user.user_metadata || {};
+      user.user_metadata.fullcontact = body;
+
+      auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
+      context.idToken['https://example.com/fullcontact'] =
+        user.user_metadata.fullcontact;
+      return callback(null, user, context);
+    }
+  );
 }
