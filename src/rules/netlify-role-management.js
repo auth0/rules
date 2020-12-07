@@ -4,9 +4,6 @@
  * @gallery true
  * @category marketplace
  *
- *
- * **Required configuration** (this Rule will be skipped if any of the below are not defined):
- *
  * **Optional configuration:**
  *
  *    - `DEFAULT_ROLE_NAME` - name of the default role to be given to a user
@@ -16,7 +13,7 @@
 
 async function (user, context, callback) {
 
-  const ManagementClient = require('auth0@2.17.0').ManagementClient;
+  const ManagementClient = require('auth0@2.27.1').ManagementClient;
   
   const namespace = configuration.CUSTOM_CLAIMS_NAMESPACE || "https://netlify-integration.com";
   const assignedRoles = (context.authorization || {}).roles;
