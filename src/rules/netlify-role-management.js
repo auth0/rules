@@ -31,15 +31,12 @@ async function (user, context, callback) {
           { id : user.user_id}, 
           { "roles" :[defaultRoleId]}
         );
-      	context.idToken[namespace + "/roles"] = [defaultRoleName];
-      	return callback(null, user, context);
+      	assignedRoles.push(defaultRoleName);
     }catch(ex){
       console.error("Failed to add default role to user");
-      return callback(null, user, context);
     }
   }
   
-  //attach existing roles to Id Token
   context.idToken[namespace + "/roles"] = assignedRoles;
   return callback(null, user, context);  
 }
