@@ -22,11 +22,8 @@ describe(ruleName, () => {
       },
       configuration: {
         FULLCONTACT_KEY: 'YOUR FULLCONTACT API KEY',
-        SLACK_HOOK_URL: 'YOUR SLACK HOOK URL'
       }
     };
-
-    stubs['slack-notify'] = jest.fn();
 
     stubs.request = {
       post: jest
@@ -58,6 +55,10 @@ describe(ruleName, () => {
   });
 });
 
-const fullContactData = {
-  test: 'test'
-}
+const fullContactData = `{
+  "test": "test",
+  "test3": {
+    "test1": "test",
+    "test2": "test"
+  }
+}`

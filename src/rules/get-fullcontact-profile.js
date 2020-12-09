@@ -12,53 +12,50 @@
  *
  */
 
-function (user, context, callback) {
+function getFullContactProfile(user, context, callback) {
   // The following two configuration keys could be added to the Rules configuration object at https://manage.auth0.com/#/rules/
   // See https://auth0.com/docs/rules/guides/configuration for details
-  
+
   // Get FullContact API key: https://dashboard.fullcontact.com/
   const FULLCONTACT_KEY = configuration.FULLCONTACT_KEY;
-  
-  // Create a Slack app and get a hook URL: https://api.slack.com/messaging/webhooks#getting-started  
-  const SLACK_HOOK = configuration.SLACK_HOOK_URL;
 
   const request = require('request');
-  const slack = require('slack-notify')(SLACK_HOOK);
 
   // skip if no email
   if (!user.email) return callback(null, user, context);
 
   // skip if FullContact metadata has already been added to the user profile
-  if (user.user_metadata && user.user_metadata.fullcontact) return callback(null, user, context);
+  if (user.user_metadata && user.user_metadata.fullcontact) {
+    return callback(null, user, context);
+  }
 
-  request.post('https://api.fullcontact.com/v3/person.enrich', {
-    'headers': {
-      'Authorization': 'Bearer ' + FULLCONTACT_KEY,
+  request.post(
+    'https://api.fullcontact.com/v3/person.enrich',
+    {
+      headers: {
+        Authorization: 'Bearer ' + FULLCONTACT_KEY
+      },
+      body: JSON.stringify({
+        email: user.email
+      })
     },
-    body: JSON.stringify({
-      "email": user.email
-    }),
-  }, (error, response, body) => {
-    if (error || (response && response.statusCode !== 200)) {
+    (error, response, body) => {
+      if (error || (response && response.statusCode !== 200)) {
+        // swallow FullContact api errors and just continue login
+        return callback(null, user, context);
+      }
 
-      slack.alert({
-        channel: '#slack_channel',
-        text: 'FullContact API Error',
-        fields: {
-          error: error ? error.toString() : (response ? response.statusCode + ' ' + body : '')
-        }
-      });
+      // if we reach here, it means FullContact returned info and we'll add it to the metadata
 
-      // swallow FullContact api errors and just continue login
-      return callback(null, user, context);
-    }
-
-    // if we reach here, it means FullContact returned info and we'll add it to the metadata
-    user.user_metadata = user.user_metadata || {};
-    user.user_metadata.fullcontact = body;
-
-      // if we reach here, it means fullcontact returned info and we'll add it to the metadata
       user.user_metadata = user.user_metadata || {};
+      try {
+        user.user_metadata.fullcontact = JSON.parse(body);
+      } catch (parseError) {
+        console.error(
+          'Error parsing FullContact response: ' + parseError.message
+        );
+        return callback(null, user, context);
+      }
       user.user_metadata.fullcontact = body;
 
       auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
