@@ -35,9 +35,10 @@ async function netlifyRoleManagement(user, context, callback) {
         { id: user.user_id },
         { roles: [defaultRoleId] }
       );
-      assignedRoles.push(defaultRoleName);
     } catch (ex) {
-      console.error('Failed to add default role to user');
+      console.error('Failed to add default role to user', ex);
+    } finally {
+      assignedRoles.push(defaultRoleName);
     }
   }
 
