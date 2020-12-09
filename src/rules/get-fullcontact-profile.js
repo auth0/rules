@@ -22,7 +22,9 @@ function getFullContactProfile(user, context, callback) {
   const request = require('request');
 
   // skip if no email
-  if (!user.email) return callback(null, user, context);
+  if (!user.email) {
+    return callback(null, user, context);
+  }
 
   // skip if FullContact metadata has already been added to the user profile
   if (user.user_metadata && user.user_metadata.fullcontact) {
@@ -39,28 +41,45 @@ function getFullContactProfile(user, context, callback) {
         email: user.email
       })
     },
-    (error, response, body) => {
-      if (error || (response && response.statusCode !== 200)) {
+    (httpError, response, body) => {
+      if (httpError) {
+        console.error(
+          'Error calling FullContact API: ' + httpError.message
+        );
         // swallow FullContact api errors and just continue login
         return callback(null, user, context);
       }
 
       // if we reach here, it means FullContact returned info and we'll add it to the metadata
 
-      user.user_metadata = user.user_metadata || {};
+      let parsedBody;
+
       try {
-        user.user_metadata.fullcontact = JSON.parse(body);
+        parsedBody = JSON.parse(body);
       } catch (parseError) {
         console.error(
           'Error parsing FullContact response: ' + parseError.message
         );
         return callback(null, user, context);
       }
-      user.user_metadata.fullcontact = body;
 
-      auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
-      context.idToken['https://example.com/fullcontact'] =
-        user.user_metadata.fullcontact;
+      user.user_metadata = user.user_metadata || {};
+      user.user_metadata.fullcontact = parsedBody;
+
+      try {
+        auth0.users.updateUserMetadata(user.user_id, user.user_metadata);
+      } catch (auth0Error) {
+        console.error(
+          'Error updating the user profile: ' + auth0Error.message
+        );
+        return callback(null, user, context);
+      }
+
+      // The details property could be very large
+      const parsedBodyClone = JSON.parse(JSON.stringify(parsedBody));
+      delete parsedBodyClone.details;
+      context.idToken['https://example.com/fullcontact'] = parsedBodyClone;
+
       return callback(null, user, context);
     }
   );

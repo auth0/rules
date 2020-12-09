@@ -29,7 +29,7 @@ describe(ruleName, () => {
       post: jest
         .fn()
         .mockImplementationOnce((url, obj, cb) => {
-          cb(null, { statusCode: 200 }, fullContactData);
+          cb(null, { statusCode: 200 }, JSON.stringify(fullContactData));
         })
     };
 
@@ -47,18 +47,24 @@ describe(ruleName, () => {
     rule(user, context, (e, u, c) => {
       const call = updateUserMetadataMock.mock.calls[0];
       expect(call[0]).toBe(user.user_id);
-      expect(call[1].fullcontact).toBe(fullContactData);
+      expect(call[1].fullcontact).toMatchObject(fullContactData);
 
-      expect(c.idToken['https://example.com/fullcontact']).toBe(fullContactData);
+      delete fullContactData.details;
+      expect(c.idToken['https://example.com/fullcontact']).toMatchObject(
+        fullContactData
+      );
       done();
     });
   });
 });
 
-const fullContactData = `{
-  "test": "test",
-  "test3": {
-    "test1": "test",
-    "test2": "test"
+const fullContactData = {
+  test: "test",
+  test3: {
+    test1: "test",
+    test2: "test"
+  },
+  details: {
+    test4: "test"
   }
-}`
+};
