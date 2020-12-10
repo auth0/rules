@@ -16,6 +16,9 @@ function adaptiveMfa(user, context, callback) {
   /*
    * This rule is used to trigger multifactor authentication when a specific risk assessment result is detected.
    *
+   * Use of this rule is recommended when end users are already enrolled in MFA and you wish to trigger MFA
+   * based on contextual risk.
+   *
    * The `context.riskAssessment` attribute will be available only when Adaptive MFA is enabled for your tenant. Use of
    * the Adaptive MFA feature requires an add-on for the Enterprise plan. Please contact sales with any questions.
    *
@@ -41,6 +44,7 @@ function adaptiveMfa(user, context, callback) {
   }
 
   // It only makes sense to prompt for MFA when the user has at least one enrolled MFA factor.
+  // Use of this rule is only recommended when end users are already enrolled in MFA. 
   const userEnrolledFactors = user.multifactor || [];
   const canPromptMfa = userEnrolledFactors.length > 0;
 
