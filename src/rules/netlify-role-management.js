@@ -16,7 +16,7 @@ async function netlifyRoleManagement(user, context, callback) {
 
   const namespace =
     configuration.CUSTOM_CLAIMS_NAMESPACE || 'https://netlify-integration.com';
-  const assignedRoles = (context.authorization || {}).roles;
+  const assignedRoles = (context.authorization || {}).roles || [];
   const defaultRoleName = configuration.DEFAULT_ROLE_NAME;
   const defaultRoleId = configuration.DEFAULT_ROLE_ID;
 
