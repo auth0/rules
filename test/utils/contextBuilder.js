@@ -72,6 +72,10 @@ class ContextBuilder {
     this.context.authentication = authentication;
     return this;
   }
+  withRiskAssessment(riskAssessment) {
+    this.context.riskAssessment = riskAssessment;
+    return this;
+  }
   build() {
     return this.context;
   }

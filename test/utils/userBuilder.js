@@ -67,6 +67,10 @@ class UserBuilder {
     this.user.identities = identities;
     return this;
   }
+  withMultifactor(multifactor) {
+    this.user.multifactor = multifactor;
+    return this;
+  }
   build() {
     return this.user;
   }
