@@ -12,7 +12,7 @@
  */
 
 async function netlifyRoleManagement(user, context, callback) {
-  const ManagementClient = require('auth0@2.27.1').ManagementClient;
+  const ManagementClient = require('auth0@2.30.0').ManagementClient;
 
   const namespace =
     configuration.CUSTOM_CLAIMS_NAMESPACE || 'https://netlify-integration.com';
