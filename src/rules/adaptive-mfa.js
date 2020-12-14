@@ -44,7 +44,7 @@ function adaptiveMfa(user, context, callback) {
   }
 
   // It only makes sense to prompt for MFA when the user has at least one enrolled MFA factor.
-  // Use of this rule is only recommended when end users are already enrolled in MFA. 
+  // Use of this rule is only recommended when end users are already enrolled in MFA.
   const userEnrolledFactors = user.multifactor || [];
   const canPromptMfa = userEnrolledFactors.length > 0;
 
