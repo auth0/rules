@@ -75,8 +75,6 @@ function(user, context, callback) {
 				.catch(function(err) {
 					return callback(err);
 				});
-
-			return;
 		}
 
 		if (payload.reason !== 'verification_accepted') {
