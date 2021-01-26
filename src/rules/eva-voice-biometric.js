@@ -70,7 +70,7 @@ function(user, context, callback) {
 			// persist the user_metadata update
 			auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
 				.then(function() {
-					callback(null, user, context);
+					return callback(null, user, context);
 				})
 				.catch(function(err) {
 					callback(err);
