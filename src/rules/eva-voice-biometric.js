@@ -60,7 +60,7 @@ function(user, context, callback) {
 			jwtid: user.jti
 		};
 
-    var payload = jwt.verify(context.request.body.token, clientSecret, options);
+    const payload = jwt.verify(context.request.body.token, clientSecret, options);
 		//console.log(payload);
 
 		if (payload.reason === 'enrolment_succeeded') {
