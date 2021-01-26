@@ -3,7 +3,6 @@
 *	@overview EVA Voice Biometric connector rule for Auth0 enables voice enrolment and verification as a second factor
 *	@gallery true
 *	@category marketplace
-*	@author Auraya Systems 2020
 *
 *	EVA WEB is a second-factor voice biometric solution designed for use with a range of web browsers that support audio capture. 
 *	The biometric verification process is intended to be part of an authentication flow to enhance security, privacy and ease-of-use. 
