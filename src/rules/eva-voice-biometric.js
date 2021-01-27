@@ -3,7 +3,6 @@
 *	@overview EVA Voice Biometric connector rule for Auth0 enables voice enrolment and verification as a second factor
 *	@gallery true
 *	@category marketplace
-*	@author Auraya Systems 2020
 *
 *	EVA WEB is a second-factor voice biometric solution designed for use with a range of web browsers that support audio capture. 
 *	The biometric verification process is intended to be part of an authentication flow to enhance security, privacy and ease-of-use. 
@@ -18,36 +17,53 @@
 *	At the conclusion of enrolment they will be redirected back to the authentication flow.
 *	
 *	Configuration Items:
-*	EVA_URL = EVA endpoint, typically: https://eva-web.mydomain.com/server/oauth
-*	CLIENT_ID = JWT client id on the EVA server (and this server)
-*	CLIENT_SECRET = JWT client secret on the EVA server (and this server)
-*	ISSUER = this app (or "issuer")
+*	AURAYA_URL = EVA endpoint, typically: https://eva-web.mydomain.com/server/oauth
+*	AURAYA_CLIENT_ID = JWT client id on the EVA server (and this server)
+*	AURAYA_CLIENT_SECRET = JWT client secret on the EVA server (and this server)
+*	AURAYA_ISSUER = this app (or "issuer")
 *	
-*	RANDOM_DIGITS = true|false
-*	COMMON_DIGITS = true|false
-*	PERSONAL_DIGITS = a user.user_metadata field that contains digits such as phone_number, or blank
+*	AURAYA_RANDOM_DIGITS = true|false whether to prompt for random digits
+*	AURAYA_COMMON_DIGITS = true|false whether to prompt for common digits
+*	AURAYA_PERSONAL_DIGITS = a user.user_metadata field that contains digits such as phone_number, or blank
+*
+*	AURAYA_DEBUG = true|false (or blank) controls debug output
 */
 function(user, context, callback) {
 
-	console.log(user);
-	//console.log(context);
-	console.log(configuration);
+	if (typeof(configuration.AURAYA_DEBUG) !== 'undefined' && configuration.AURAYA_DEBUG === 'true') {
+		console.log(user);
+		console.log(context);
+		console.log(configuration);
+	}
+	
+	if (
+	    !configuration.AURAYA_COMMON_DIGITS ||
+	    !configuration.AURAYA_RANDOM_DIGITS ||
+	    !configuration.AURAYA_PERSONAL_DIGITS ||
+	    !configuration.AURAYA_URL ||
+	    !configuration.AURAYA_CLIENT_ID ||
+	    !configuration.AURAYA_CLIENT_SECRET ||
+	    !configuration.AURAYA_ISSUER
+	  ) {
+	    console.log('Missing required configuration. Skipping.');
+	    return callback(null, user, context);
+	  }
 
-	var clientSecret = configuration.CLIENT_SECRET;
+	const clientSecret = configuration.AURAYA_CLIENT_SECRET;
     
   
-	// Prepare Users' enrolment status
+	// Prepare user's enrolment status
 	user.user_metadata = user.user_metadata || {};
-	user.user_metadata.eva = user.user_metadata.eva || {};
+	user.user_metadata.auraya_eva = user.user_metadata.auraya_eva || {};
 
 
 	// User has initiated a login and is prompted to use voice biometrics
 	// Send user's information and query params in a JWT to avoid tampering
-	function createToken(clientId, clientSecret, issuer, user) {
+	function createToken(user) {
 		const options = {
 			expiresInMinutes: 2,
-			audience: clientId,
-			issuer: issuer
+			audience: configuration.AURAYA_CLIENT_ID,
+			issuer: configuration.AURAYA_ISSUER
 		};
 
 		return jwt.sign(user, clientSecret, options);
@@ -61,11 +77,13 @@ function(user, context, callback) {
 			jwtid: user.jti
 		};
 
-    var payload = jwt.verify(context.request.body.token, clientSecret, options);
-		//console.log(payload);
+    	var payload = jwt.verify(context.request.body.token, clientSecret, options);
+    	if (typeof(configuration.AURAYA_DEBUG) !== 'undefined' && configuration.AURAYA_DEBUG === 'true') {
+			console.log(payload);
+		}
 
 		if (payload.reason === 'enrolment_succeeded') {
-			user.user_metadata.eva.status = 'enrolled';
+			user.user_metadata.auraya_eva.status = 'enrolled';
 
 			console.log('Biometric user successfully enrolled');
 			// persist the user_metadata update
@@ -91,53 +109,51 @@ function(user, context, callback) {
 		console.log('Biometric verification accepted');
 		return callback(null, user, context);
 
-	} else {
+	} 
 
-		const url = require('url@0.10.3');
-		user.jti = uuid.v4();
-		user.user_metadata.eva.status = user.user_metadata.eva.status || 'initial';
-		const mode = (user.user_metadata.eva.status === 'initial') ? 'enrol' : 'verify';
-		
-		
-		var personalDigits = ''; 
-		// empty string means do not use personal digits
-		// otherwise it is a property of the user.user_metadata object
-		// typically "phone_number"
-		if (typeof(configuration.PERSONAL_DIGITS) !== 'undefined' && configuration.PERSONAL_DIGITS !== '') {
-			personalDigits = user.user_metadata[configuration.PERSONAL_DIGITS];
-		}
-
-		const token = createToken(
-			configuration.CLIENT_ID,
-			clientSecret,
-			configuration.ISSUER, {
-				sub: user.user_id,
-				jti: user.jti,
-				oauth: {
-					state: '', // not used in token, only in the GET request
-					callbackURL: url.format({
-						protocol: 'https',
-						hostname: auth0.domain,
-						pathname: '/continue'
-					}),
-					nonce: user.jti // performs same function as jti
-				},
-				biometric: {
-					id: user.user_id, // email - can be used for identities that cross IdP boundaries 
-					mode: mode,
-					personalDigits: personalDigits,
-					commonDigits: configuration.COMMON_DIGITS,
-					randomDigits: configuration.RANDOM_DIGITS
-				}
-
-			}
-		);
-
-		
-		context.redirect = {
-			url: `${configuration.EVA_URL}?token=${token}`
-		};
-		
-		return callback(null, user, context);
+	const url = require('url@0.10.3');
+	user.jti = uuid.v4();
+	user.user_metadata.auraya_eva.status = user.user_metadata.auraya_eva.status || 'initial';
+	const mode = (user.user_metadata.auraya_eva.status === 'initial') ? 'enrol' : 'verify';
+	
+	
+	let personalDigits = ''; 
+	// empty string means do not use personal digits
+	// otherwise it is a property of the user.user_metadata object
+	// typically "phone_number"
+	if (typeof(configuration.AURAYA_PERSONAL_DIGITS) !== 'undefined' && configuration.AURAYA_PERSONAL_DIGITS !== '') {
+		personalDigits = user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
 	}
+
+	const token = createToken( 
+		{
+			sub: user.user_id,
+			jti: user.jti,
+			oauth: {
+				state: '', // not used in token, only in the GET request
+				callbackURL: url.format({
+					protocol: 'https',
+					hostname: context.request.hostname,
+					pathname: '/continue'
+				}),
+				nonce: user.jti // performs same function as jti
+			},
+			biometric: {
+				id: user.user_id, // email - can be used for identities that cross IdP boundaries 
+				mode: mode,
+				personalDigits: personalDigits,
+				commonDigits: configuration.AURAYA_COMMON_DIGITS,
+				randomDigits: configuration.AURAYA_RANDOM_DIGITS
+			}
+
+		}
+	);
+
+	
+	context.redirect = {
+		url: `${configuration.AURAYA_URL}?token=${token}`
+	};
+	
+	return callback(null, user, context);
+
 }
