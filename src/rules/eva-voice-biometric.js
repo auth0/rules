@@ -77,7 +77,7 @@ function(user, context, callback) {
 			jwtid: user.jti
 		};
 
-    	var payload = jwt.verify(context.request.body.token, clientSecret, options);
+    	const payload = jwt.verify(context.request.body.token, clientSecret, options);
     	if (typeof(configuration.AURAYA_DEBUG) !== 'undefined' && configuration.AURAYA_DEBUG === 'true') {
 			console.log(payload);
 		}
@@ -89,13 +89,11 @@ function(user, context, callback) {
 			// persist the user_metadata update
 			auth0.users.updateUserMetadata(user.user_id, user.user_metadata)
 				.then(function() {
-					callback(null, user, context);
+					return callback(null, user, context);
 				})
 				.catch(function(err) {
-					callback(err);
+					return callback(err);
 				});
-
-			return;
 		}
 
 		if (payload.reason !== 'verification_accepted') {
@@ -149,7 +147,6 @@ function(user, context, callback) {
 		}
 	);
 
-	
 	context.redirect = {
 		url: `${configuration.AURAYA_URL}?token=${token}`
 	};
@@ -157,3 +154,4 @@ function(user, context, callback) {
 	return callback(null, user, context);
 
 }
+
