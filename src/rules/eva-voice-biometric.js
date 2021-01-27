@@ -97,10 +97,10 @@ function evaVoiceBiometric(user, context, callback) {
       auth0.users
         .updateUserMetadata(user.user_id, user.user_metadata)
         .then(function () {
-          return callback(null, user, context);
+           callback(null, user, context);
         })
         .catch(function (err) {
-          return callback(err);
+           callback(err);
         });
         
         return;
