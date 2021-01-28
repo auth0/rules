@@ -124,12 +124,10 @@ function evaVoiceBiometric(user, context, callback) {
 
   // default value for these is 'true'
   const commonDigits =
-    typeof configuration.AURAYA_COMMON_DIGITS === 'undefined'
-      ? 'true'
+    typeof configuration.AURAYA_COMMON_DIGITS === 'undefined'? 'true'
       : configuration.AURAYA_COMMON_DIGITS;
   const randomDigits =
-    typeof configuration.AURAYA_RANDOM_DIGITS === 'undefined'
-      ? 'true'
+    typeof configuration.AURAYA_RANDOM_DIGITS === 'undefined'? 'true'
       : configuration.AURAYA_RANDOM_DIGITS;
 
   const token = createToken({
