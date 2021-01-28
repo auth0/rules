@@ -4,24 +4,13 @@
  *	@gallery true
  *	@category marketplace
  *
- *	EVA WEB is a second-factor voice biometric solution designed for use with a range of web browsers that support audio capture.
- *	The biometric verification process is intended to be part of an authentication flow to enhance security, privacy and ease-of-use.
- *	EVA WEB is an offering from Auraya Systems.
- *
- *	The voice tokens used with EVA WEB are predominantly digit strings, although phrases are also supported.
- *	The usual verification process will usually prompt the user to read out a sequence of random digits,
- *	a sequence of consecutive digits, and optionally their phone number.
- *
- *	The first time a user is directed to EVA WEB where they will be invited to enrol their voice.
- *	This process captures between 3 and 8 utterances depending on the required voice tokens, and includes a biometric “Opt-In” consent step.
- *	At the conclusion of enrolment they will be redirected back to the authentication flow.
- *
  *	Configuration Items:
  *	AURAYA_URL = EVA endpoint, typically: https://eva-web.mydomain.com/server/oauth
  *	AURAYA_CLIENT_ID = JWT client id on the EVA server (and this server)
  *	AURAYA_CLIENT_SECRET = JWT client secret on the EVA server (and this server)
  *	AURAYA_ISSUER = this app (or "issuer")
  *
+ *  Optional configuration items
  *	AURAYA_RANDOM_DIGITS = true|false whether to prompt for random digits
  *	AURAYA_COMMON_DIGITS = true|false whether to prompt for common digits
  *	AURAYA_PERSONAL_DIGITS = a user.user_metadata field that contains digits such as phone_number, or blank
@@ -39,9 +28,6 @@ function evaVoiceBiometric(user, context, callback) {
   }
 
   if (
-    !configuration.AURAYA_COMMON_DIGITS ||
-    !configuration.AURAYA_RANDOM_DIGITS ||
-    !configuration.AURAYA_PERSONAL_DIGITS ||
     !configuration.AURAYA_URL ||
     !configuration.AURAYA_CLIENT_ID ||
     !configuration.AURAYA_CLIENT_SECRET ||
@@ -97,13 +83,13 @@ function evaVoiceBiometric(user, context, callback) {
       auth0.users
         .updateUserMetadata(user.user_id, user.user_metadata)
         .then(function () {
-           callback(null, user, context);
+          callback(null, user, context);
         })
         .catch(function (err) {
-           callback(err);
+          callback(err);
         });
-        
-        return;
+
+      return;
     }
 
     if (payload.reason !== 'verification_accepted') {
@@ -136,6 +122,16 @@ function evaVoiceBiometric(user, context, callback) {
     personalDigits = user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
   }
 
+  // default value for these is 'true'
+  const commonDigits =
+    typeof configuration.AURAYA_COMMON_DIGITS === 'undefined'
+      ? 'true'
+      : configuration.AURAYA_COMMON_DIGITS;
+  const randomDigits =
+    typeof configuration.AURAYA_RANDOM_DIGITS === 'undefined'
+      ? 'true'
+      : configuration.AURAYA_RANDOM_DIGITS;
+
   const token = createToken({
     sub: user.user_id,
     jti: user.jti,
@@ -152,8 +148,8 @@ function evaVoiceBiometric(user, context, callback) {
       id: user.user_id, // email - can be used for identities that cross IdP boundaries
       mode: mode,
       personalDigits: personalDigits,
-      commonDigits: configuration.AURAYA_COMMON_DIGITS,
-      randomDigits: configuration.AURAYA_RANDOM_DIGITS
+      commonDigits: commonDigits,
+      randomDigits: randomDigits
     }
   });
 
