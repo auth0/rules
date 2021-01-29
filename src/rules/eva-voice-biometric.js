@@ -10,18 +10,18 @@
  *	AURAYA_CLIENT_SECRET = JWT client secret on the EVA server (and this server)
  *	AURAYA_ISSUER = this app (or "issuer")
  *
- *  Optional configuration items
- *	AURAYA_RANDOM_DIGITS = true|false whether to prompt for random digits
- *	AURAYA_COMMON_DIGITS = true|false whether to prompt for common digits
- *	AURAYA_PERSONAL_DIGITS = a user.user_metadata field that contains digits such as phone_number, or blank
+ *  Optional configuration items:
+ *	AURAYA_RANDOM_DIGITS = optional. true|false whether to prompt for random digits
+ *	AURAYA_COMMON_DIGITS = optional. true|false whether to prompt for common digits
+ *	AURAYA_PERSONAL_DIGITS = optional. a user.user_metadata property that contains digits such as phone_number
+ 
+ *	AURAYA_COMMON_DIGITS_PROMPT = optional. a digit string to prompt for common digits (e.g '987654321')
+ *	AURAYA_PERSONAL_DIGITS_PROMPT = optional. a string to prompt for personal digits (e.g 'your cell number')
  *
- *	AURAYA_DEBUG = true|false (or blank) controls debug output
+ *	AURAYA_DEBUG = optional. true|false  controls detailed debug output
  */
 function evaVoiceBiometric(user, context, callback) {
-  if (
-    typeof configuration.AURAYA_DEBUG !== 'undefined' &&
-    configuration.AURAYA_DEBUG === 'true'
-  ) {
+  if (typeof configuration.AURAYA_DEBUG !== 'undefined') {
     console.log(user);
     console.log(context);
     console.log(configuration);
@@ -56,11 +56,11 @@ function evaVoiceBiometric(user, context, callback) {
   }
 
   if (context.protocol === 'redirect-callback') {
-    // User was redirected to the /continue endpoint with correct state parameter value
+    // user was redirected to the /continue endpoint with correct state parameter value
 
     var options = {
       //subject: user.user_id, // validating the subject is nice to have but not strictly necessary
-      jwtid: user.jti
+      jwtid: user.jti // unlike state, this value can't be spoofed by DNS hacking or inspecting the payload
     };
 
     const payload = jwt.verify(
@@ -68,10 +68,7 @@ function evaVoiceBiometric(user, context, callback) {
       clientSecret,
       options
     );
-    if (
-      typeof configuration.AURAYA_DEBUG !== 'undefined' &&
-      configuration.AURAYA_DEBUG === 'true'
-    ) {
+    if (typeof configuration.AURAYA_DEBUG !== 'undefined') {
       console.log(payload);
     }
 
@@ -111,16 +108,12 @@ function evaVoiceBiometric(user, context, callback) {
   const mode =
     user.user_metadata.auraya_eva.status === 'initial' ? 'enrol' : 'verify';
 
-  let personalDigits = '';
-  // empty string means do not use personal digits
-  // otherwise it is a property of the user.user_metadata object
-  // typically "phone_number"
-  if (
-    typeof configuration.AURAYA_PERSONAL_DIGITS !== 'undefined' &&
-    configuration.AURAYA_PERSONAL_DIGITS !== ''
-  ) {
-    personalDigits = user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
-  }
+  
+  // returns property of the user.user_metadata object, typically "phone_number"
+  // default is '', (server skips this prompt)
+  const personalDigits = 
+    typeof configuration.AURAYA_PERSONAL_DIGITS === 'undefined'? ''
+      : user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
 
   // default value for these is 'true'
   const commonDigits =
@@ -129,6 +122,14 @@ function evaVoiceBiometric(user, context, callback) {
   const randomDigits =
     typeof configuration.AURAYA_RANDOM_DIGITS === 'undefined'? 'true'
       : configuration.AURAYA_RANDOM_DIGITS;
+      
+  // default value for these is '' (the server default)
+  const commonDigitsPrompt =
+    typeof configuration.AURAYA_COMMON_DIGITS_PROMPT === 'undefined'? '' // 123456789
+      : configuration.AURAYA_COMMON_DIGITS_PROMPT;
+  const personalDigitsPrompt =
+    typeof configuration.AURAYA_PERSONAL_DIGITS_PROMPT === 'undefined'? '' // 'your phone number'
+      : configuration.AURAYA_PERSONAL_DIGITS_PROMPT;
 
   const token = createToken({
     sub: user.user_id,
@@ -146,8 +147,11 @@ function evaVoiceBiometric(user, context, callback) {
       id: user.user_id, // email - can be used for identities that cross IdP boundaries
       mode: mode,
       personalDigits: personalDigits,
+      personalDigitsPrompt: personalDigitsPrompt,
       commonDigits: commonDigits,
+      commonDigitsPrompt: commonDigitsPrompt,
       randomDigits: randomDigits
+      
     }
   });
 
