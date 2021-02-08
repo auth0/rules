@@ -58,7 +58,7 @@ describe(ruleName, () => {
     });
   });
 
-  describe('context.authentication is not set', () => {
+  describe('context.authentication includes mfa', () => {
     beforeEach(() => {
       const request = new RequestBuilder()
         .withQuery({
@@ -68,7 +68,9 @@ describe(ruleName, () => {
         .build();
       context = new ContextBuilder()
         .withRequest(request)
-        .withAuthentication(undefined)
+        .withAuthentication({
+          methods: [ { name: 'mfa' } ]
+        })
         .build();
     });
 
