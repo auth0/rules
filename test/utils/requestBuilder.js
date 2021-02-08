@@ -7,7 +7,7 @@ class RequestBuilder {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
       ip: '188.6.125.49',
       hostname: 'mydomain.auth0.com',
-      query: 
+      query:
       {
         scope: 'openid',
         response_type: 'code',
@@ -36,6 +36,10 @@ class RequestBuilder {
   }
   withGeoIp(geoIp) {
     this.request.geoip = geoIp;
+    return this;
+  }
+  withQuery(query) {
+    this.request.query = { ...this.request.query, ...query };
     return this;
   }
   build() {
