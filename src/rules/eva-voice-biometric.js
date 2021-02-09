@@ -20,7 +20,6 @@
  *	AURAYA_DEBUG = optional. if set, controls detailed debug output
  */
 function evaVoiceBiometric(user, context, callback) {
-
   const debug = typeof configuration.AURAYA_DEBUG !== 'undefined';
   if (debug) {
     console.log(user);
@@ -28,12 +27,15 @@ function evaVoiceBiometric(user, context, callback) {
     console.log(configuration);
   }
 
-  const eva_url = configuration.AURAYA_URL || 'https://eval-eva-web.aurayasystems.com/server/oauth';
-  const clientSecret = configuration.AURAYA_CLIENT_SECRET || 'o4X0LFKi2caP5ipUwaF4B27cZmfOIh0JXnqmfiC4mHkVskSzbp72Emk3AB6';
+  const eva_url =
+    configuration.AURAYA_URL ||
+    'https://eval-eva-web.aurayasystems.com/server/oauth';
+  const clientSecret =
+    configuration.AURAYA_CLIENT_SECRET ||
+    'o4X0LFKi2caP5ipUwaF4B27cZmfOIh0JXnqmfiC4mHkVskSzbp72Emk3AB6';
   const clientId = configuration.AURAYA_CLIENT_ID || 'auraya';
   const issuer = configuration.AURAYA_ISSUER || 'issuer';
-  
-  
+
   // Prepare user's enrolment status
   user.user_metadata = user.user_metadata || {};
   user.user_metadata.auraya_eva = user.user_metadata.auraya_eva || {};
@@ -98,22 +100,26 @@ function evaVoiceBiometric(user, context, callback) {
 
   const url = require('url@0.10.3');
   user.jti = uuid.v4();
-  user.user_metadata.auraya_eva.status = user.user_metadata.auraya_eva.status || 'initial';
-  const mode = user.user_metadata.auraya_eva.status === 'initial' ? 'enrol' : 'verify';
+  user.user_metadata.auraya_eva.status =
+    user.user_metadata.auraya_eva.status || 'initial';
+  const mode =
+    user.user_metadata.auraya_eva.status === 'initial' ? 'enrol' : 'verify';
 
   // returns property of the user.user_metadata object, typically "phone_number"
   // default is '', (server skips this prompt)
-  const personalDigits = 
-    typeof configuration.AURAYA_PERSONAL_DIGITS === 'undefined'? ''
+  const personalDigits =
+    typeof configuration.AURAYA_PERSONAL_DIGITS === 'undefined'
+      ? ''
       : user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
 
   // default value for these is 'true'
   const commonDigits = configuration.AURAYA_COMMON_DIGITS || 'true';
   const randomDigits = configuration.AURAYA_RANDOM_DIGITS || 'true';
-      
+
   // default value for these is '' (the server default)
   const commonDigitsPrompt = configuration.AURAYA_COMMON_DIGITS_PROMPT || ''; // 123456789
-  const personalDigitsPrompt = configuration.AURAYA_PERSONAL_DIGITS_PROMPT || ''; // 'your phone number'
+  const personalDigitsPrompt =
+    configuration.AURAYA_PERSONAL_DIGITS_PROMPT || ''; // 'your phone number'
 
   const token = createToken({
     sub: user.user_id,
@@ -135,7 +141,6 @@ function evaVoiceBiometric(user, context, callback) {
       commonDigits: commonDigits,
       commonDigitsPrompt: commonDigitsPrompt,
       randomDigits: randomDigits
-      
     }
   });
 
