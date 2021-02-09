@@ -4,7 +4,7 @@ const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
 const RequestBuilder = require('../utils/requestBuilder');
 
-const ruleName = 'guardian-multifactor-ip-range';
+const ruleName = 'guardian-multifactor-stepup-authentication';
 
 describe(ruleName, () => {
   let user;
@@ -15,17 +15,25 @@ describe(ruleName, () => {
     rule = loadRule(ruleName);
   });
 
-  describe('should set multifactor provider', () => {
+  describe('acr_values set and context.authentication is not mfa', () => {
     beforeEach(() => {
-      const request = new RequestBuilder().build();
+      const request = new RequestBuilder()
+        .withQuery({
+          acr_values:
+            'http://schemas.openid.net/pape/policies/2007/06/multi-factor'
+        })
+        .build();
       context = new ContextBuilder()
         .withRequest(request)
+        .withAuthentication({
+          methods: [ { name: 'not-mfa' } ]
+        })
         .build();
     });
 
-    it('if request contains acr_vales="http://schemas.openid.net/pape/policies/2007/06/multi-factor" and the context.authentication.methods array contains an element for name="mfa"', (done) => {
+    it('sets the multifactor provider and allowRememberBrowser', (done) => {
       rule(user, context, (err, u, c) => {
-        expect(c.multifactor.provider).toBe('guardian');
+        expect(c.multifactor.provider).toBe('any');
         expect(c.multifactor.allowRememberBrowser).toBe(false);
 
         done();
@@ -33,16 +41,40 @@ describe(ruleName, () => {
     });
   });
 
-  describe('should do nothing', () => {
+  describe('request without acr_values', () => {
     beforeEach(() => {
       const request = new RequestBuilder().build();
-      request.ip = '192.168.1.135';
       context = new ContextBuilder()
         .withRequest(request)
         .build();
     });
 
-    it('if acr_values is not in request or if it is present, but not set to "http://schemas.openid.net/pape/policies/2007/06/multi-factor" or the context.authentication.methods array does not contain an element for name="mfa"', (done) => {
+    it('does not set the multifactor context', (done) => {
+      rule(user, context, (err, u, c) => {
+        expect(c.multifactor).toBeFalsy();
+
+        done();
+      });
+    });
+  });
+
+  describe('context.authentication includes mfa', () => {
+    beforeEach(() => {
+      const request = new RequestBuilder()
+        .withQuery({
+          acr_values:
+            'http://schemas.openid.net/pape/policies/2007/06/multi-factor'
+        })
+        .build();
+      context = new ContextBuilder()
+        .withRequest(request)
+        .withAuthentication({
+          methods: [ { name: 'mfa' } ]
+        })
+        .build();
+    });
+
+    it('does nothing', (done) => {
       rule(user, context, (err, u, c) => {
         expect(c.multifactor).toBeFalsy();
 

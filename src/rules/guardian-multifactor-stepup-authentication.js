@@ -21,11 +21,16 @@ function guardianMultifactorStepUpAuthentication(user, context, callback) {
   // and multi-factor authentication has not already been completed in the
   // current session/
 
-  if (
+  const isMfa =
     context.request.query.acr_values ===
-      'http://schemas.openid.net/pape/policies/2007/06/multi-factor' &&
-    !context.authentication.methods.some((method) => method.name === 'mfa')
-  ) {
+    'http://schemas.openid.net/pape/policies/2007/06/multi-factor';
+
+  let authMethods = [];
+  if (context.authentication && Array.isArray(context.authentication.methods)) {
+    authMethods = context.authentication.methods;
+  }
+
+  if (isMfa && !authMethods.some((method) => method.name === 'mfa')) {
     context.multifactor = {
       provider: 'any',
       allowRememberBrowser: false
