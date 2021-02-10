@@ -4,21 +4,22 @@
  *	@gallery true
  *	@category marketplace
  *
+ * Please see the [EVA Voice Biometrics integration](https://marketplace.auth0.com/integrations/eva-voice-biometrics) for more information and detailed installation instructions.
  *
- *	all configuration items are optional:
- *	AURAYA_URL = optional. EVA endpoint, typically: https://eva-web.mydomain.com/server/oauth
- *	AURAYA_CLIENT_ID = optional. JWT client id on the EVA server (and this server)
- *	AURAYA_CLIENT_SECRET = optional. JWT client secret on the EVA server (and this server)
- *	AURAYA_ISSUER = optional. this app (or "issuer")
+ * **Optional configuration:**
  *
- *	AURAYA_RANDOM_DIGITS = optional. true|false whether to prompt for random digits
- *	AURAYA_COMMON_DIGITS = optional. true|false whether to prompt for common digits
- *	AURAYA_PERSONAL_DIGITS = optional. a user.user_metadata property that contains digits such as phone_number
- *	AURAYA_COMMON_DIGITS_PROMPT = optional. a digit string to prompt for common digits (e.g '987654321')
- *	AURAYA_PERSONAL_DIGITS_PROMPT = optional. a string to prompt for personal digits (e.g 'your cell number')
- *
- *	AURAYA_DEBUG = optional. if set, controls detailed debug output
+ *    - `AURAYA_URL` EVA endpoint, typically: https://eva-web.mydomain.com/server/oauth
+ *    - `AURAYA_CLIENT_ID` JWT client id on the EVA server (and this server)
+ *    - `AURAYA_CLIENT_SECRET` JWT client secret on the EVA server (and this server)
+ *    - `AURAYA_ISSUER` This app (or "issuer")
+ *    - `AURAYA_RANDOM_DIGITS`Set to "true" to prompt for random digits or "false" not to
+ *    - `AURAYA_COMMON_DIGITS` Set to "true" to prompt for common digits or "false" not to
+ *    - `AURAYA_PERSONAL_DIGITS` A user.user_metadata property that contains digits such as phone_number
+ *    - `AURAYA_COMMON_DIGITS_PROMPT` A digit string to prompt for common digits (e.g '987654321')
+ *    - `AURAYA_PERSONAL_DIGITS_PROMPT` A string to prompt for personal digits (e.g 'your cell number')
+ *    - `AURAYA_DEBUG` Set to "true" to log errors in the console
  */
+
 function evaVoiceBiometric(user, context, callback) {
   const debug = typeof configuration.AURAYA_DEBUG !== 'undefined';
   if (debug) {
@@ -107,10 +108,11 @@ function evaVoiceBiometric(user, context, callback) {
 
   // returns property of the user.user_metadata object, typically "phone_number"
   // default is '', (server skips this prompt)
-  const personalDigits =
-    typeof configuration.AURAYA_PERSONAL_DIGITS === 'undefined'
-      ? ''
-      : user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
+
+  let personalDigits = '';
+  if (typeof configuration.AURAYA_PERSONAL_DIGITS !== 'undefined') {
+    personalDigits = user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
+  }
 
   // default value for these is 'true'
   const commonDigits = configuration.AURAYA_COMMON_DIGITS || 'true';
