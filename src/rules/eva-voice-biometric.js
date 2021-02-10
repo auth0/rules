@@ -108,10 +108,11 @@ function evaVoiceBiometric(user, context, callback) {
 
   // returns property of the user.user_metadata object, typically "phone_number"
   // default is '', (server skips this prompt)
-  const personalDigits =
-    typeof configuration.AURAYA_PERSONAL_DIGITS === 'undefined'
-      ? ''
-      : user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
+
+  let personalDigits = '';
+  if (typeof configuration.AURAYA_PERSONAL_DIGITS !== 'undefined') {
+    personalDigits = user.user_metadata[configuration.AURAYA_PERSONAL_DIGITS];
+  }
 
   // default value for these is 'true'
   const commonDigits = configuration.AURAYA_COMMON_DIGITS || 'true';
