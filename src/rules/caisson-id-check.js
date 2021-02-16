@@ -1,7 +1,7 @@
 /**
  * @title Caisson ID Check
  * @overview Validate US driver's licenses and international passports in real time.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [Caisson integration](https://marketplace.auth0.com/integrations/caisson-id-check) for more information and detailed installation instructions.
