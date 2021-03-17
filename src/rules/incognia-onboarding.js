@@ -6,9 +6,9 @@
  *
  */
 async function incogniaOnboardingRule(user, context, callback) {
-  const _ = require('lodash')
+  const _ = require('lodash@4.17.19')
 
-  const { IncogniaAPI } = require('@incognia/api')
+  const { IncogniaAPI } = require('@incognia/api@1.0.0')
   const { Auth0UserUpdateUtilities } = require('@auth0/rule-utilities@0.2.0')
 
   const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET } = configuration;
