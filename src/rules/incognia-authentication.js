@@ -20,9 +20,9 @@ async function incogniaAuthenticationRule(user, context, callback) {
 
   // For this rule to be used, please set 'incognia_authentication_rule' as 'enabled' in your Auth0
   // application metadata. This can be done in the advanced settings of your app.
-  const incogniaLoginRule = _.get(context, 'clientMetadata.incognia_authentication_rule');
-  if (!incogniaLoginRule || incogniaLoginRule !== 'enabled') {
-    console.log('Incognia login rule is not enabled for this client. Skipping');
+  const incogniaAuthenticationRule = _.get(context, 'clientMetadata.incognia_authentication_rule');
+  if (!incogniaAuthenticationRule || incogniaAuthenticationRule !== 'enabled') {
+    console.log('Incognia authentication rule is not enabled for this client. Skipping');
     return callback(null, user, context);
   }
 
