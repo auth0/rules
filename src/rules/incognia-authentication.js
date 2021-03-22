@@ -1,11 +1,11 @@
 /**
- * @title Incognia Login Rule
+ * @title Incognia Authentication Rule
  * @overview Verify if the device logging in is at a trusted location.
  * @gallery true
  * @category marketplace
  *
  */
-async function incogniaLoginRule(user, context, callback) {
+async function incogniaAuthenticationRule(user, context, callback) {
   const _ = require('lodash@4.17.19')
 
   const { IncogniaAPI } = require('@incognia/api@1.0.0')
@@ -18,9 +18,9 @@ async function incogniaLoginRule(user, context, callback) {
     return callback(null, user, context);
   }
 
-  // For this rule to be used, please set 'incognia_login_rule' as 'enabled' in your Auth0
+  // For this rule to be used, please set 'incognia_authentication_rule' as 'enabled' in your Auth0
   // application metadata. This can be done in the advanced settings of your app.
-  const incogniaLoginRule = _.get(context, 'clientMetadata.incognia_login_rule');
+  const incogniaLoginRule = _.get(context, 'clientMetadata.incognia_authentication_rule');
   if (!incogniaLoginRule || incogniaLoginRule !== 'enabled') {
     console.log('Incognia login rule is not enabled for this client. Skipping');
     return callback(null, user, context);
