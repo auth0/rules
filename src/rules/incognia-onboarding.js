@@ -11,7 +11,7 @@ async function incogniaOnboardingRule(user, context, callback) {
   const { IncogniaAPI } = require('@incognia/api@1.0.0')
   const { Auth0UserUpdateUtilities } = require('@auth0/rule-utilities@0.2.0')
 
-  const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET } = configuration;
+  const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET, INCOGNIA_HOME_ADDRESS_PROP } = configuration;
 
   if (!INCOGNIA_CLIENT_ID || !INCOGNIA_CLIENT_SECRET) {
     console.log('Missing required configuration. Skipping.');
@@ -20,20 +20,24 @@ async function incogniaOnboardingRule(user, context, callback) {
 
   // For this rule to be used, please set 'incognia_onboarding_rule' as 'enabled' in your Auth0
   // application metadata. This can be done in the advanced settings of your app.
+  // https://auth0.com/docs/get-started/dashboard/application-settings#application-metadata
   const incogniaOnboardingRule = _.get(context, 'clientMetadata.incognia_onboarding_rule');
-  if (!incogniaOnboardingRule || incogniaOnboardingRule !== 'enabled') {
+  if (incogniaOnboardingRule !== 'enabled') {
     console.log('Incognia onboarding rule is not enabled for this client. Skipping');
     return callback(null, user, context);
   }
 
-  const installationId = _.get(context, 'request.query.installation_id');
+  const installationId = _.get(context, 'request.query.incognia_installation_id');
   if (!installationId) {
     console.log('Missing installation_id. Skipping.');
     return callback(null, user, context);
   }
 
-  // User home address should be set using Auth0's Signup API for example.
-  const homeAddress = _.get(user, 'user_metadata.home_address');
+  // User home address should be set using Auth0's Signup API for example. If the home address is
+  // not in 'user_metadata.home_address', please specify the path of the field inside the user
+  // object where the home address is through the INCOGNIA_HOME_ADDRESS_PROP configuration.
+  const homeAddressProp = INCOGNIA_HOME_ADDRESS_PROP || 'user_metadata.home_address';
+  const homeAddress = _.get(user, homeAddressProp);
   if (!homeAddress) {
     console.log('Missing user home address. Skipping.');
     return callback(null, user, context);
