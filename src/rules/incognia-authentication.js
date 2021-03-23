@@ -22,7 +22,7 @@ async function incogniaAuthenticationRule(user, context, callback) {
   // application metadata. This can be done in the advanced settings of your app.
   // https://auth0.com/docs/get-started/dashboard/application-settings#application-metadata
   const incogniaAuthenticationRule = _.get(context, 'clientMetadata.incognia_authentication_rule');
-  if (!incogniaAuthenticationRule || incogniaAuthenticationRule !== 'enabled') {
+  if (incogniaAuthenticationRule !== 'enabled') {
     console.log('Incognia authentication rule is not enabled for this client. Skipping');
     return callback(null, user, context);
   }
