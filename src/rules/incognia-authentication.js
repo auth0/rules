@@ -27,7 +27,7 @@ async function incogniaAuthenticationRule(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const installationId = _.get(context, 'request.query.installation_id');
+  const installationId = _.get(context, 'request.query.incognia_installation_id');
   if (!installationId) {
     console.log('Missing installation_id. Skipping.');
     return callback(null, user, context);
