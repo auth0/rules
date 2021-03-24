@@ -18,15 +18,6 @@ async function incogniaOnboardingRule(user, context, callback) {
     return callback(null, user, context);
   }
 
-  // For this rule to be used, please set 'incognia_onboarding_rule' as 'enabled' in your Auth0
-  // application metadata. This can be done in the advanced settings of your app.
-  // https://auth0.com/docs/get-started/dashboard/application-settings#application-metadata
-  const incogniaOnboardingRule = _.get(context, 'clientMetadata.incognia_onboarding_rule');
-  if (incogniaOnboardingRule !== 'enabled') {
-    console.log('Incognia onboarding rule is not enabled for this client. Skipping');
-    return callback(null, user, context);
-  }
-
   const installationId = _.get(context, 'request.query.incognia_installation_id');
   if (!installationId) {
     console.log('Missing installation_id. Skipping.');
