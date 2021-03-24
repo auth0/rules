@@ -8,7 +8,7 @@
  async function arenguCompleteUserProfile(user, context, callback) {
   if (
     !configuration.SESSION_TOKEN_SECRET ||
-    !configuration.ARENGU_POLICIES_FORM_URL
+    !configuration.ARENGU_PROFILE_FORM_URL
   ) {
     console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
@@ -37,7 +37,8 @@
 
   // Modify your login criteria to your needs
   function isLogin() {
-    return context.stats.loginsCount > 2;
+    const loginCount = configuration.ARENGU_PROFILE_LOGIN_COUNT || 2;
+    return context.stats.loginsCount > parseInt(loginCount, 10);
   }
 
   function isEmptyUserMeta(key) {
