@@ -46,10 +46,11 @@ async function incogniaAuthenticationRule(user, context, callback) {
       installationId: installationId,
       accountId: accountId
     });
-    // TODO: should this be in context.idToken instead? This is information about the request,
-    // not the user.
-    const userUtils = new Auth0UserUpdateUtilities(user, auth0, 'incognia');
-    userUtils.setAppMeta('assessment', loginAssessment);
+
+    // Incognia's risk assessment will be in a namespaced claim so it can be used in other rules
+    // for skipping/prompting MFA or in the mobile app itself to decide whether the user should be
+    // redirected to step-up auth for example.
+    context.idToken["http://incognia/assessment"] = loginAssessment.riskAssessment;
   } catch (error) {
     console.log('Error calling Incognia API for a new login.');
     return callback(error);
