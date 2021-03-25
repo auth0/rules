@@ -30,8 +30,7 @@
  */
 async function seczettaGrabRiskScore(user, context, callback) {
   
-  if (!configuration.SECZETTA_API_KEY || !configuration.SECZETTA_BASE_URL || !configuration.SECZETTA_ATTRIBUTE_ID 
-    || !configuration.SECZETTA_PROFILE_TYPE_ID || !configuration.SECZETTA_ALLOWABLE_RISK || !configuration.SECZETTA_MAXIMUM_ALLOWED_RISK) {
+  if (!configuration.SECZETTA_API_KEY || !configuration.SECZETTA_BASE_URL || !configuration.SECZETTA_ATTRIBUTE_ID || !configuration.SECZETTA_PROFILE_TYPE_ID || !configuration.SECZETTA_ALLOWABLE_RISK || !configuration.SECZETTA_MAXIMUM_ALLOWED_RISK) {
     console.log("Missing required configuration. Skipping.");
     return callback(null, user, context);
   }
@@ -40,7 +39,8 @@ async function seczettaGrabRiskScore(user, context, callback) {
     "@auth0/rule-utilities@0.2.0"
   );
 
-  const axios = require("axios@0.19.2");
+  const axios = require("axios@0.21.1");
+  const URL = require("url").URL;
 
   let profileResponse;
   let riskScoreResponse;
@@ -49,7 +49,8 @@ async function seczettaGrabRiskScore(user, context, callback) {
   let profileTypeId = configuration.SECZETTA_PROFILE_TYPE_ID;
 
   let uid = user.username || user.email; //depends on the configuration
-  let profileRequestUrl = configuration.SECZETTA_BASE_URL + '/advanced_search/run';
+  const profileRequestUrl = new URL('/api/advanced_search/run', configuration.SECZETTA_BASE_URL);
+
   let advancedSearchBody = {
     advanced_search: {
       label: "All Contractors",
@@ -71,7 +72,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
   };
   
   try {
-    	profileResponse = await axios.post(profileRequestUrl,advancedSearchBody,{
+    	profileResponse = await axios.post(profileRequestUrl.href,advancedSearchBody,{
         headers: {
           'Content-Type':'application/json',
           'Authorization': 'Token token='+configuration.SECZETTA_API_KEY,
@@ -101,10 +102,10 @@ async function seczettaGrabRiskScore(user, context, callback) {
   let objectId = profileResponse.data.profiles[0].id;
   console.log(objectId);
 
-  let riskScoreRequestUrl = configuration.SECZETTA_BASE_URL + '/risk_scores?object_id=' + objectId;
+  const riskScoreRequestUrl = new URL('/api/risk_scores?object_id=' + objectId, configuration.SECZETTA_BASE_URL);
 
   try {
-      riskScoreResponse = await axios.get(riskScoreRequestUrl,{
+      riskScoreResponse = await axios.get(riskScoreRequestUrl.href,{
       headers: {
         'Content-Type':'application/json',
         'Authorization': 'Token token='+configuration.SECZETTA_API_KEY,
