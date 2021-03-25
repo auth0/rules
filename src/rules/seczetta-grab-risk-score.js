@@ -132,7 +132,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
   const maximumRisk = parseInt(configuration.SECZETTA_MAXIMUM_ALLOWED_RISK, 10);
   
   //if risk score is below the maxium risk score but above allowable risk: Require MFA
-  if (allowableRisk && overallScore > allowableRisk && overallScore < maximumRisk) {
+  if ((allowableRisk && overallScore > allowableRisk && overallScore < maximumRisk) || (allowableRisk === 0)) {
     console.log(
       `Risk score ${overallScore} is greater than maximum of ${allowableRisk}. Prompting for MFA`
     );
