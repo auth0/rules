@@ -6,10 +6,10 @@
  *
  */
 async function incogniaOnboardingRule(user, context, callback) {
-  const _ = require('lodash@4.17.19')
+  const _ = require('lodash@4.17.19');
 
-  const { IncogniaAPI } = require('@incognia/api@1.0.0')
-  const { Auth0UserUpdateUtilities } = require('@auth0/rule-utilities@0.2.0')
+  const { IncogniaAPI } = require('@incognia/api@1.0.0');
+  const { Auth0UserUpdateUtilities } = require('@auth0/rule-utilities@0.2.0');
 
   const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET, INCOGNIA_HOME_ADDRESS_PROP } = configuration;
 
@@ -70,7 +70,7 @@ async function incogniaOnboardingRule(user, context, callback) {
       onboardingAssessment = await incogniaAPI.registerOnboardingAssessment({
         installationId: installationId,
         addressLine: homeAddress
-      })
+      });
     } catch (error) {
       console.log('Error calling Incognia API for new signup submission');
       return callback(error);
@@ -104,7 +104,7 @@ async function incogniaOnboardingRule(user, context, callback) {
     first_assessment_at: firstAssessmentAt || Math.round(Date.now() / 1000),
     signup_id: onboardingAssessment.id,
     assessment: onboardingAssessment
-  }
+  };
 
   try {
     userUtils.setAppMeta('incognia', updatedMetadata);
