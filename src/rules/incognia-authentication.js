@@ -50,7 +50,7 @@ async function incogniaAuthenticationRule(user, context, callback) {
     // Incognia's risk assessment will be in a namespaced claim so it can be used in other rules
     // for skipping/prompting MFA or in the mobile app itself to decide whether the user should be
     // redirected to step-up auth for example.
-    context.idToken["http://www.incognia.com/assessment"] = loginAssessment.riskAssessment;
+    context.idToken["https://www.incognia.com/assessment"] = loginAssessment.riskAssessment;
   } catch (error) {
     console.log('Error calling Incognia API for a new login.');
     return callback(error);
