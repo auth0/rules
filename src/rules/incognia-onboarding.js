@@ -11,14 +11,21 @@ async function incogniaOnboardingRule(user, context, callback) {
   const { IncogniaAPI } = require('@incognia/api@1.0.0');
   const { Auth0UserUpdateUtilities } = require('@auth0/rule-utilities@0.2.0');
 
-  const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET, INCOGNIA_HOME_ADDRESS_PROP } = configuration;
+  const {
+    INCOGNIA_CLIENT_ID,
+    INCOGNIA_CLIENT_SECRET,
+    INCOGNIA_HOME_ADDRESS_PROP
+  } = configuration;
 
   if (!INCOGNIA_CLIENT_ID || !INCOGNIA_CLIENT_SECRET) {
     console.log('Missing required configuration. Skipping.');
     return callback(null, user, context);
   }
 
-  const installationId = _.get(context, 'request.query.incognia_installation_id');
+  const installationId = _.get(
+    context,
+    'request.query.incognia_installation_id'
+  );
   if (!installationId) {
     console.log('Missing installation_id. Skipping.');
     return callback(null, user, context);
@@ -27,7 +34,8 @@ async function incogniaOnboardingRule(user, context, callback) {
   // User home address should be set using Auth0's Signup API for example. If the home address is
   // not in 'user_metadata.home_address', please specify the path of the field inside the user
   // object where the home address is through the INCOGNIA_HOME_ADDRESS_PROP configuration.
-  const homeAddressProp = INCOGNIA_HOME_ADDRESS_PROP || 'user_metadata.home_address';
+  const homeAddressProp =
+    INCOGNIA_HOME_ADDRESS_PROP || 'user_metadata.home_address';
   const homeAddress = _.get(user, homeAddressProp);
   if (!homeAddress) {
     console.log('Missing user home address. Skipping.');
@@ -39,7 +47,9 @@ async function incogniaOnboardingRule(user, context, callback) {
   const status = userUtils.getAppMeta('status');
   // This rule was previously run and calculated the assessment successfully.
   if (status && status !== 'pending') {
-    console.log('Assessment is already calculated or is unevaluable. Skipping.');
+    console.log(
+      'Assessment is already calculated or is unevaluable. Skipping.'
+    );
     return callback(null, user, context);
   }
 
@@ -59,12 +69,14 @@ async function incogniaOnboardingRule(user, context, callback) {
   // The rule was previously run, but Incognia could not assess the signup.
   if (signupId) {
     try {
-      onboardingAssessment = await incogniaAPI.getOnboardingAssessment(signupId);
+      onboardingAssessment = await incogniaAPI.getOnboardingAssessment(
+        signupId
+      );
     } catch (error) {
       console.log('Error calling Incognia API for signup previously submitted');
       return callback(error);
     }
-  // This is the first time the rule is being run with all necessary arguments.
+    // This is the first time the rule is being run with all necessary arguments.
   } else {
     try {
       onboardingAssessment = await incogniaAPI.registerOnboardingAssessment({
@@ -90,7 +102,8 @@ async function incogniaOnboardingRule(user, context, callback) {
   } else if (!firstAssessmentAt) {
     newStatus = 'pending';
   } else {
-    const firstAssessmentAge = Math.round(Date.now() / 1000) - firstAssessmentAt;
+    const firstAssessmentAge =
+      Math.round(Date.now() / 1000) - firstAssessmentAt;
     // 48 hours limit.
     if (firstAssessmentAge > 172800) {
       newStatus = 'unevaluable';

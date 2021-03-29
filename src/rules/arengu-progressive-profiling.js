@@ -1,11 +1,11 @@
 /**
- * @title Arengu Progressive Profiling 
+ * @title Arengu Progressive Profiling
  * @overview Capture new users' information in your authentication flows.
  * @gallery true
  * @category marketplace
  */
 
- async function arenguCompleteUserProfile(user, context, callback) {
+async function arenguCompleteUserProfile(user, context, callback) {
   if (
     !configuration.SESSION_TOKEN_SECRET ||
     !configuration.ARENGU_PROFILE_FORM_URL
@@ -17,7 +17,7 @@
   const {
     Auth0RedirectRuleUtilities,
     Auth0UserUpdateUtilities
-  } = require("@auth0/rule-utilities@0.2.0");
+  } = require('@auth0/rule-utilities@0.2.0');
 
   const ruleUtils = new Auth0RedirectRuleUtilities(
     user,
@@ -42,14 +42,16 @@
   }
 
   function isEmptyUserMeta(key) {
-    return userUtils.getUserMeta(key) === undefined ||
+    return (
+      userUtils.getUserMeta(key) === undefined ||
       userUtils.getUserMeta(key) === null ||
-      userUtils.getUserMeta(key).length === 0;
+      userUtils.getUserMeta(key).length === 0
+    );
   }
 
   function isProfileIncomplete() {
     // Add your required user_medata keys
-    return isEmptyUserMeta('job_title') || isEmptyUserMeta('company_name');
+    return isEmptyUserMeta('job_title') || isEmptyUserMeta('company_name');
   }
 
   if (ruleUtils.isRedirectCallback && ruleUtils.queryParams.session_token) {
