@@ -41,18 +41,19 @@ async function seczettaGrabRiskScore(user, context, callback) {
   let profileResponse;
   let riskScoreResponse;
 
-  let attributeId = configuration.SECZETTA_ATTRIBUTE_ID;
-  let profileTypeId = configuration.SECZETTA_PROFILE_TYPE_ID;
+  const attributeId = configuration.SECZETTA_ATTRIBUTE_ID;
+  const profileTypeId = configuration.SECZETTA_PROFILE_TYPE_ID;
   const allowAuthOnError =
     configuration.SECZETTA_AUTHENTICATE_ON_ERROR === 'true';
 
-  let uid = user.username || user.email; //depends on the configuration
+  const uid = user.username || user.email; //depends on the configuration
+
   const profileRequestUrl = new URL(
     '/api/advanced_search/run',
     configuration.SECZETTA_BASE_URL
   );
 
-  let advancedSearchBody = {
+  const advancedSearchBody = {
     advanced_search: {
       label: 'All Contractors',
       condition_rules_attributes: [
@@ -109,7 +110,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
   }
 
   //Should now have the profile in profileResponse. Lets grab it.
-  let objectId = profileResponse.data.profiles[0].id;
+  const objectId = profileResponse.data.profiles[0].id;
   console.log(objectId);
 
   const riskScoreRequestUrl = new URL(
