@@ -35,8 +35,6 @@ async function seczettaGrabRiskScore(user, context, callback) {
     return callback(null, user, context);
   }
 
-  const userUtils = new require('@auth0/rule-utilities@0.2.0');
-
   const axios = require('axios@0.21.1');
   const URL = require('url').URL;
 
