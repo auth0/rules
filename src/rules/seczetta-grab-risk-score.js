@@ -90,15 +90,15 @@ async function seczettaGrabRiskScore(user, context, callback) {
       if (allowAuthOnError) {
         return callback(null, user, context);
       }
-      return callback(new UnauthorizedError('Error retrieving Risk Score.'));
+      return callback(new UnauthorizedError('Error retrieving SecZetta Risk Score.'));
     }
   } catch (profileError) {
     // Swallow risk scope API call, default is set to highest risk below.
-    console.log(`Error while calling Profile API: ${profileError.message}`);
+    console.log(`Error while calling SecZetta Profile API: ${profileError.message}`);
     if (allowAuthOnError) {
       return callback(null, user, context);
     }
-    return callback(new UnauthorizedError('Error retrieving Risk Score.'));
+    return callback(new UnauthorizedError('Error retrieving SecZetta Risk Score.'));
   }
 
   //Should now have the profile in profileResponse. Lets grab it.
@@ -120,11 +120,11 @@ async function seczettaGrabRiskScore(user, context, callback) {
     });
   } catch (riskError) {
     // Swallow risk scope API call, default is set to highest risk below.
-    console.log(`Error while calling Risk Score API: ${riskError.message}`);
+    console.log(`Error while calling SecZetta Risk Score API: ${riskError.message}`);
     if (allowAuthOnError) {
       return callback(null, user, context);
     }
-    return callback(new UnauthorizedError('Error retrieving Risk Score.'));
+    return callback(new UnauthorizedError('Error retrieving SecZetta Risk Score.'));
   }
 
   //Should now finally have the risk score. Lets add it to the user
