@@ -46,7 +46,8 @@ async function seczettaGrabRiskScore(user, context, callback) {
   const allowAuthOnError =
     configuration.SECZETTA_AUTHENTICATE_ON_ERROR === 'true';
 
-  const uid = user.username || user.email; //depends on the configuration
+  // Depends on the configuration
+  const uid = user.username || user.email;
 
   const profileRequestUrl = new URL(
     '/api/advanced_search/run',
@@ -86,7 +87,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
       }
     );
 
-    //if the user isnt found via the advanced search. A
+    // If the user is not found via the advanced search
     if (profileResponse.data.profiles.length === 0) {
       console.log('Profile not found. Empty Array sent back!');
       if (allowAuthOnError) {
@@ -97,19 +98,20 @@ async function seczettaGrabRiskScore(user, context, callback) {
       );
     }
   } catch (profileError) {
-    // Swallow risk scope API call, default is set to highest risk below.
     console.log(
       `Error while calling SecZetta Profile API: ${profileError.message}`
     );
+
     if (allowAuthOnError) {
       return callback(null, user, context);
     }
+
     return callback(
       new UnauthorizedError('Error retrieving SecZetta Risk Score.')
     );
   }
 
-  //Should now have the profile in profileResponse. Lets grab it.
+  // Should now have the profile in profileResponse. Lets grab it.
   const objectId = profileResponse.data.profiles[0].id;
   console.log(objectId);
 
@@ -127,29 +129,27 @@ async function seczettaGrabRiskScore(user, context, callback) {
       }
     });
   } catch (riskError) {
-    // Swallow risk scope API call, default is set to highest risk below.
     console.log(
       `Error while calling SecZetta Risk Score API: ${riskError.message}`
     );
+
     if (allowAuthOnError) {
       return callback(null, user, context);
     }
+
     return callback(
       new UnauthorizedError('Error retrieving SecZetta Risk Score.')
     );
   }
 
-  //Should now finally have the risk score. Lets add it to the user
-  var riskScoreObj = riskScoreResponse.data.risk_scores[0];
+  // Should now finally have the risk score. Lets add it to the user
+  const riskScoreObj = riskScoreResponse.data.risk_scores[0];
   const overallScore = riskScoreObj.overall_score;
-
-  // Default risk value is set to highest if API fails or no score returned.
-  //var riskScore = typeof apiResponse.riskScore === "number" ? riskScore : 100;
 
   const allowableRisk = parseInt(configuration.SECZETTA_ALLOWABLE_RISK, 10);
   const maximumRisk = parseInt(configuration.SECZETTA_MAXIMUM_ALLOWED_RISK, 10);
 
-  //if risk score is below the maxium risk score but above allowable risk: Require MFA
+  // If risk score is below the maxium risk score but above allowable risk: Require MFA
   if (
     (allowableRisk &&
       overallScore > allowableRisk &&
@@ -166,7 +166,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
     return callback(null, user, context);
   }
 
-  //if risk score is above the maxium risk score: Fail authN
+  // If risk score is above the maxium risk score: Fail authN
   if (maximumRisk && overallScore >= maximumRisk) {
     console.log(
       `Risk score ${overallScore} is greater than maximum of ${maximumRisk}`
