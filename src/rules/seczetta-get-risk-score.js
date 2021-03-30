@@ -1,5 +1,5 @@
 /**
- * @title SecZetta Grab Risk Score
+ * @title SecZetta Get Risk Score
  * @overview Grab the risk score from SecZetta to use in the authentication flow
  * @gallery true
  * @category marketplace
