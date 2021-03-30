@@ -36,6 +36,12 @@ async.reduce(files, [], (rules, file, callback) => {
     const code = data.split('\n').slice(parsed.comment.end).join('\n').trim();
 
     if (argv.allRules || parsed.gallery === 'true') {
+      const ruleDescription = converter.makeHtml(parsed.example);
+
+      if (!ruleDescription) {
+        return callback(new Error(`Blank description for ${parsed.title}`));
+      }
+
       const rule = {
         id: path.basename(file).replace('.js', ''),
         title: parsed.title,

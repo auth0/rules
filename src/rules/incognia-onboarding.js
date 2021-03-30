@@ -4,7 +4,14 @@
  * @gallery true
  * @category marketplace
  *
+ * Please see the [Incognia Onboarding integration](https://marketplace.auth0.com/integrations/incognia-onboarding) for more information and detailed installation instructions.
+ *
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
+ *
+ *    - INCOGNIA_CLIENT_ID: The client ID obtained from Incognia's dashboard (My Apps > API Credentials)
+ *    - INCOGNIA_CLIENT_SECRET: The client secret obtained from Incognia's dashboard (My Apps > API Credentials)
  */
+
 async function incogniaOnboardingRule(user, context, callback) {
   const _ = require('lodash@4.17.19');
 
