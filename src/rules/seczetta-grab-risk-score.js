@@ -1,12 +1,9 @@
-/* global configuration, auth0 */
-
 /**
  * @title SecZetta Grab Risk Score
  * @overview Grab the risk score from SecZetta to use in the authentication flow
  * @gallery true
- * @category marketplace"
- * 
- * 
+ * @category marketplace
+ *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
  *    - `SECZETTA_API_KEY` API Token from your SecZetta tennant
@@ -20,16 +17,13 @@
  *
  *    - `SECZETTA_AUTHENTICATE_ON_ERROR` Choose whether or not the rule continues to authenticate on error
  *    - `SECZETTA_RISK_KEY` The attribute name on the account where the users risk score is stored
- *    
- * **Helpful Hints**
- *    - The SecZetta API documentation is located here: https://{{SECZETTA_BASE_URL}}/api/v1/
  *
- * @param {object} user
- * @param {object} context
- * @param {function} callback
+ * **Helpful Hints**
+ *
+ *    - The SecZetta API documentation is located here: https://{{SECZETTA_BASE_URL}}/api/v1/
  */
 async function seczettaGrabRiskScore(user, context, callback) {
-  
+
   if (!configuration.SECZETTA_API_KEY || !configuration.SECZETTA_BASE_URL || !configuration.SECZETTA_ATTRIBUTE_ID || !configuration.SECZETTA_PROFILE_TYPE_ID || !configuration.SECZETTA_ALLOWABLE_RISK || !configuration.SECZETTA_MAXIMUM_ALLOWED_RISK) {
     console.log("Missing required configuration. Skipping.");
     return callback(null, user, context);
@@ -70,7 +64,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
       ]
     }
   };
-  
+
   try {
     	profileResponse = await axios.post(profileRequestUrl.href,advancedSearchBody,{
         headers: {
@@ -80,7 +74,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
         },
       });
 
-      //if the user isnt found via the advanced search. A 
+      //if the user isnt found via the advanced search. A
     	if( profileResponse.data.profiles.length === 0 ) {
         console.log("Profile not found. Empty Array sent back!");
   	 		if( configuration.SECZETTA_AUTHENTICATE_ON_ERROR && configuration.SECZETTA_AUTHENTICATE_ON_ERROR === "true" ) {
@@ -88,7 +82,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
         }
         return callback(new UnauthorizedError("Error retrieving Risk Score."));
   		}
-    
+
   } catch (profileError) {
     // Swallow risk scope API call, default is set to highest risk below.
     console.log(`Error while calling Profile API: ${profileError.message}`);
@@ -130,7 +124,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
 
   const allowableRisk = parseInt(configuration.SECZETTA_ALLOWABLE_RISK, 10);
   const maximumRisk = parseInt(configuration.SECZETTA_MAXIMUM_ALLOWED_RISK, 10);
-  
+
   //if risk score is below the maxium risk score but above allowable risk: Require MFA
   if ((allowableRisk && overallScore > allowableRisk && overallScore < maximumRisk) || (allowableRisk === 0)) {
     console.log(
@@ -141,7 +135,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
       allowRememberBrowser: false
     };
     return callback(null, user, context);
-  
+
   }
 
   //if risk score is above the maxium risk score: Fail authN
