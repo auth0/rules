@@ -43,6 +43,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
 
   let attributeId = configuration.SECZETTA_ATTRIBUTE_ID;
   let profileTypeId = configuration.SECZETTA_PROFILE_TYPE_ID;
+  const allowAuthOnError = configuration.SECZETTA_AUTHENTICATE_ON_ERROR === "true"
 
   let uid = user.username || user.email; //depends on the configuration
   const profileRequestUrl = new URL(
@@ -86,10 +87,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
     //if the user isnt found via the advanced search. A
     if (profileResponse.data.profiles.length === 0) {
       console.log('Profile not found. Empty Array sent back!');
-      if (
-        configuration.SECZETTA_AUTHENTICATE_ON_ERROR &&
-        configuration.SECZETTA_AUTHENTICATE_ON_ERROR === 'true'
-      ) {
+      if (allowAuthOnError) {
         return callback(null, user, context);
       }
       return callback(new UnauthorizedError('Error retrieving Risk Score.'));
@@ -97,10 +95,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
   } catch (profileError) {
     // Swallow risk scope API call, default is set to highest risk below.
     console.log(`Error while calling Profile API: ${profileError.message}`);
-    if (
-      configuration.SECZETTA_AUTHENTICATE_ON_ERROR &&
-      configuration.SECZETTA_AUTHENTICATE_ON_ERROR === 'true'
-    ) {
+    if (allowAuthOnError) {
       return callback(null, user, context);
     }
     return callback(new UnauthorizedError('Error retrieving Risk Score.'));
@@ -126,10 +121,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
   } catch (riskError) {
     // Swallow risk scope API call, default is set to highest risk below.
     console.log(`Error while calling Risk Score API: ${riskError.message}`);
-    if (
-      configuration.SECZETTA_AUTHENTICATE_ON_ERROR &&
-      configuration.SECZETTA_AUTHENTICATE_ON_ERROR === 'true'
-    ) {
+    if (allowAuthOnError) {
       return callback(null, user, context);
     }
     return callback(new UnauthorizedError('Error retrieving Risk Score.'));
