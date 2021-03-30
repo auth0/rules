@@ -43,7 +43,8 @@ async function seczettaGrabRiskScore(user, context, callback) {
 
   let attributeId = configuration.SECZETTA_ATTRIBUTE_ID;
   let profileTypeId = configuration.SECZETTA_PROFILE_TYPE_ID;
-  const allowAuthOnError = configuration.SECZETTA_AUTHENTICATE_ON_ERROR === "true"
+  const allowAuthOnError =
+    configuration.SECZETTA_AUTHENTICATE_ON_ERROR === 'true';
 
   let uid = user.username || user.email; //depends on the configuration
   const profileRequestUrl = new URL(
@@ -90,15 +91,21 @@ async function seczettaGrabRiskScore(user, context, callback) {
       if (allowAuthOnError) {
         return callback(null, user, context);
       }
-      return callback(new UnauthorizedError('Error retrieving SecZetta Risk Score.'));
+      return callback(
+        new UnauthorizedError('Error retrieving SecZetta Risk Score.')
+      );
     }
   } catch (profileError) {
     // Swallow risk scope API call, default is set to highest risk below.
-    console.log(`Error while calling SecZetta Profile API: ${profileError.message}`);
+    console.log(
+      `Error while calling SecZetta Profile API: ${profileError.message}`
+    );
     if (allowAuthOnError) {
       return callback(null, user, context);
     }
-    return callback(new UnauthorizedError('Error retrieving SecZetta Risk Score.'));
+    return callback(
+      new UnauthorizedError('Error retrieving SecZetta Risk Score.')
+    );
   }
 
   //Should now have the profile in profileResponse. Lets grab it.
@@ -120,11 +127,15 @@ async function seczettaGrabRiskScore(user, context, callback) {
     });
   } catch (riskError) {
     // Swallow risk scope API call, default is set to highest risk below.
-    console.log(`Error while calling SecZetta Risk Score API: ${riskError.message}`);
+    console.log(
+      `Error while calling SecZetta Risk Score API: ${riskError.message}`
+    );
     if (allowAuthOnError) {
       return callback(null, user, context);
     }
-    return callback(new UnauthorizedError('Error retrieving SecZetta Risk Score.'));
+    return callback(
+      new UnauthorizedError('Error retrieving SecZetta Risk Score.')
+    );
   }
 
   //Should now finally have the risk score. Lets add it to the user
@@ -145,7 +156,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
     allowableRisk === 0
   ) {
     console.log(
-      `Risk score ${overallScore} is greater than maximum of ${allowableRisk}. Prompting for MFA`
+      `Risk score ${overallScore} is greater than maximum of ${allowableRisk}. Prompting for MFA.`
     );
     context.multifactor = {
       provider: 'any',
@@ -161,10 +172,7 @@ async function seczettaGrabRiskScore(user, context, callback) {
     );
     return callback(
       new UnauthorizedError(
-        'A ' +
-          overallScore +
-          ' Risk score is too high. Maximum acceptable risk is ' +
-          maximumRisk
+        `A ${overallScore} risk score is too high. Maximum acceptable risk is ${maximumRisk}.`
       )
     );
   }
