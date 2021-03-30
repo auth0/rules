@@ -113,7 +113,6 @@ async function seczettaGrabRiskScore(user, context, callback) {
 
   // Should now have the profile in profileResponse. Lets grab it.
   const objectId = profileResponse.data.profiles[0].id;
-  console.log(objectId);
 
   const riskScoreRequestUrl = new URL(
     '/api/risk_scores?object_id=' + objectId,
