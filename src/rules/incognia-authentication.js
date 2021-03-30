@@ -8,8 +8,8 @@
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
- *    - INCOGNIA_CLIENT_ID: The client ID obtained from Incognia's dashboard (My Apps > API Credentials)
- *    - INCOGNIA_CLIENT_SECRET: The client secret obtained from Incognia's dashboard (My Apps > API Credentials)
+ *    - `INCOGNIA_CLIENT_ID`: The client ID obtained from Incognia's dashboard (My Apps > API Credentials)
+ *    - `INCOGNIA_CLIENT_SECRET`: The client secret obtained from Incognia's dashboard (My Apps > API Credentials)
  */
 
 async function incogniaAuthenticationRule(user, context, callback) {
