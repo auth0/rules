@@ -9,7 +9,7 @@
  *    - `SECZETTA_API_KEY` API Token from your SecZetta tennant
  *    - `SECZETTA_BASE_URL` URL for your SecZetta tennant
  *    - `SECZETTA_ATTRIBUTE_ID` the id of the SecZetta attribute you are searching on (i.e personal_email, user_name, etc.)
- *    - `SECZETTA_PROFILE_TYPE_ID' the id of the profile type this user's profile
+ *    - `SECZETTA_PROFILE_TYPE_ID` the id of the profile type this user's profile
  *    - `SECZETTA_ALLOWABLE_RISK` Set to a risk score integer value above which MFA is required
  *    - `SECZETTA_MAXIMUM_ALLOWED_RISK` Set to a maximum risk score integer value above which login fails.
  *
@@ -20,7 +20,7 @@
  *
  * **Helpful Hints**
  *
- *    - The SecZetta API documentation is located here: https://{{SECZETTA_BASE_URL}}/api/v1/
+ *    - The SecZetta API documentation is located here: `https://{{SECZETTA_BASE_URL}}/api/v1/`
  */
 async function seczettaGrabRiskScore(user, context, callback) {
   if (
