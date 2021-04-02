@@ -18,7 +18,7 @@
  */
 /* global configuration */
 async function oneTrustConsentManagement(user, context, callback) {
-  const axios = require('axios@0.19.2');
+  const axios = require('axios@0.21.1');
 
   const {
     ONETRUST_REQUEST_INFORMATION,

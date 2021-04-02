@@ -18,7 +18,7 @@
 *
 */
 function consentricProgressiveConsent(user, context, callback) {
-  const axios = require('axios@0.19.2');
+  const axios = require('axios@0.21.1');
   const moment = require('moment@2.11.2');
   const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
 
