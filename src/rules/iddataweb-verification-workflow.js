@@ -32,7 +32,7 @@ async function iddatawebVerificationWorkflow(user, context, callback) {
   }
 
   const { Auth0RedirectRuleUtilities } = require('@auth0/rule-utilities@0.1.0');
-  const axiosClient = require('axios@0.19.2');
+  const axiosClient = require('axios@0.21.1');
   const url = require('url');
 
   const ruleUtils = new Auth0RedirectRuleUtilities(

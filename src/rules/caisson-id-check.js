@@ -51,7 +51,7 @@ async function caissonIDCheck(user, context, callback) {
       api: 'https://api.caisson.com',
       dashboard: 'https://www.caisson.com'
     },
-    axios: require('axios@0.19.2'),
+    axios: require('axios@0.21.1'),
     util: new Auth0RedirectRuleUtilities(user, context, caissonConf)
   };
 
