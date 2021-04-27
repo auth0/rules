@@ -15,7 +15,7 @@
 async function incogniaAuthenticationRule(user, context, callback) {
   const _ = require('lodash@4.17.19');
 
-  const { IncogniaAPI } = require('@incognia/api@1.1.0');
+  const { IncogniaAPI } = require('@incognia/api@1.1.1');
 
   const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET, INCOGNIA_REGION } = configuration;
 
