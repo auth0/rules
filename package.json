@@ -1,13 +1,13 @@
 {
   "name": "rules-templates",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "Auth0 Rules Repository",
   "main": "./rules",
   "scripts": {
     "validate": "node validator.js",
     "build": "node build && npm run validate",
     "format": "prettier --write src/rules",
-    "release": "npm run format && npm test && npm run build",
+    "release": "npm run format && npm test && npm run build && npm run validate",
     "deploy": "node deploy.js",
     "test": "jest"
   },
