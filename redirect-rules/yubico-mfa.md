@@ -4,6 +4,8 @@
 var request = require('request');
 var qs = require('qs');
 var jwt = require('jsonwebtoken');
+var bodyParser = require('body-parser')
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 return function (context, req, res) {
 
@@ -30,11 +32,21 @@ return function (context, req, res) {
     },
 
     /*
+     * 2. Parse the form body
+     */
+        function(callback) {
+            if (req.method === 'POST') {
+                return urlencodedParser(req, res, callback);
+            }
+            return callback();
+        },
+
+    /*
      * 2. Validate OTP
      */
     function(callback) {
       if (req.method === 'POST') {
-        yubico_validate(context.data.yubikey_clientid, context.data.otp, function(err,resp) {
+        yubico_validate(context.secrets.yubikey_clientid, req.body.otp, function(err,resp) {
           if (err) {
             return callback(err);
           }
@@ -45,15 +57,15 @@ return function (context, req, res) {
               status: resp.status,
               otp: resp.otp
             };
-            var key = Buffer.from(context.data.yubikey_secret, 'base64');
+            var key = Buffer.from(context.secrets.yubikey_secret, 'base64');
             var options = {
-              subject: context.data.user,
+              subject: context.query.user,
               expiresIn: 60,
-              audience: context.data.yubikey_clientid,
+              audience: context.secrets.yubikey_clientid,
               issuer: 'urn:auth0:yubikey:mfa'
             };
             var token = jwt.sign(payload, key, options);
-            res.writeHead(301, {Location: context.data.returnUrl + "?id_token=" + token + "&state=" + context.data.state});
+            res.writeHead(301, {Location: context.secrets.returnUrl + "?id_token=" + token + "&state=" + context.query.state});
             res.end();
             callback();
           } else {
@@ -122,7 +134,7 @@ return function (context, req, res) {
       'Content-Type': 'text/html'
     });
     res.end(require('ejs').render(otpForm.toString().match(/[^]*\/\*([^]*)\*\/\s*\}$/)[1], {
-      user: context.data.user,
+      user: context.query.user,
       errors: errors || []
     }));
   }
