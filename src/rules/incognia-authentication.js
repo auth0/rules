@@ -17,7 +17,11 @@ async function incogniaAuthenticationRule(user, context, callback) {
 
   const { IncogniaAPI } = require('@incognia/api@1.1.1');
 
-  const { INCOGNIA_CLIENT_ID, INCOGNIA_CLIENT_SECRET, INCOGNIA_REGION } = configuration;
+  const {
+    INCOGNIA_CLIENT_ID,
+    INCOGNIA_CLIENT_SECRET,
+    INCOGNIA_REGION
+  } = configuration;
 
   if (!INCOGNIA_CLIENT_ID || !INCOGNIA_CLIENT_SECRET) {
     console.log('Missing required configuration. Skipping.');
