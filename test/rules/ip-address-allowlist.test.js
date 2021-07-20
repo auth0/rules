@@ -4,7 +4,7 @@ const loadRule = require('../utils/load-rule');
 const ContextBuilder = require('../utils/contextBuilder');
 const RequestBuilder = require('../utils/requestBuilder');
 
-const ruleName = 'ip-address-whitelist';
+const ruleName = 'ip-address-allowlist';
 
 describe(ruleName, () => {
   let context;
@@ -22,7 +22,7 @@ describe(ruleName, () => {
         .build();
     });
 
-    it('if ip isn`t in the whitelist', (done) => {
+    it('if ip isn`t in the allowlist', (done) => {
       rule({}, context, (err) => {
         expect(err).toBeInstanceOf(Error);
         expect(err.message).toEqual('Access denied from this IP address.');
@@ -40,7 +40,7 @@ describe(ruleName, () => {
         .build();
     });
 
-    it('if ip isn`t in the whitelist', (done) => {
+    it('if ip isn`t in the allowlist', (done) => {
       rule({}, context, (err, u, c) => {
         expect(c.request.ip).toEqual('1.2.3.4');
         done();
