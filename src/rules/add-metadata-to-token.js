@@ -1,6 +1,6 @@
 /**
  * @title User metadata for Cumul.io
- * @overview Add Cumul.io user metaadata to token to be used for Cumul.io dashboard filtering
+ * @overview Add Cumul.io user metadata to tokens to be used for Cumul.io dashboard filtering
  * @gallery true
  * @category marketplace
  */
