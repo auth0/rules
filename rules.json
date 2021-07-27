@@ -93,6 +93,16 @@
         "code": "function emailVerified(user, context, callback) {\n  if (!user.email_verified) {\n    return callback(\n      new UnauthorizedError('Please verify your email before logging in.')\n    );\n  } else {\n    return callback(null, user, context);\n  }\n}"
       },
       {
+        "id": "ip-address-allowlist",
+        "title": "IP Address allowlist",
+        "overview": "Only allow access to an app from a specific set of IP addresses.",
+        "categories": [
+          "access control"
+        ],
+        "description": "<p>This rule will only allow access to an app from a specific set of IP addresses</p>",
+        "code": "function ipAddressAllowlist(user, context, callback) {\n  const allowlist = ['1.2.3.4', '2.3.4.5']; // authorized IPs\n  const userHasAccess = allowlist.some(function (ip) {\n    return context.request.ip === ip;\n  });\n\n  if (!userHasAccess) {\n    return callback(new Error('Access denied from this IP address.'));\n  }\n\n  return callback(null, user, context);\n}"
+      },
+      {
         "id": "ip-address-blocklist",
         "title": "IP Address Blocklist",
         "overview": "Do not allow access to an app from a specific set of IP addresses.",
@@ -101,16 +111,6 @@
         ],
         "description": "<p>This rule will deny access to an app from a specific set of IP addresses.</p>",
         "code": "function ipAddressBlocklist(user, context, callback) {\n  const blocklist = ['1.2.3.4', '2.3.4.5']; // unauthorized IPs\n  const notAuthorized = blocklist.some(function (ip) {\n    return context.request.ip === ip;\n  });\n\n  if (notAuthorized) {\n    return callback(\n      new UnauthorizedError('Access denied from this IP address.')\n    );\n  }\n\n  return callback(null, user, context);\n}"
-      },
-      {
-        "id": "ip-address-whitelist",
-        "title": "IP Address whitelist",
-        "overview": "Only allow access to an app from a specific set of IP addresses.",
-        "categories": [
-          "access control"
-        ],
-        "description": "<p>This rule will only allow access to an app from a specific set of IP addresses</p>",
-        "code": "function ipAddressWhitelist(user, context, callback) {\n  const whitelist = ['1.2.3.4', '2.3.4.5']; // authorized IPs\n  const userHasAccess = whitelist.some(function (ip) {\n    return context.request.ip === ip;\n  });\n\n  if (!userHasAccess) {\n    return callback(new Error('Access denied from this IP address.'));\n  }\n\n  return callback(null, user, context);\n}"
       },
       {
         "id": "roles-creation",
