@@ -23,7 +23,7 @@
   "homepage": "https://github.com/auth0/rules",
   "devDependencies": {
     "ajv": "^6.5.4",
-    "async": "2.6.0",
+    "async": "2.6.4",
     "auth0": "^2.22.0",
     "aws-sdk": "2.359.0",
     "crypto": "^1.0.1",
