@@ -1,7 +1,7 @@
 /**
  * @title Arengu Progressive Profiling
  * @overview Capture new users' information in your authentication flows.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [Aregnu Progressive Profiling integration](https://marketplace.auth0.com/integrations/arengu-progressive-profiling) for more information and detailed installation instructions.

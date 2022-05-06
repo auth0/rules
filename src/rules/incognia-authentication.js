@@ -1,7 +1,7 @@
 /**
  * @title Incognia Authentication Rule
  * @overview Verify if the device logging in is at a trusted location.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [Incognia Authentication integration](https://marketplace.auth0.com/integrations/incognia-authentication) for more information and detailed installation instructions.

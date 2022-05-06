@@ -1,7 +1,7 @@
 /**
 * @title Consentric Progressive Consent
 * @overview Uses a widget to capture missing consents and preferences at login to boost engagement and support compliance
-* @gallery true
+* @gallery false
 * @category marketplace
 *
 * Please see the [MyLife Digital integration](https://marketplace.auth0.com/integrations/mylife-digital-progressive-consent) for more information and detailed installation instructions.

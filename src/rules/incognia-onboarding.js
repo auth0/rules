@@ -1,7 +1,7 @@
 /**
  * @title Incognia Onboarding Rule
  * @overview Verify if the device location behavior matches the address declared during onboarding.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [Incognia Onboarding integration](https://marketplace.auth0.com/integrations/incognia-onboarding) for more information and detailed installation instructions.

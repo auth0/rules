@@ -1,7 +1,7 @@
 /**
  * @title User app_metadata for Cumul.io
  * @overview Add Cumul.io user app_metadata to tokens to be used for Cumul.io dashboard filtering
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * This integration simplifies the process of making full use of integrated Cumul.io dashboards' multi tenant features
