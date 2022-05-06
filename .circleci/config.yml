@@ -5,7 +5,6 @@ jobs:
     parameters:
       v:
         type: string
-        default: "12"
     docker:
       - image: circleci/node:<< parameters.v >>
     steps:
@@ -49,13 +48,12 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build_and_test
       - build_and_test:
           name: build_and_test_node12
           v: "12"
       - build_and_test:
-          name: build_and_test_node13
-          v: "13"
+          name: build_and_test_node16
+          v: "16"
   build_test_and_deploy:
     jobs:
       - build_and_test:
