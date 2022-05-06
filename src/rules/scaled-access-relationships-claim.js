@@ -1,7 +1,7 @@
 /**
  * @title Scaled Access relationship-based claims
  * @overview Adds a claim based on the relationships the subject has in Scaled Access
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [Scaled Access integration](https://marketplace.auth0.com/integrations/scaled-access) for more information and detailed installation instructions.

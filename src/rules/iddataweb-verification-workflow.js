@@ -1,7 +1,7 @@
 /**
  * @title ID DataWeb Verification Workflow
  * @overview Verify your user's identity in 180+ countries with ID DataWeb's adaptive Verification Workflows.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [ID DataWeb integration](https://marketplace.auth0.com/integrations/iddataweb-identity-verification) for more information and detailed installation instructions.
