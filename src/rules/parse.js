@@ -42,9 +42,8 @@ function generateParseSessionToken(user, context, callback) {
 
       // user was found, add sessionToken to user profile
       if (response.statusCode === 200) {
-        context.idToken['https://example.com/parse_session_token'] = JSON.parse(
-          body
-        ).sessionToken;
+        context.idToken['https://example.com/parse_session_token'] =
+          JSON.parse(body).sessionToken;
         return callback(null, user, context);
       }
 
