@@ -5,6 +5,7 @@ jobs:
     parameters:
       v:
         type: string
+        default: "12"
     docker:
       - image: circleci/node:<< parameters.v >>
     steps:
