@@ -1,7 +1,7 @@
 /**
  * @title YooniK Face Authentication
  * @overview Redirect to your YooniK Face Application for Face Authentication during login.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):

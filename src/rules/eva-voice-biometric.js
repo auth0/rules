@@ -1,8 +1,8 @@
 /**
- *	@title EVA Voice Biometric connector
- *	@overview EVA Voice Biometric connector rule for Auth0 enables voice enrolment and verification as a second factor
- *	@gallery true
- *	@category marketplace
+ * @title EVA Voice Biometric connector
+ * @overview EVA Voice Biometric connector rule for Auth0 enables voice enrolment and verification as a second factor
+ * @gallery false
+ * @category marketplace
  *
  * Please see the [EVA Voice Biometrics integration](https://marketplace.auth0.com/integrations/eva-voice-biometrics) for more information and detailed installation instructions.
  *

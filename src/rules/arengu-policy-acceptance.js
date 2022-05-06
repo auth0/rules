@@ -1,7 +1,7 @@
 /**
  * @title Arengu Policy Acceptance
  * @overview Require your users to accept custom privacy policies or new terms.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [Aregnu Policy Acceptance integration](https://marketplace.auth0.com/integrations/arengu-policy-acceptance) for more information and detailed installation instructions.

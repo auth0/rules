@@ -1,7 +1,7 @@
 /**
  * @title OneTrust Consent Management
  * @overview Enhance Auth0 user profiles with consent, opt-ins and communication preferences data.
- * @gallery true
+ * @gallery false
  * @category marketplace
  *
  * Please see the [OneTrust integration](https://marketplace.auth0.com/integrations/onetrust-consent-management) for more information and detailed installation instructions.
