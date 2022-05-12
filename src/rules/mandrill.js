@@ -42,22 +42,21 @@ function sendMandrillEmail(user, context, callback) {
   const mandrill_send_endpoint =
     'https://mandrillapp.com/api/1.0/messages/send.json';
 
-  request.post({ url: mandrill_send_endpoint, form: body }, function (
-    err,
-    resp,
-    body
-  ) {
-    if (err) {
-      return callback(err);
+  request.post(
+    { url: mandrill_send_endpoint, form: body },
+    function (err, resp, body) {
+      if (err) {
+        return callback(err);
+      }
+      user.app_metadata.signedUp = true;
+      auth0.users
+        .updateAppMetadata(user.user_id, user.app_metadata)
+        .then(function () {
+          callback(null, user, context);
+        })
+        .catch(function (err) {
+          callback(err);
+        });
     }
-    user.app_metadata.signedUp = true;
-    auth0.users
-      .updateAppMetadata(user.user_id, user.app_metadata)
-      .then(function () {
-        callback(null, user, context);
-      })
-      .catch(function (err) {
-        callback(err);
-      });
-  });
+  );
 }

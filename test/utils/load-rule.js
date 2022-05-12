@@ -2,7 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const parseComments = require('parse-comments');
+const ParseComments = require('parse-comments');
+const parseComments = new ParseComments();
 
 /**
  * Loads a rule, optionally with stubs
@@ -18,8 +19,8 @@ module.exports = function (ruleFileName, globals, stubs) {
   const fileName = path.join(__dirname, '../../src/rules', ruleFileName + '.js');
   const data = fs.readFileSync(fileName, 'utf8');
 
-  const parsed = parseComments(data)[0];
-  const code = data.split('\n').slice(parsed.comment.end).join('\n').trim();
+  const parsed = parseComments.parse(data)[0];
+  const code = data.split('\n').slice(parsed.loc.end.line).join('\n').trim();
 
   return compile(code, globals, stubs);
 }

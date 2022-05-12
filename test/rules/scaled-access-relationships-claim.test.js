@@ -42,7 +42,7 @@ describe(ruleName, () => {
         delete sandbox.global.scaledAccessM2mToken;
     })
 
-    describe("When the user already exists", async () => {
+    describe("When the user already exists", () => {
         beforeEach(() => {
             const request = new RequestBuilder().build();
             request.hostname = "some-tenant.eu.auth0.com";
@@ -126,7 +126,6 @@ function givenTheUserHasRelationships(relationships) {
             }
         };
     });
-    console.log({response});
     nock("https://api.int.scaledaccess.com")
         .get("/privategroups-v2/tenant/actors/user/existing_user_id/relationships")
         .reply(200, response);

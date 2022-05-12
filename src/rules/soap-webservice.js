@@ -17,8 +17,7 @@ function getRolesFromSoapService(user, context, callback) {
     request.post(
       {
         url: 'https://somedomain.com/RoleService.svc',
-        body:
-          '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><GetRolesForCurrentUser xmlns="http://tempuri.org"/></s:Body></s:Envelope>',
+        body: '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><GetRolesForCurrentUser xmlns="http://tempuri.org"/></s:Body></s:Envelope>',
         headers: {
           'Content-Type': 'text/xml; charset=utf-8',
           SOAPAction: 'http://tempuri.org/RoleService/GetRolesForCurrentUser'

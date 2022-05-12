@@ -3,7 +3,7 @@
 const async = require('async');
 const path = require('path');
 const yargs = require('yargs');
-const parseComments = require('parse-comments');
+const ParseComments = require('parse-comments');
 const showdown = require('showdown');
 const fs = require('fs');
 const glob = require('glob');
@@ -22,6 +22,8 @@ const argv = yargs
 
 const files = glob.sync(__dirname + '/src/rules/*.js');
 
+const parseComments = new ParseComments();
+
 const converter = new showdown.Converter();
 showdown.setFlavor('github');
 
@@ -30,10 +32,10 @@ async.reduce(files, [], (rules, file, callback) => {
   fs.readFile(file, 'utf8', (err, data) => {
     if (err) return callback(err);
 
-    const parsed = parseComments(data)[0];
+    const parsed = parseComments.parse(data)[0];
 
     // strip the opening comment and remove extra newlines
-    const code = data.split('\n').slice(parsed.comment.end).join('\n').trim();
+    const code = data.split('\n').slice(parsed.loc.end.line).join('\n').trim();
 
     if (argv.allRules || parsed.gallery === 'true') {
       const ruleDescription = converter.makeHtml(parsed.example);
