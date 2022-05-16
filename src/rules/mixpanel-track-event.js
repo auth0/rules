@@ -1,13 +1,13 @@
 /**
- * @title Tracks Logins in MixPanel
- * @overview Send a Sign In event to MixPanel to track logins
- * @gallery true
- * @category webhook
  *
  * This rule will send a `Sign In` event to MixPanel, and will include the application the user is signing in to as a property.
  *
  * See [MixPanel HTTP API](https://mixpanel.com/help/reference/http) for more information.
  *
+ * @title Tracks Logins in MixPanel
+ * @overview Send a Sign In event to MixPanel to track logins
+ * @gallery true
+ * @category webhook
  */
 
 function trackLoginInMixPanel(user, context, callback) {

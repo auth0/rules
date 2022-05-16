@@ -1,9 +1,4 @@
 /**
- * @title Caisson ID Check
- * @overview Validate US driver's licenses and international passports in real time.
- * @gallery false
- * @category marketplace
- *
  * Please see the [Caisson integration](https://marketplace.auth0.com/integrations/caisson-id-check) for more information and detailed installation instructions.
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
@@ -15,6 +10,11 @@
  * **Optional configuration:**
  *
  *    - `CAISSON_DEBUG` Set to "true" to log errors in the console
+ * 
+ * @title Caisson ID Check
+ * @overview Validate US driver's licenses and international passports in real time.
+ * @gallery false
+ * @category marketplace
  */
 
 async function caissonIDCheck(user, context, callback) {

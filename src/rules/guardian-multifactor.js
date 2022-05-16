@@ -1,13 +1,13 @@
 /**
- * @title Multifactor with Auth0 Guardian
- * @overview Trigger multifactor authentication with Auth0 when a condition is met.
- * @gallery true
- * @category multifactor,guardian
  *
  * This rule is used to trigger multifactor authentication with Auth0 when a condition is met.
  *
  * Upon first login, the user can enroll the device.
  *
+ * @title Multifactor with Auth0 Guardian
+ * @overview Trigger multifactor authentication with Auth0 when a condition is met.
+ * @gallery true
+ * @category multifactor,guardian
  */
 
 function guardianMultifactor(user, context, callback) {

@@ -1,8 +1,4 @@
 /**
- * @title Enrich profile with Towerdata - formerly RapLeaf
- * @overview Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile.
- * @gallery true
- * @category enrich profile
  *
  * This rule gets user information from towerdata using the e-mail (if available).
  *
@@ -10,6 +6,10 @@
  *
  * See http://docs.towerdata.com/#introduction-3 for full details.
  *
+ * @title Enrich profile with Towerdata - formerly RapLeaf
+ * @overview Get user information from towerdata (formerly rapleaf) using email and add towerdata property to user profile.
+ * @gallery true
+ * @category enrich profile
  */
 
 function getTowerdataProfile(user, context, callback) {

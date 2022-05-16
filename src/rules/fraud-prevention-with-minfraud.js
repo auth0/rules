@@ -1,11 +1,11 @@
 /**
- * @title Fraud Prevention
- * @overview Send the user's IP address, user agent, email address and username in MD5 to MaxMind's MinFraud API.
  *
  * This rule will send the user's IP address, user agent, email address (in MD5) and username (in MD5) to MaxMind's MinFraud API. This API will return information about this current transaction like the location, a risk score, ...
  *
  * > Note: You will need to sign up here to get a license key https://www.maxmind.com/
  *
+ * @title Fraud Prevention
+ * @overview Send the user's IP address, user agent, email address and username in MD5 to MaxMind's MinFraud API.
  */
 
 function fraudPrevention(user, context, callback) {

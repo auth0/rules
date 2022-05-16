@@ -1,8 +1,4 @@
 /**
- * @title Arengu Policy Acceptance
- * @overview Require your users to accept custom privacy policies or new terms.
- * @gallery false
- * @category marketplace
  *
  * Please see the [Aregnu Policy Acceptance integration](https://marketplace.auth0.com/integrations/arengu-policy-acceptance) for more information and detailed installation instructions.
  *
@@ -11,6 +7,10 @@
  *    - `SESSION_TOKEN_SECRET`: A long, random string at least 32 bytes long
  *    - `ARENGU_POLICIES_FORM_URL`: The URL that contains an [embedded form](https://github.com/arengu/forms-js-sdk#embed-a-form) or with a [hosted form page](https://www.arengu.com/pages)
  *
+ * @title Arengu Policy Acceptance
+ * @overview Require your users to accept custom privacy policies or new terms.
+ * @gallery false
+ * @category marketplace
  */
 
 async function arenguCheckUserPolicies(user, context, callback) {

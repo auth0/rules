@@ -1,8 +1,4 @@
 /**
- * @title Require MFA Enrollment
- * @overview Require MFA Enrollment on next login
- * @gallery true
- * @category multifactor
  *
  * This rule requires that any user not already enrolled in MFA will be presented with an enrollment prompt on their next login.
  *
@@ -10,6 +6,10 @@
  *
  * Use of the Adaptive MFA feature requires an add-on for the Enterprise plan. Please contact sales with any questions. See our [Adaptive MFA documentation](https://auth0.com/docs/mfa/adaptive-mfa) for more information.
  *
+ * @title Require MFA Enrollment
+ * @overview Require MFA Enrollment on next login
+ * @gallery true
+ * @category multifactor
  */
 
 function requireMfaEnrollment(user, context, callback) {

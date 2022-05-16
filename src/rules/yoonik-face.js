@@ -1,8 +1,4 @@
 /**
- * @title YooniK Face Authentication
- * @overview Redirect to your YooniK Face Application for Face Authentication during login.
- * @gallery false
- * @category marketplace
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
@@ -11,6 +7,10 @@
  *      used in the custom app in order to verify and re-sign the session token back to Auth0.
  *    - `YOONIK_APP_URL` The URL of your custom application that receives the redirect.
  *
+ * @title YooniK Face Authentication
+ * @overview Redirect to your YooniK Face Application for Face Authentication during login.
+ * @gallery false
+ * @category marketplace
  */
 async function yoonikFaceAuthentication(user, context, callback) {
   if (!configuration.SESSION_TOKEN_SECRET || !configuration.YOONIK_APP_URL) {

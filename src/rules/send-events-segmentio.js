@@ -1,8 +1,4 @@
 /**
- * @title Send events to Segment IO
- * @overview Send events to segment.io
- * @gallery false
- * @category webhook
  *
  * This rule is used to send two different events to [segment.io](http://segment.io)
  *
@@ -10,6 +6,10 @@
  *
  * The `sendEvent` function is a simple wrapper around the [segment.io Track REST API](https://segment.io/libraries/rest-api#track) which is trivial to call using the provided `request` module. Notice we are also sending some additional contextual information: the IP address and User Agent of the user.
  *
+ * @title Send events to Segment IO
+ * @overview Send events to segment.io
+ * @gallery false
+ * @category webhook
  */
 
 function sendEventsToSegmentIo(user, context, callback) {

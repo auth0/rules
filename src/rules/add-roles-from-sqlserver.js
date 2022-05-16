@@ -1,13 +1,13 @@
 /**
- * @title Add user roles from a SQL Server database
- * @overview Query a SQL server database on each login and add a roles array to the user.
- * @gallery true
- * @category enrich profile
  *
  * This rule will query a SQL server database on each login and add a `roles` array to the user.
  *
  * > Note: you can store the connection string securely on Auth0 encrypted configuration. Also make sure when you call an external endpoint to open your firewall/ports to our IP address which you can find it in the rules editor. This happens when you query SQL Azure for example.
  *
+ * @title Add user roles from a SQL Server database
+ * @overview Query a SQL server database on each login and add a roles array to the user.
+ * @gallery true
+ * @category enrich profile
  */
 
 function addRolesFromSqlServer(user, context, callback) {

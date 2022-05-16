@@ -1,8 +1,4 @@
 /**
- * @title Incognia Authentication Rule
- * @overview Verify if the device logging in is at a trusted location.
- * @gallery false
- * @category marketplace
  *
  * Please see the [Incognia Authentication integration](https://marketplace.auth0.com/integrations/incognia-authentication) for more information and detailed installation instructions.
  *
@@ -10,6 +6,11 @@
  *
  *    - `INCOGNIA_CLIENT_ID`: The client ID obtained from Incognia's dashboard (My Apps > API Credentials)
  *    - `INCOGNIA_CLIENT_SECRET`: The client secret obtained from Incognia's dashboard (My Apps > API Credentials)
+ * 
+ * @title Incognia Authentication Rule
+ * @overview Verify if the device logging in is at a trusted location.
+ * @gallery false
+ * @category marketplace
  */
 
 async function incogniaAuthenticationRule(user, context, callback) {

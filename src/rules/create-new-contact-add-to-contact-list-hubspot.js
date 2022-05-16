@@ -1,8 +1,4 @@
 /**
- * @title Add New Contact to HubSpot for Marketing
- * @overview Add New Contact to HubSpot then add to a List for marketing
- * @gallery true
- * @category webhook
  *
  * This rule will add a New Contact to HubSpot if they don't already exist, and then add that Contact to a List for marketing.
  *
@@ -11,6 +7,11 @@
  * For more details about the Rules configuration settings, see here https://auth0.com/docs/rules/guides/configuration
  * For more information about Hubspot API keys see here https://knowledge.hubspot.com/integrations/how-do-i-get-my-hubspot-api-key
  * Use 1 as the value for HUBSPOT_NEW_MEMBER_LIST_ID for the default list in Hubspot. Otherwise, you can see the ID of any list in HubSpot visiting it, and looking at the URL. It will have this format https://app.hubspot.com/contacts/:portalId/lists/:listId where :listId is the value you want.
+ * 
+ * @title Add New Contact to HubSpot for Marketing
+ * @overview Add New Contact to HubSpot then add to a List for marketing
+ * @gallery true
+ * @category webhook
  */
 
 function createNewContactAndAddToContactListHubSpot(user, context, callback) {

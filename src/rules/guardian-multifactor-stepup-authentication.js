@@ -1,8 +1,4 @@
 /**
- * @title Multifactor Stepup Authentication
- * @overview Used to challenge for a second factor when requested by sending acr_values.
- * @gallery true
- * @category multifactor
  *
  * This rule will challenge for a second authentication factor on request (step up) when
  * acr_values = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor' is sent in
@@ -10,6 +6,10 @@
  * to determine when the user has already successfully completed a challenge in the
  * current session.
  *
+ * @title Multifactor Stepup Authentication
+ * @overview Used to challenge for a second factor when requested by sending acr_values.
+ * @gallery true
+ * @category multifactor
  */
 
 function guardianMultifactorStepUpAuthentication(user, context, callback) {

@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule is used to disable the Resource Owner endpoint (to prevent users from bypassing MFA policies).
+ *
  * @title Disable the Resource Owner endpoint
  * @overview Disable the Resource Owner endpoint to prevent users from bypassing MFA policies.
  * @gallery true
  * @category access control
- *
- * This rule is used to disable the Resource Owner endpoint (to prevent users from bypassing MFA policies).
- *
  */
 
 function disableResourceOwner(user, context, callback) {

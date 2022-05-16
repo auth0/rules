@@ -1,8 +1,4 @@
 /**
- * @title Tracks Logins and Signups with Splunk HEC
- * @overview Send SignUp and Login events to Splunk's [HTTP Event Collector] (http://dev.splunk.com/view/event-collector/SP-CAAAE7F), including some contextual information of the user.
- * @gallery true
- * @category webhook
  *
  * This rule will send a `SignUp` & `Login` events to Splunk's HTTP Event Collector, including some contextual information of the user: the application the user is signing in, client IP address, username, etc.
  *
@@ -17,6 +13,10 @@
  *
  * ![](https://cdn.auth0.com/website/rules/splunk-hec-rule.png)
  *
+ * @title Tracks Logins and Signups with Splunk HEC
+ * @overview Send SignUp and Login events to Splunk's [HTTP Event Collector] (http://dev.splunk.com/view/event-collector/SP-CAAAE7F), including some contextual information of the user.
+ * @gallery true
+ * @category webhook
  */
 
 function trackEventsWithSplunkHec(user, context, callback) {

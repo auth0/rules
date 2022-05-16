@@ -1,21 +1,21 @@
 /**
-* @title Consentric Progressive Consent
-* @overview Uses a widget to capture missing consents and preferences at login to boost engagement and support compliance
-* @gallery false
-* @category marketplace
-*
-* Please see the [MyLife Digital integration](https://marketplace.auth0.com/integrations/mylife-digital-progressive-consent) for more information and detailed installation instructions.
-
-* **Required configuration** (this Rule will be skipped if any of the below are not defined):
-*
-*    - `CONSENTRIC_AUTH_HOST` The URL to authenticate against for your Consentric API token, like `https://sandbox-consentric.eu.auth0.com`
-*    - `CONSENTRIC_API_HOST` The Consentric API host URL, like `https://sandbox.consentric.io`
-*    - `CONSENTRIC_CLIENT_ID` The Consentric ClientId issued to you
-*    - `CONSENTRIC_CLIENT_SECRET` The Consentric ClientSecret issued to you
-*    - `CONSENTRIC_AUDIENCE` The name of the Consentric API being called, like `https://sandbox.consentric.io`
-*    - `CONSENTRIC_APPLICATION_ID` The Consentric ApplicationId issued to you
-*    - `CONSENTRIC_REDIRECT_URL` The URL of the page containing the Progressive widget
-*
+ *
+ * Please see the [MyLife Digital integration](https://marketplace.auth0.com/integrations/mylife-digital-progressive-consent) for more information and detailed installation instructions.
+ 
+ * **Required configuration** (this Rule will be skipped if any of the below are not defined):
+ *
+ *    - `CONSENTRIC_AUTH_HOST` The URL to authenticate against for your Consentric API token, like `https://sandbox-consentric.eu.auth0.com`
+ *    - `CONSENTRIC_API_HOST` The Consentric API host URL, like `https://sandbox.consentric.io`
+ *    - `CONSENTRIC_CLIENT_ID` The Consentric ClientId issued to you
+ *    - `CONSENTRIC_CLIENT_SECRET` The Consentric ClientSecret issued to you
+ *    - `CONSENTRIC_AUDIENCE` The name of the Consentric API being called, like `https://sandbox.consentric.io`
+ *    - `CONSENTRIC_APPLICATION_ID` The Consentric ApplicationId issued to you
+ *    - `CONSENTRIC_REDIRECT_URL` The URL of the page containing the Progressive widget
+ *
+ * @title Consentric Progressive Consent
+ * @overview Uses a widget to capture missing consents and preferences at login to boost engagement and support compliance
+ * @gallery false
+ * @category marketplace
 */
 function consentricProgressiveConsent(user, context, callback) {
   const axios = require('axios@0.21.1');

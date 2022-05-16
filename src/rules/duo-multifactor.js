@@ -1,8 +1,4 @@
 /**
- * @title Multifactor with Duo Security
- * @overview Trigger multifactor authentication with Duo Security when a condition is met.
- * @gallery true
- * @category multifactor
  *
  * This rule is used to trigger multifactor authentication with [Duo Security](http://duosecurity.com) when a condition is met.
  *
@@ -10,6 +6,10 @@
  *
  * You need to create two __integrations__ in __Duo Security__: one of type __WebSDK__ and the other __Admin SDK__.
  *
+ * @title Multifactor with Duo Security
+ * @overview Trigger multifactor authentication with Duo Security when a condition is met.
+ * @gallery true
+ * @category multifactor
  */
 
 function duoMultifactor(user, context, callback) {

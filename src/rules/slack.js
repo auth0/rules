@@ -1,14 +1,15 @@
 /**
- * @title Slack Notification on User Signup
- * @overview Slack notification on user signup.
- * @gallery true
- * @category webhook
  *
  * This rule sends a message to a Slack channel on every user signup.
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
  *    - `SLACK_HOOK_URL` URL to the Slack hook to notify.
+ * 
+ * @title Slack Notification on User Signup
+ * @overview Slack notification on user signup.
+ * @gallery true
+ * @category webhook
  */
 
 function slackNotificationOnUserSignup(user, context, callback) {

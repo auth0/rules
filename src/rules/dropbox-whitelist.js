@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule denies/grant access to users based on a list of emails stored in Dropbox.
+ *
  * @title Whitelist on the cloud
  * @overview Determine access to users based on a whitelist of emails stored in Dropbox.
  * @gallery true
  * @category access control
- *
- * This rule denies/grant access to users based on a list of emails stored in Dropbox.
- *
  */
 
 function dropboxWhitelist(user, context, callback) {

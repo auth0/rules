@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will set the `picture` to the original sized profile picture for users who login with LinkedIn.
+ *
  * @title Use the original sized profile picture for LinkedIn connections
  * @overview Set the picture to the profile picture for users who login with LinkedIn
  * @gallery true
  * @category enrich profile
- *
- * This rule will set the `picture` to the original sized profile picture for users who login with LinkedIn.
- *
  */
 
 function useOriginallinkedInProfilePicture(user, context, callback) {
