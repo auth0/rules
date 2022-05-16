@@ -13,7 +13,7 @@
  * **Optional configuration:**
  *
  *    - `SCALED_ACCESS_CUSTOMCLAIM` A namespaced ID token claim (defaults to `https://scaledaccess.com/relationships`)
- * 
+ *
  * @title Scaled Access relationship-based claims
  * @overview Adds a claim based on the relationships the subject has in Scaled Access
  * @gallery false

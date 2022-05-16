@@ -5,7 +5,7 @@
  * We use a persistent property `SignedUp` to track whether this is the first login or subsequent ones.
  *
  * In the same way you can use other services like [Amazon SES](http://docs.aws.amazon.com/ses/latest/APIReference/Welcome.html), [Mandrill](https://auth0.com/mandrill) and few others.
- * 
+ *
  * @title Send emails through SendGrid
  * @overview Send an email to an administrator through SendGrind on the first login of a user.
  * @gallery true

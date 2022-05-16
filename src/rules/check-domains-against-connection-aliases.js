@@ -5,7 +5,7 @@
  * Use this rule to only allow users from specific email domains to login.
  *
  * For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.
- * 
+ *
  * @title Check if user email domain matches configured domain
  * @overview Check user email domain matches domains configured in connection.
  * @gallery true

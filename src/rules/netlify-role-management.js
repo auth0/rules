@@ -5,7 +5,7 @@
  *    - `DEFAULT_ROLE_NAME` - name of the default role to be given to a user
  *    - `DEFAULT_ROLE_ID` - id of the role to be given to a user
  *    - `CUSTOM_CLAIMS_NAMESPACE` - namespace for adding custom claims to ID Token
- * 
+ *
  * @title Netlify Role Management
  * @overview Adds a default role if the user doesn't have any yet and attaches roles to the ID Token.
  * @gallery true

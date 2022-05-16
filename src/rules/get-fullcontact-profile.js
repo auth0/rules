@@ -9,7 +9,7 @@
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
  *    - `FULLCONTACT_KEY` API key found at https://dashboard.fullcontact.com/
- * 
+ *
  * @title Enrich profile with FullContact
  * @overview Get the user profile from FullContact using the email then add a new property to user_metadata.
  * @gallery true

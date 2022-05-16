@@ -14,7 +14,7 @@
  *    - `AURAYA_COMMON_DIGITS_PROMPT` A digit string to prompt for common digits (e.g '987654321')
  *    - `AURAYA_PERSONAL_DIGITS_PROMPT` A string to prompt for personal digits (e.g 'your cell number')
  *    - `AURAYA_DEBUG` Set to "true" to log errors in the console
- * 
+ *
  * @title EVA Voice Biometric connector
  * @overview EVA Voice Biometric connector rule for Auth0 enables voice enrolment and verification as a second factor
  * @gallery false
