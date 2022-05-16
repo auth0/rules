@@ -1,8 +1,4 @@
 /**
- * @title SecZetta Get Risk Score
- * @overview Grab the risk score from SecZetta to use in the authentication flow
- * @gallery false
- * @category marketplace
  *
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
@@ -21,6 +17,11 @@
  * **Helpful Hints**
  *
  *    - The SecZetta API documentation is located here: `https://{{SECZETTA_BASE_URL}}/api/v1/`
+ * 
+ * @title SecZetta Get Risk Score
+ * @overview Grab the risk score from SecZetta to use in the authentication flow
+ * @gallery false
+ * @category marketplace
  */
 async function seczettaGrabRiskScore(user, context, callback) {
   if (

@@ -1,8 +1,4 @@
 /**
- * @title ID DataWeb Verification Workflow
- * @overview Verify your user's identity in 180+ countries with ID DataWeb's adaptive Verification Workflows.
- * @gallery false
- * @category marketplace
  *
  * Please see the [ID DataWeb integration](https://marketplace.auth0.com/integrations/iddataweb-identity-verification) for more information and detailed installation instructions.
  *
@@ -16,6 +12,10 @@
  *
  *    - `IDDATAWEB_ALWAYS_VERIFY` Controls if users are verified each time they login, or just initially. We recommend "true" (verify the user on every login) for testing, not set (verify once, then not again) for production.
  *
+ * @title ID DataWeb Verification Workflow
+ * @overview Verify your user's identity in 180+ countries with ID DataWeb's adaptive Verification Workflows.
+ * @gallery false
+ * @category marketplace
  */
 
 async function iddatawebVerificationWorkflow(user, context, callback) {

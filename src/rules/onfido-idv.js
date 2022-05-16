@@ -1,8 +1,4 @@
 /**
- * @title Onfido Identity Verification
- * @overview Redirect to your Onfido IDV Application for Identity Verification during login.
- * @gallery true
- * @category marketplace
  *
  * Please see the [Onfido integration](https://marketplace.auth0.com/integrations/onfido-identity-verification) for more information and detailed installation instructions.
  *
@@ -13,9 +9,10 @@
  *    - `ONFIDO_REGION` The supported Onfido region your tenant is operating in
  *    - `ONFIDO_ID_VERIFICATION_URL` URL to receive the redirect
  *
- * @param {object} user
- * @param {object} context
- * @param {function} callback
+ * @title Onfido Identity Verification
+ * @overview Redirect to your Onfido IDV Application for Identity Verification during login.
+ * @gallery true
+ * @category marketplace
  */
 /* global configuration */
 async function onfidoIdentityVerification(user, context, callback) {

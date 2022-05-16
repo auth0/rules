@@ -1,8 +1,4 @@
 /**
- * @title Adaptive MFA
- * @overview Trigger multifactor authentication for a specific risk assessment result.
- * @gallery true
- * @category multifactor
  *
  * This rule is used to trigger multifactor authentication when a specific risk assessment result is detected.
  *
@@ -10,6 +6,10 @@
  *
  * For more information about Adaptive MFA and the `context.riskAssessment` attribute, read our [full documentation](https://auth0.com/docs/mfa/adaptive-mfa).
  *
+ * @title Adaptive MFA
+ * @overview Trigger multifactor authentication for a specific risk assessment result.
+ * @gallery true
+ * @category multifactor
  */
 
 function adaptiveMfa(user, context, callback) {

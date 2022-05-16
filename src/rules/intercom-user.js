@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will call the Intercom API to create a new contact or update an existing contact's activity, whenever there is a signup or login with Auth0.
+ *
  * @title Record or update an Intercom User
  * @overview Call the Intercom API to record/update an User.
  * @gallery false
  * @category webhook
- *
- * This rule will call the Intercom API to create a new contact or update an existing contact's activity, whenever there is a signup or login with Auth0.
- *
  */
 
 function intercomUser(user, context, callback) {

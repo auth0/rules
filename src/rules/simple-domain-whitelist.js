@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will only allow access to users with specific email domains.
+ *
  * @title Email domain whitelist
  * @overview Only allow access to users with specific whitelist email domains.
  * @gallery true
  * @category access control
- *
- * This rule will only allow access to users with specific email domains.
- *
  */
 
 function emailDomainWhitelist(user, context, callback) {

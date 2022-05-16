@@ -1,10 +1,10 @@
 /**
- * @title Query mongodb and enrich profile
- * @overview Query mongoDB and add a property to the user.
- * @category database
  *
  * This rule will query mongodb and add a property to the user.
  *
+ * @title Query mongodb and enrich profile
+ * @overview Query mongoDB and add a property to the user.
+ * @category database
  */
 
 function enrichProfileWithMongo(user, context, callback) {

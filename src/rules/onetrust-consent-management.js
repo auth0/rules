@@ -1,8 +1,4 @@
 /**
- * @title OneTrust Consent Management
- * @overview Enhance Auth0 user profiles with consent, opt-ins and communication preferences data.
- * @gallery false
- * @category marketplace
  *
  * Please see the [OneTrust integration](https://marketplace.auth0.com/integrations/onetrust-consent-management) for more information and detailed installation instructions.
  *
@@ -15,6 +11,11 @@
  * **Optional configuration:**
  *
  *    - `ONETRUST_SKIP_IF_NO_EMAIL` If set to "true" then the Rule will be skipped if there is no email address. Otherwise the Rule will fail with an error.
+ * 
+ * @title OneTrust Consent Management
+ * @overview Enhance Auth0 user profiles with consent, opt-ins and communication preferences data.
+ * @gallery false
+ * @category marketplace
  */
 /* global configuration */
 async function oneTrustConsentManagement(user, context, callback) {

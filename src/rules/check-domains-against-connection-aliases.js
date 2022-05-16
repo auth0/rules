@@ -1,14 +1,15 @@
 /**
- * @title Check if user email domain matches configured domain
- * @overview Check user email domain matches domains configured in connection.
- * @gallery true
- * @category access control
  *
  * This rule checks if the user's login email matches any domains configured in an enterprise connection. If there are no matches, the login is denied. But, if there are no domains configured it will allow access.
  *
  * Use this rule to only allow users from specific email domains to login.
  *
  * For example, ExampleCo has setup exampleco.com as a managed domain. They add exampleco.com to the email domains list in their SAML connection. Now, only users with an email ending with @exampleco.com (and not @examplecocorp.com) can login via SAML.
+ * 
+ * @title Check if user email domain matches configured domain
+ * @overview Check user email domain matches domains configured in connection.
+ * @gallery true
+ * @category access control
  */
 
 function checkDomainsAgainstConnectionAliases(user, context, callback) {

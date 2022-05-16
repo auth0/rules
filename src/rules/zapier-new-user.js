@@ -1,8 +1,4 @@
 /**
- * @title Trigger a Zap on New Users
- * @overview Trigger a Zap on every new user signup to Zapier.
- * @gallery true
- * @category webhook
  *
  * **What is Zapier?** [Zapier](http://zapier.com) is a tool for primarily non-technical users to connect together web apps. An integration between two apps is called a Zap. A Zap is made up of a Trigger and an Action. Whenever the trigger happens in one app, Zapier will automatically perform the action in another app.
  *
@@ -10,6 +6,10 @@
  *
  * This rule will call Zapier static hook every time a new user signs up.
  *
+ * @title Trigger a Zap on New Users
+ * @overview Trigger a Zap on every new user signup to Zapier.
+ * @gallery true
+ * @category webhook
  */
 
 function triggerZapOnNewUser(user, context, callback) {

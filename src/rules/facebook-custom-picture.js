@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will set the `picture` to a custom size for users who login with Facebook.
+ *
  * @title Use a custom sized profile picture for Facebook connections
  * @overview Set a custom sized profile picture for Facebook connections
  * @gallery true
  * @category enrich profile
- *
- * This rule will set the `picture` to a custom size for users who login with Facebook.
- *
  */
 
 function facebookCustomPicture(user, context, callback) {

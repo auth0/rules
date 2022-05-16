@@ -1,8 +1,4 @@
 /**
- * @title Send email with Mandrill
- * @overview Send email with Mandrill
- * @gallery true
- * @category webhook
  *
  * This rule will send an email to an administrator on a user's first login. We use a persistent `signedUp` property to track whether this is the case or not.
  *
@@ -12,6 +8,10 @@
  *
  * Make sure to change the sender and destination emails.
  *
+ * @title Send email with Mandrill
+ * @overview Send email with Mandrill
+ * @gallery true
+ * @category webhook
  */
 
 function sendMandrillEmail(user, context, callback) {

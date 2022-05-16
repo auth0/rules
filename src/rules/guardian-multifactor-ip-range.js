@@ -1,10 +1,11 @@
 /**
+ *
+ * This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.
+ * 
  * @title Multifactor when request comes from outside an IP range
  * @overview Trigger multifactor authentication when IP is outside the expected range.
  * @gallery true
  * @category multifactor,guardian
- *
- * This rule is used to trigger multifactor authentication when the requesting IP is from outside the corporate IP range.
  */
 
 function guardianMultifactorIpRange(user, context, callback) {

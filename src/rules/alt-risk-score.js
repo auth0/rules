@@ -1,14 +1,13 @@
-/* global configuration */
 /**
- * @title Alternate Risk Score
- * @overview Send the user's IP address, user agent, email address and username to MaxMind's MinFraud API.
- * @gallery true
- * @category enrich profile
  *
  * This rule will send the user's IP address, user agent, email address (in MD5) and username (in MD5) to MaxMind's MinFraud API. This API will return information about this current transaction like the location, a risk score, ...
  *
  * > Note: You will need to sign up here to get a license key https://www.maxmind.com/
  *
+ * @title Alternate Risk Score
+ * @overview Send the user's IP address, user agent, email address and username to MaxMind's MinFraud API.
+ * @gallery true
+ * @category enrich profile
  */
 
 // eslint-disable-next-line no-unused-vars
