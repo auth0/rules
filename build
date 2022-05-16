@@ -37,19 +37,23 @@ async.reduce(files, [], (rules, file, callback) => {
     // strip the opening comment and remove extra newlines
     const code = data.split('\n').slice(parsed.loc.end.line).join('\n').trim();
 
-    if (argv.allRules || parsed.gallery === 'true') {
-      const ruleDescription = converter.makeHtml(parsed.example);
+    const ruleTags = {};
+    parsed.tags.forEach((tag) => ruleTags[tag.title] = tag.description);
+
+    if (argv.allRules || ruleTags.gallery === 'true') {
+      const ruleExample = parsed.examples.reduce((prev, curr) => "\n\n" + curr.description + "\n<pre><code>" + curr.value + "</code></pre>" + prev, "");
+      const ruleDescription = converter.makeHtml(parsed.description + ruleExample);
 
       if (!ruleDescription) {
-        return callback(new Error(`Blank description for ${parsed.title}`));
+        return callback(new Error(`Blank description for ${file}`));
       }
 
       const rule = {
         id: path.basename(file).replace('.js', ''),
-        title: parsed.title,
-        overview: parsed.overview,
-        categories: parsed.category ? parsed.category.split(',') : ['default'],
-        description: converter.makeHtml(parsed.example),
+        title: ruleTags.title,
+        overview: ruleTags.overview,
+        categories: ruleTags.category ? ruleTags.category.split(',') : ['default'],
+        description: ruleDescription,
         code
       };
       rules.push(rule);
