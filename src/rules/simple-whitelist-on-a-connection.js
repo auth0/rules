@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).
+ *
  * @title Whitelist on Specific Connection
  * @overview Only allow access to users coming from a whitelist on specific connection.
  * @gallery true
  * @category access control
- *
- * This rule will only allow access to certain users coming from a specific connection (e.g. fitbit).
- *
  */
 
 function whitelistForSpecificConnection(user, context, callback) {

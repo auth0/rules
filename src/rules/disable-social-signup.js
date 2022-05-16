@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule is used to prevent signups using social connections.
+ *
  * @title Disable social signups
  * @overview Disable signups from social connections.
  * @gallery true
  * @category access control
- *
- * This rule is used to prevent signups using social connections.
- *
  */
 
 function disableSocialSignups(user, context, callback) {

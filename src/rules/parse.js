@@ -1,7 +1,4 @@
 /**
- * @title Generate an Parse Session Token
- * @overview Generate a session token for accessing the Parse API
- * @category enrich profile
  *
  * This rule is used to generate a session token for accessing [Parse API](http://parse.com/). The rule adds a new `user.parse_session_token` property set to the user profile containing the Parse session token. You can use this `session token` to make further Parse API calls.
  *
@@ -11,6 +8,9 @@
  *
  * <img src="https://docs.google.com/drawings/d/1vCyhpNkW2rOktXI5bp4sogmR6p8qBqJeJY-A5vfHA8c/pub?w=1219&amp;h=558">
  *
+ * @title Generate an Parse Session Token
+ * @overview Generate a session token for accessing the Parse API
+ * @category enrich profile
  */
 
 function generateParseSessionToken(user, context, callback) {

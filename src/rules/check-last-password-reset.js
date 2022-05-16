@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will check the last time that a user changed his or her account password.
+ *
  * @title Check last password reset
  * @overview Check the last time that a user changed his or her account password.
  * @gallery true
  * @category access control
- *
- * This rule will check the last time that a user changed his or her account password.
- *
  */
 
 function checkLastPasswordReset(user, context, callback) {

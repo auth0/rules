@@ -1,8 +1,4 @@
 /**
- * @title Move user metadata attributes to profile root attributes
- * @overview Moves select data from user_metadata to profile root attributes (family_name, given_name, name, nickname and picture).
- * @gallery true
- * @category enrich profile
  *
  * This rule moves select data from user_metadata to profile root attributes (family_name, given_name, name, nickname and picture).
  * Verify the field mapping before enabling this rule.
@@ -12,6 +8,11 @@
  * 1- The rule updates the profile root attribute with the mapped field from user_metadata.
  * 2- The mapped fields from user_metadata will be removed following the update.
  * 3- This rule will be executed on each login event. For signup scenarios, you should only consider using this rule if you currently use a custom signup form or Authentication Signup API, as these signup methods do not support setting the root attributes.
+ * 
+ * @title Move user metadata attributes to profile root attributes
+ * @overview Moves select data from user_metadata to profile root attributes (family_name, given_name, name, nickname and picture).
+ * @gallery true
+ * @category enrich profile
  */
 function migrateRootAttributes(user, context, cb) {
   // Field Mapping, the property is the root attribute and the value is the field name on user_metadata.

@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule adds a Roles field to the user based on some pattern.
+ *
  * @title Set roles to a user
  * @overview Add a Roles field to the user based on some pattern.
  * @gallery true
  * @category access control
- *
- * This rule adds a Roles field to the user based on some pattern.
- *
  */
 
 function setRolesToUser(user, context, callback) {

@@ -1,10 +1,10 @@
 /**
- * @title Verify user email with password reset
- * @overview Verify user email with password reset.
- * @gallery true
  *
  * This rule will set the user's email as verified in the next login sequence after the password is reset successfully.
  *
+ * @title Verify user email with password reset
+ * @overview Verify user email with password reset.
+ * @gallery true
  */
 
 function verifyUserWithPasswordReset(user, context, callback) {

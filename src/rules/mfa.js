@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule is used to trigger multifactor authentication when a condition is met.
+ *
  * @title Multifactor Authentication
  * @overview Trigger multifactor authentication when a condition is met.
  * @gallery true
  * @category multifactor
- *
- * This rule is used to trigger multifactor authentication when a condition is met.
- *
  */
 
 function multifactorAuthentication(user, context, callback) {

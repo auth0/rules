@@ -1,8 +1,4 @@
 /**
- * @title Send events to Keen
- * @overview Send a signup event to Keen IO, tracked by the user.signedUp property
- * @gallery true
- * @category webhook
  *
  * This rule is used to send a `signup` event to [Keen IO](http://keen.io)
  *
@@ -13,6 +9,10 @@
  *
  * ![](http://puu.sh/7k4qN.png)
  *
+ * @title Send events to Keen
+ * @overview Send a signup event to Keen IO, tracked by the user.signedUp property
+ * @gallery true
+ * @category webhook
  */
 
 function sendEventsToKeen(user, context, callback) {

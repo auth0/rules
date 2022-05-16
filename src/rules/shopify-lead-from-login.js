@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule is used to add user accounts to Shopify as user logs in
+ *
  * @title shopify-leads-from-login
  * @overview Add lead to Shopify at login
  * @gallery true
  * @category webhook
- *
- * This rule is used to add user accounts to Shopify as user logs in
- *
  */
 
 async function addShopifyUser(user, context, callback) {

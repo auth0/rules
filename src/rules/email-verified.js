@@ -1,8 +1,4 @@
 /**
- * @title Force email verification
- * @overview Only allow access to users with verified emails.
- * @gallery true
- * @category access control
  *
  * This rule will only allow access users that have verified their emails.
  *
@@ -13,6 +9,10 @@
  *
  * If you are using [auth0.js](https://auth0.com/docs/libraries/auth0js), the equivalent option is `auto_login: false`.
  *
+ * @title Force email verification
+ * @overview Only allow access to users with verified emails.
+ * @gallery true
+ * @category access control
  */
 
 function emailVerified(user, context, callback) {

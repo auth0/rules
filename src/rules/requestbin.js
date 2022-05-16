@@ -1,8 +1,4 @@
 /**
- * @title Dump rule variables to RequestBin
- * @overview Shows how to post the variables sent to your Rule to RequestBin to help troubleshoot rule issues
- * @gallery true
- * @category debugging
  *
  * This rule shows how to post the variables sent to your Rule to [RequestBin](https://requestbin.fullcontact.com) to help troubleshoot issues with your Rules.
  *
@@ -12,6 +8,10 @@
  *
  * You can run this rule by itself, or paste it into an existing rule.
  *
+ * @title Dump rule variables to RequestBin
+ * @overview Shows how to post the variables sent to your Rule to RequestBin to help troubleshoot rule issues
+ * @gallery true
+ * @category debugging
  */
 
 function sendVariablesToRequestBin(user, context, callback) {

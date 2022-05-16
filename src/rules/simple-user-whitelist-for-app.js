@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule will only allow access to users with specific email addresses on a specific app.
+ *
  * @title Whitelist for a Specific App
  * @overview Only allow access to users with whitelist email addresses on a specific app
  * @gallery true
  * @category access control
- *
- * This rule will only allow access to users with specific email addresses on a specific app.
- *
  */
 
 function userWhitelistForSpecificApp(user, context, callback) {

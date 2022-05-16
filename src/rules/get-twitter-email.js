@@ -1,8 +1,4 @@
 /**
- * @title Get email address from Twitter
- * @overview Get user email address from Twitter.
- * @gallery true
- * @category enrich profile
  *
  * Get email address from Twitter
  *
@@ -18,6 +14,10 @@
  *
  * For example, you can save it under `app_metadata.social_email`.
  *
+ * @title Get email address from Twitter
+ * @overview Get user email address from Twitter.
+ * @gallery true
+ * @category enrich profile
  */
 
 function getTwitterEmail(user, context, callback) {

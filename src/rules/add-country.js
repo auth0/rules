@@ -1,8 +1,4 @@
 /**
- * @title Add country to the user profile
- * @overview Add a country attribute to the user based on their IP address.
- * @gallery true
- * @category enrich profile
  *
  * This rule will add a `country` attribute to the user based on their ip address.
  *
@@ -22,6 +18,10 @@
  * }
  * ```
  *
+ * @title Add country to the user profile
+ * @overview Add a country attribute to the user based on their IP address.
+ * @gallery true
+ * @category enrich profile
  */
 
 function addCountry(user, context, callback) {

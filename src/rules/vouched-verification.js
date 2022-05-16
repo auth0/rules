@@ -1,8 +1,4 @@
 /**
- * @title Vouched Verification
- * @overview Verify a person's identity using Vouched.
- * @gallery true
- * @category marketplace
  *
  * Please see the [Vouched integration](https://marketplace.auth0.com/integrations/vouched-id-verification) for more information and detailed installation instructions.
  *
@@ -16,6 +12,11 @@
  *    - `VOUCHED_API_URL` Your Vouched API URL; leave blank unless instructed by your Vouched rep
  *    - `VOUCHED_ID_TOKEN_CLAIM` Set a `https://vouchedid/is_verified` claim in the ID token with results
  *    - `VOUCHED_VERIFICATION_OPTIONAL` Set to "true" to succeed even if verification fails
+ * 
+ * @title Vouched Verification
+ * @overview Verify a person's identity using Vouched.
+ * @gallery true
+ * @category marketplace
  */
 
 async function vouchedVerification(user, context, callback) {

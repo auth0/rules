@@ -1,11 +1,11 @@
 /**
+ *
+ * This rule gets the user locations based on the IP and is added to the `user_metadata` in the `geoip` attribute.
+ *
  * @title Enrich profile with the locations where the user logs in
  * @overview Get the user locations based on IP address and add to the app_metadata in the geoip attribute
  * @gallery true
  * @category enrich profile
- *
- * This rule gets the user locations based on the IP and is added to the `user_metadata` in the `geoip` attribute.
- *
  */
 
 function getIp(user, context, callback) {

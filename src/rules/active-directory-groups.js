@@ -1,13 +1,12 @@
 /**
+ * This rule checks if a user belongs to an AD group and if not, it will return Access Denied.
+ *
+ * > Note: you can mix this with `context.clientID` or `clientName` to do it only for specific application
+ * 
  * @title Active Directory group membership
  * @overview Check Active Directory membership, else return Access Denied.
  * @gallery true
  * @category access control
- *
- * This rule checks if a user belongs to an AD group and if not, it will return Access Denied.
- *
- * > Note: you can mix this with `context.clientID` or `clientName` to do it only for specific application
- *
  */
 
 function activeDirectoryGroups(user, context, callback) {

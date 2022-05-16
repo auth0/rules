@@ -1,13 +1,13 @@
 /**
- * @title Send emails through Mailgun
- * @overview Send an email to an administrator on the first login of a user using Mailgun.
- * @gallery true
- * @category webhook
  *
  * This rule will send an email to an administrator on the first login of a user using [Mailgun](https://mailgun.com).
  *
  * We use a persistent property `SignedUp` to track whether this is the first login or subsequent ones.
  *
+ * @title Send emails through Mailgun
+ * @overview Send an email to an administrator on the first login of a user using Mailgun.
+ * @gallery true
+ * @category webhook
  */
 
 function sendMailgunEmail(user, context, callback) {
