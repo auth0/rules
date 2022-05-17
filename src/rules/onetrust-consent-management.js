@@ -11,7 +11,7 @@
  * **Optional configuration:**
  *
  *    - `ONETRUST_SKIP_IF_NO_EMAIL` If set to "true" then the Rule will be skipped if there is no email address. Otherwise the Rule will fail with an error.
- * 
+ *
  * @title OneTrust Consent Management
  * @overview Enhance Auth0 user profiles with consent, opt-ins and communication preferences data.
  * @gallery false

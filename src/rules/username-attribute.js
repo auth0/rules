@@ -3,7 +3,7 @@
  * This rule will add one attribute to the user's metadata object on when they log in or sign up
  *
  * This is useful for cases where you want to add the username to an email using liquid syntax.
- * 
+ *
  * @title Add Username to AppMetadata
  * @overview Adds metadata on when an user first signs up or logs in.
  * @gallery true

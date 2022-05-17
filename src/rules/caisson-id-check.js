@@ -10,7 +10,7 @@
  * **Optional configuration:**
  *
  *    - `CAISSON_DEBUG` Set to "true" to log errors in the console
- * 
+ *
  * @title Caisson ID Check
  * @overview Validate US driver's licenses and international passports in real time.
  * @gallery false

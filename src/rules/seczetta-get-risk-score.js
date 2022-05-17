@@ -17,7 +17,7 @@
  * **Helpful Hints**
  *
  *    - The SecZetta API documentation is located here: `https://{{SECZETTA_BASE_URL}}/api/v1/`
- * 
+ *
  * @title SecZetta Get Risk Score
  * @overview Grab the risk score from SecZetta to use in the authentication flow
  * @gallery false

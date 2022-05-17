@@ -6,7 +6,7 @@
  *
  *    - `INCOGNIA_CLIENT_ID`: The client ID obtained from Incognia's dashboard (My Apps > API Credentials)
  *    - `INCOGNIA_CLIENT_SECRET`: The client secret obtained from Incognia's dashboard (My Apps > API Credentials)
- * 
+ *
  * @title Incognia Authentication Rule
  * @overview Verify if the device logging in is at a trusted location.
  * @gallery false

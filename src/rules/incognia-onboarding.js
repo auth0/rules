@@ -6,7 +6,7 @@
  *
  *    - `INCOGNIA_CLIENT_ID`: The client ID obtained from Incognia's dashboard (My Apps > API Credentials)
  *    - `INCOGNIA_CLIENT_SECRET`: The client secret obtained from Incognia's dashboard (My Apps > API Credentials)
- * 
+ *
  * @title Incognia Onboarding Rule
  * @overview Verify if the device location behavior matches the address declared during onboarding.
  * @gallery false

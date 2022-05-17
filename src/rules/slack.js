@@ -5,7 +5,7 @@
  * **Required configuration** (this Rule will be skipped if any of the below are not defined):
  *
  *    - `SLACK_HOOK_URL` URL to the Slack hook to notify.
- * 
+ *
  * @title Slack Notification on User Signup
  * @overview Slack notification on user signup.
  * @gallery true

@@ -1,7 +1,7 @@
 /**
  *
  * This rule will deny access to an app from a specific set of IP addresses.
- * 
+ *
  * @title IP Address Blocklist
  * @overview Do not allow access to an app from a specific set of IP addresses.
  * @gallery true

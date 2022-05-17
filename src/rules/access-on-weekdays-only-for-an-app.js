@@ -1,6 +1,6 @@
 /**
  * This rule is used to prevent access during weekends for a specific app.
- * 
+ *
  * @title Allow Access during weekdays for a specific App
  * @overview Prevent access to app during weekends.
  * @gallery true
