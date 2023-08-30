@@ -4,7 +4,7 @@ repository:
   name: rules
   owner: dx_extensibility
   lifecycle: deprecation
-  tier: Tier-2
+  tier: Tier-3
   language: Node.js
   tags:
   repositories:
