@@ -3,7 +3,7 @@ version: 1
 repository:
   name: rules
   owner: dx_extensibility
-  lifecycle: deprecation
+  lifecycle: general_availability
   tier: Tier-3
   language: Node.js
   tags:
