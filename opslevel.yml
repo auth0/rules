@@ -1,5 +1,13 @@
 ---
 version: 1
 repository:
+  name: rules
   owner: dx_extensibility
+  lifecycle: deprecation
+  tier: Tier-2
+  language: Node.js
   tags:
+  repositories:
+    - name: auth0/rules
+      path: /
+      provider: github
