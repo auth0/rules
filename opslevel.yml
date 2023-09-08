@@ -1,0 +1,13 @@
+---
+version: 1
+repository:
+  name: rules
+  owner: dx_extensibility
+  lifecycle: general_availability
+  tier: Tier-3
+  language: Node.js
+  tags:
+  repositories:
+    - name: auth0/rules
+      path: /
+      provider: github
