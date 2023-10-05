@@ -3,7 +3,7 @@
  * If the application the user is logging in to is SAML (like Salesforce for instance), you can customize the mapping between the Auth0 user and the SAML attributes.
  * Below you can see that we are mapping `user_id` to the NameID, `email` to `http://schemas.../emailaddress`, etc.
  *
- * For more information about SAML options, see the [SAML Configuration docs](https://docs.auth0.com/saml-configuration).
+ * For more information about SAML options, see the [SAML Configuration docs](https://auth0.com/docs/authenticate/protocols/saml/saml-configuration).
  *
  * @title SAML Attributes mapping
  * @overview In a SAML application customize the mapping between the Auth0 user and the SAML attributes
