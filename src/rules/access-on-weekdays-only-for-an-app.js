@@ -9,10 +9,11 @@
 
 function accessOnWeekdaysOnly(user, context, callback) {
   if (context.clientName === 'TheAppToCheckAccessTo') {
-    const date = new Date();
-    const d = date.getDay();
+    // Get the current day in US Central Time
+    const day = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago', weekday: 'long'});
 
-    if (d === 0 || d === 6) {
+    // Don't allow access on the weekend
+    if (!['Saturday', 'Sunday'].includes(day)) {
       return callback(
         new UnauthorizedError('This app is available during the week')
       );
