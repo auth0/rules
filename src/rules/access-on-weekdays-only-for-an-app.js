@@ -13,7 +13,7 @@ function accessOnWeekdaysOnly(user, context, callback) {
     const day = new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago', weekday: 'long'});
 
     // Don't allow access on the weekend
-    if (!['Saturday', 'Sunday'].includes(day)) {
+    if (['Saturday', 'Sunday'].includes(day)) {
       return callback(
         new UnauthorizedError('This app is available during the week')
       );
